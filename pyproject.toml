@@ -1,0 +1,7 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "api: calls the real Anthropic API (skipped by default; run with -m api)",
+    "docker: needs a running Docker daemon and the sandbox image",
+]
+addopts = "-m 'not api'"

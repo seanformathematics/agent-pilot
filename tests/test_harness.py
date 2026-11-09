@@ -1,0 +1,350 @@
+"""Harness and Agent behaviour against a fake client and fake sandbox."""
+
+import json
+import sys
+
+import anthropic
+import httpx2 as httpx
+import pytest
+
+from harness.agent import Agent
+from harness.harness import Harness
+from tests.conftest import FakeClient, entries_of, sent_to_model, text_reply, tool_call
+from tests.fixtures.dummy_logger import DummyLogger
+
+GOOD_SUBMISSION = {"total": 1555, "method_notes": "Summed with Python's sum()."}
+
+
+def run_agent(make_harness, responses, config=None):
+    harness, logger = make_harness(config=config)
+    client = FakeClient(responses)
+    agent = Agent("solver-0", client, harness)
+    harness.start_agent("solver-0")
+    outcome = agent.run(harness.task_for("solver-0"))
+    harness.stop_agent("solver-0")
+    return outcome, harness, logger, client
+
+
+# ----- the happy path and the record ------------------------------------
+
+def test_run_then_submit_is_accepted(make_harness):
+    outcome, harness, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(sum([1, 2]))"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert outcome == {"agent_id": "solver-0", "status": "submitted", "turns": 2}
+    assert harness.accepted_submissions == [
+        {"agent_id": "solver-0", "attempt": 1, "submission": GOOD_SUBMISSION}]
+    assert entries_of(logger, "flag") == []
+
+
+def test_every_agent_emission_appears_in_log(make_harness):
+    responses = [
+        tool_call("run_python", {"code": "print(1)"}, text="Let me compute."),
+        tool_call("submit_result", GOOD_SUBMISSION, text="Submitting."),
+    ]
+    expected_content = [r.to_dict()["content"] for r in responses]
+    _, _, logger, _ = run_agent(make_harness, responses)
+
+    logged = [e["data"]["response"]["content"] for e in entries_of(logger, "api_response")]
+    assert logged == expected_content
+
+    tool_ids = [block["id"] for content in expected_content for block in content if block["type"] == "tool_use"]
+    assert [e["data"]["tool_use_id"] for e in entries_of(logger, "tool_call")] == tool_ids
+    assert [e["data"]["tool_use_id"] for e in entries_of(logger, "tool_result")] == tool_ids
+
+
+def test_run_starts_with_config_and_system_prompts(make_harness):
+    _, harness, logger, _ = run_agent(make_harness, [tool_call("submit_result", GOOD_SUBMISSION)])
+    first, second = logger.entries[0], logger.entries[1]
+    assert first["kind"] == "run_start"
+    assert first["data"]["config"]["model"] == "claude-opus-5-5"
+    assert second["kind"] == "system_prompt"
+    assert second["data"]["text"] == harness.system_prompts["solver"]
+
+
+def test_task_is_logged_and_sent_first(make_harness):
+    _, harness, logger, client = run_agent(make_harness, [tool_call("submit_result", GOOD_SUBMISSION)])
+    task = harness.task_for("solver-0")
+    assert entries_of(logger, "task")[0]["data"]["text"] == task
+    assert client.calls[0]["messages"][0] == {"role": "user", "content": task}
+
+
+def test_execution_files_archived_and_hashed(make_harness):
+    _, harness, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    files = entries_of(logger, "execution")[0]["data"]["files"]
+    assert set(files) == {"solver-0-0001.py", "solver-0-0001.out", "solver-0-0001.err"}
+    for name, digest in files.items():
+        import hashlib
+        assert hashlib.sha256((harness.run_dir / "outputs" / "solver-0" / name).read_bytes()).hexdigest() == digest
+
+
+# ----- the conversation is built correctly ------------------------------
+
+def test_thinking_blocks_passed_back_unchanged(make_harness):
+    first = tool_call("run_python", {"code": "print(1)"})
+    _, _, _, client = run_agent(make_harness, [first, tool_call("submit_result", GOOD_SUBMISSION)])
+    assistant_turn = client.calls[1]["messages"][1]
+    assert assistant_turn == {"role": "assistant", "content": first.to_dict()["content"]}
+    assert assistant_turn["content"][0]["type"] == "thinking"
+
+
+def test_parallel_tool_calls_answered_in_one_message(make_harness):
+    from tests.conftest import make_message
+    two_calls = make_message([
+        {"type": "tool_use", "id": "toolu_a", "name": "run_python", "input": {"code": "print(1)"}},
+        {"type": "tool_use", "id": "toolu_b", "name": "run_python", "input": {"code": "fail"}},
+    ], "tool_use")
+    _, _, _, client = run_agent(make_harness, [two_calls, tool_call("submit_result", GOOD_SUBMISSION)])
+    results = client.calls[1]["messages"][2]
+    assert results["role"] == "user"
+    assert [(r["tool_use_id"], r["is_error"]) for r in results["content"]] == [("toolu_a", False), ("toolu_b", True)]
+
+
+def test_run_python_result_has_exact_keys(make_harness):
+    _, _, _, client = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])
+    assert list(result) == ["exit_code", "stdout", "stderr", "duration_s", "timed_out", "truncated"]
+
+
+def test_effort_and_model_come_from_config(make_harness):
+    _, _, _, client = run_agent(make_harness, [tool_call("submit_result", GOOD_SUBMISSION)])
+    call = client.calls[0]
+    assert call["model"] == "claude-opus-5-5"
+    assert call["output_config"] == {"effort": "low"}
+    assert call["max_tokens"] == 16000
+    assert [t["name"] for t in call["tools"]] == ["run_python", "submit_result"]
+
+
+# ----- rejected and malformed calls ------------------------------------
+
+def test_malformed_run_python_rejected_and_logged(make_harness):
+    _, _, logger, client = run_agent(make_harness, [
+        tool_call("run_python", {"source": "print(1)"}),  # wrong key
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    rejection = entries_of(logger, "rejection")[0]["data"]
+    assert "Invalid run_python input" in rejection["message"]
+    result = client.calls[1]["messages"][2]["content"][0]
+    assert result["is_error"] is True
+    assert entries_of(logger, "execution") == []
+
+
+def test_unknown_tool_rejected_and_logged(make_harness):
+    _, _, logger, client = run_agent(make_harness, [
+        tool_call("read_logs", {}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert entries_of(logger, "tool_call")[0]["data"]["name"] == "read_logs"
+    assert "Unknown or unavailable tool" in entries_of(logger, "rejection")[0]["data"]["message"]
+    assert client.calls[1]["messages"][2]["content"][0]["is_error"] is True
+
+
+def test_timeout_above_limit_rejected(make_harness):
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)", "timeout_s": 500}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert "exceeds the limit" in entries_of(logger, "rejection")[0]["data"]["message"]
+    assert entries_of(logger, "execution") == []
+
+
+# ----- submissions -------------------------------------------------------
+
+def test_submission_without_code_execution_is_flagged(make_harness):
+    _, harness, logger, _ = run_agent(make_harness, [tool_call("submit_result", GOOD_SUBMISSION)])
+    flags = entries_of(logger, "flag")
+    assert [f["data"]["reason"] for f in flags] == ["submit_without_successful_run"]
+    assert harness.accepted_submissions  # flagged, not blocked
+
+
+def test_submission_after_only_failed_execution_is_flagged(make_harness):
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "fail"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert [f["data"]["reason"] for f in entries_of(logger, "flag")] == ["submit_without_successful_run"]
+
+
+def test_invalid_submission_rejected_then_resubmitted(make_harness):
+    outcome, harness, logger, client = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", {"total": "lots"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert outcome["status"] == "submitted"
+    message = entries_of(logger, "rejection")[0]["data"]["message"]
+    assert "Invalid submission" in message and "Submissions remaining: 2" in message
+    assert harness.accepted_submissions == [
+        {"agent_id": "solver-0", "attempt": 2, "submission": GOOD_SUBMISSION}]
+
+
+def test_sanity_check_rejects_submission(make_harness):
+    _, harness, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "   "}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert "method_notes is empty" in entries_of(logger, "rejection")[0]["data"]["message"]
+    assert len(harness.accepted_submissions) == 1
+
+
+def test_submission_limit_enforced(make_harness):
+    bad = {"total": "x"}
+    outcome, harness, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", bad),
+        tool_call("submit_result", bad),
+        tool_call("submit_result", bad),
+        tool_call("submit_result", GOOD_SUBMISSION),
+        text_reply("I give up."),
+    ])
+    assert harness.accepted_submissions == []
+    assert "No submissions left" in entries_of(logger, "rejection")[-1]["data"]["message"]
+    assert outcome["status"] == "ended_turn_without_submission"
+
+
+# ----- stopping ----------------------------------------------------------
+
+def test_stops_when_model_ends_turn_without_tool(make_harness):
+    outcome, _, _, _ = run_agent(make_harness, [text_reply("Done, I think.")])
+    assert outcome["status"] == "ended_turn_without_submission"
+
+
+def test_stops_at_max_tokens_without_tool(make_harness):
+    outcome, _, _, _ = run_agent(make_harness, [text_reply("Long...", stop_reason="max_tokens")])
+    assert outcome["status"] == "max_tokens_without_tool_call"
+
+
+def test_stops_on_refusal(make_harness):
+    outcome, _, logger, _ = run_agent(make_harness, [text_reply("", stop_reason="refusal")])
+    assert outcome["status"] == "refusal"
+    assert entries_of(logger, "agent_end")[0]["data"]["status"] == "refusal"
+
+
+def test_turn_limit(make_harness, toy_config):
+    config = toy_config.model_copy(update={"limits": toy_config.limits.model_copy(update={"max_turns": 2})})
+    outcome, _, _, client = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"code": "print(2)"}),
+    ], config=config)
+    assert outcome == {"agent_id": "solver-0", "status": "turn_limit", "turns": 2}
+    assert len(client.calls) == 2
+
+
+def test_token_budget(make_harness, toy_config):
+    config = toy_config.model_copy(update={"limits": toy_config.limits.model_copy(update={"max_total_tokens": 200})})
+    outcome, harness, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),   # 150 tokens
+        tool_call("run_python", {"code": "print(2)"}),   # 300 tokens: over budget
+        tool_call("run_python", {"code": "print(3)"}),   # never requested
+    ], config=config)
+    assert outcome["status"] == "budget_exhausted"
+    assert harness.tokens_used == 300
+    assert [e["data"]["tokens_used"] for e in entries_of(logger, "budget")] == [150, 300]
+
+
+def api_status_error(cls, status: int, headers: dict | None = None):
+    request = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
+    response = httpx.Response(status, request=request, headers=headers or {})
+    return cls(f"HTTP {status}", response=response, body=None)
+
+
+def run_with_sleep_log(make_harness, responses, config=None):
+    harness, logger = make_harness(config=config)
+    waits = []
+    agent = Agent("solver-0", FakeClient(responses), harness, sleep=waits.append)
+    harness.start_agent("solver-0")
+    outcome = agent.run(harness.task_for("solver-0"))
+    return outcome, logger, waits
+
+
+def test_transient_error_retried_and_logged(make_harness):
+    outcome, logger, waits = run_with_sleep_log(make_harness, [
+        api_status_error(anthropic.InternalServerError, 529),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert outcome["status"] == "submitted"
+    assert outcome["turns"] == 1  # a retried call is one turn
+    error = entries_of(logger, "api_error")[0]["data"]
+    assert (error["attempt"], error["status_code"], error["will_retry"], error["wait_s"]) == (1, 529, True, 2)
+    assert waits == [2]
+
+
+def test_retries_exhausted_ends_agent(make_harness):
+    request = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
+    errors = [anthropic.APIConnectionError(request=request) for _ in range(3)]
+    outcome, logger, waits = run_with_sleep_log(make_harness, errors)
+    assert outcome["status"] == "api_error"
+    logged = [e["data"] for e in entries_of(logger, "api_error")]
+    assert [e["attempt"] for e in logged] == [1, 2, 3]
+    assert [e["will_retry"] for e in logged] == [True, True, False]
+    assert waits == [2, 4]
+
+
+def test_retry_after_header_respected(make_harness):
+    _, logger, waits = run_with_sleep_log(make_harness, [
+        api_status_error(anthropic.RateLimitError, 429, {"retry-after": "7"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert waits == [7.0]
+
+
+def test_bad_request_not_retried(make_harness):
+    outcome, logger, waits = run_with_sleep_log(make_harness, [
+        api_status_error(anthropic.BadRequestError, 400),
+    ])
+    assert outcome["status"] == "api_error"
+    assert entries_of(logger, "api_error")[0]["data"]["retryable"] is False
+    assert waits == []
+
+
+def test_client_with_sdk_retries_refused(make_harness):
+    harness, _ = make_harness()
+    client = FakeClient([])
+    client.max_retries = 2
+    with pytest.raises(ValueError, match="max_retries=0"):
+        Agent("solver-0", client, harness)
+
+
+def test_make_client_has_sdk_retries_off(monkeypatch):
+    from harness.agent import make_client
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key-not-real")
+    assert make_client().max_retries == 0
+
+
+# ----- isolation of the record from the agent --------------------------
+
+def test_no_log_content_reaches_the_model(make_harness):
+    _, harness, logger, client = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("read_logs", {}),
+        tool_call("submit_result", {"total": "bad"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    everything_sent = sent_to_model(client)
+    assert str(harness.run_dir) not in everything_sent
+    assert "log.jsonl" not in everything_sent
+    for entry in logger.entries:
+        assert entry["hash"] not in everything_sent
+    assert "prev_hash" not in everything_sent
+
+
+def test_analysis_not_imported_during_run(make_harness):
+    sys.modules.pop("tests.fixtures.toy_sum.analysis", None)
+    run_agent(make_harness, [tool_call("submit_result", GOOD_SUBMISSION)])
+    assert "tests.fixtures.toy_sum.analysis" not in sys.modules
+
+
+def test_work_root_must_not_overlap_run_dir(tmp_path, toy_config):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    logger = DummyLogger(run_dir / "log.jsonl")
+    with pytest.raises(ValueError, match="must not overlap"):
+        Harness(toy_config, run_dir, run_dir / "work", logger)

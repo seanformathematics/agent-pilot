@@ -1,0 +1,17 @@
+# Environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editors
+*.swp
+*.swo
+.DS_Store
+
+# Secrets: the API key comes from the environment only, never from files.
+.env
+
+# Sean's personal notes
+harness/TODO.md
+experiments/TODO.md
