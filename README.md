@@ -4,11 +4,11 @@ Controlled experiments **on** LLM agents doing computational physics. The
 physics is the testbed; the agents are the subject; the harness is the
 instrument.
 
-> **Status (2026-11-10):** M0, M1 and M2 done (tags `m0-harness-core`,
-> `m1-single-run`, `m2-hash-chain`): runs use Sean's hash-chained logger and
-> are checked by his verifier. **Next: M3**, the first live run: budget agreed, everything
-> is ready; it starts once `ANTHROPIC_API_KEY` is set (runbook in
-> MILESTONES.md). Full plan: [MILESTONES.md](MILESTONES.md). Lessons we are
+> **Status (2026-11-10):** M0–M3 done (tags `m0-harness-core`,
+> `m1-single-run`, `m2-hash-chain`, `m3-first-live-run`). The first live run
+> against the real API (`runs/2026-11-10_toy_sum_single_001`) completed,
+> verified and was committed. **Next: M4**, the `independent` topology. Full
+> plan: [MILESTONES.md](MILESTONES.md). Lessons we are
 > tracking: [LESSONS.md](LESSONS.md). Full rules: [CLAUDE.md](CLAUDE.md).
 
 **How to read this page:** §1 is the rules (read every time). §2 is how the

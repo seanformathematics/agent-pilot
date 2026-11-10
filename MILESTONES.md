@@ -152,7 +152,7 @@ Checkpoint: `m2-hash-chain`
 
 ---
 
-## M3 — First live run (toy experiment, real API)
+## M3 — First live run (toy experiment, real API) ✅
 
 Done when: one real `single` run of `toy_sum` completes, verifies, and is
 committed to `runs/`.
@@ -162,7 +162,7 @@ committed to `runs/`.
       project's key, and no more than ~5 live toy runs without checking in.
       Expected cost ~$0.10 per toy run (claude-opus-5-5, $4 / $20 per million
       input / output tokens); worst case ~$4–5, capped by `max_total_tokens`
-- [ ] **SEAN, blocking:** `ANTHROPIC_API_KEY` in your shell environment
+- [x] **SEAN, blocking:** `ANTHROPIC_API_KEY` in your shell environment
       (never in a file)
 - [x] One marked test that calls the real API, skipped by default:
       `tests/test_live_api.py` (runs into a temp folder, commits nothing)
@@ -171,10 +171,13 @@ committed to `runs/`.
       is created
 - [x] A fake key appears nowhere in a run folder, including log, outputs and
       workspace tar (`test_api_key_appears_nowhere_in_a_run_folder`)
-- [ ] Run it; read the log together; check `verify.py`, the index line and
-      the analysis result
-- [ ] Commit the run folder (the harness does this itself) and record the
-      token count and cost in LESSONS.md
+- [x] Run it; read the log together; check `verify.py`, the index line and
+      the analysis result. 2026-11-10: `2026-11-10_toy_sum_single_001`,
+      completed in 2 turns (`run_python`, then `submit_result`), verify ok,
+      analysis `estimate 1555, passed true`; key absent from the run folder
+- [x] Commit the run folder (the harness does this itself, commit
+      `5a4aa62`) and record the token count and cost in LESSONS.md (§3:
+      2,459 tokens, $0.0125; about 8× under the estimate)
 
 **Runbook for the first live session**
 

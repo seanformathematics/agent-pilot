@@ -63,3 +63,31 @@ code. Both are now set in the config (`tmp_mb`, `shm_mb`), so they are
 recorded in every run and identical across machines. Lesson: anything the
 environment decides silently is an uncontrolled variable; make it a config
 value.
+
+---
+
+## 3. What does a run cost, in tokens and money?
+
+**Why it matters.** Budgets are set in tokens (`max_total_tokens`) and
+agreed in dollars. Estimates made before any live run can be far off; the
+real numbers come from the `usage` field of every `api_response` entry in
+the log, and `tokens_used` in the index.
+
+**Measured so far** (claude-opus-5-5, effort `low`, $4 / $20 per million
+input / output tokens):
+
+| Run | Turns | Input | Output | Total | Cost |
+|-----|-------|-------|--------|-------|------|
+| smoke test (temp folder, not recorded), 2026-11-10 | 2 | — | — | 2,453 | ~$0.013 |
+| `2026-11-10_toy_sum_single_001` | 2 | 2,293 | 166 | 2,459 | $0.0125 |
+
+**First observation.** The pre-run estimate was ~$0.10 per toy run; the
+real cost is about 8× lower. Input dominates (~93% of tokens): every turn
+resends the system prompt, tool schemas and the history so far, so input
+grows with the number of turns. Ising runs will have many more turns and
+larger tool outputs, so expect cost to scale faster than linearly in turns.
+
+**Questions to answer as runs accumulate:**
+- How do tokens scale with turns, and with the size of tool results?
+- Would prompt caching (system prompt + tools) change the cost materially?
+- What `max_total_tokens` is right for an Ising run?
