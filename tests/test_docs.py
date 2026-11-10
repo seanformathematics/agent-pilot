@@ -6,6 +6,7 @@ longer exists. This test catches that.
 """
 
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -29,3 +30,24 @@ def test_every_file_in_claude_md_layout_exists():
     assert names
     for name in names:
         assert (ROOT / "harness" / name).exists(), f"CLAUDE.md layout lists harness/{name}, which does not exist"
+
+
+def git_attr(attr: str, path: str) -> str:
+    out = subprocess.run(["git", "check-attr", attr, "--", path], cwd=ROOT,
+                         capture_output=True, text=True, check=True).stdout
+    return out.rsplit(": ", 1)[1].strip()
+
+
+def test_run_records_are_never_line_ending_converted():
+    # Git on Windows can rewrite \n as \r\n on checkout. In runs/ that would
+    # change the bytes behind every SHA-256 in the log, so verify would report
+    # untouched outputs as altered. .gitattributes marks runs/ as not-text.
+    for path in ["runs/2026-01-01_x_single_001/log.jsonl",
+                 "runs/2026-01-01_x_single_001/outputs/agent_0/exec_001.out",
+                 "runs/index.jsonl"]:
+        assert git_attr("text", path) == "unset", path
+
+
+def test_code_and_prompts_check_out_with_unix_line_endings():
+    for path in ["harness/run.py", "tests/fixtures/toy_sum/config.yaml", "README.md"]:
+        assert git_attr("eol", path) == "lf", path

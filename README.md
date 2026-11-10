@@ -4,9 +4,10 @@ Controlled experiments **on** LLM agents doing computational physics. The
 physics is the testbed; the agents are the subject; the harness is the
 instrument.
 
-> **Status (2026-11-10):** M0 and M1 done (tags `m0-harness-core`,
-> `m1-single-run`). **Next: M2**, waiting on Sean's `logger.py` and
-> `verify.py`. Full plan: [MILESTONES.md](MILESTONES.md). Lessons we are
+> **Status (2026-11-10):** M0, M1 and M2 done (tags `m0-harness-core`,
+> `m1-single-run`, `m2-hash-chain`): runs use Sean's hash-chained logger and
+> are checked by his verifier. **Next: M3**, the first live run, waiting on
+> Sean's go-ahead and spending limit. Full plan: [MILESTONES.md](MILESTONES.md). Lessons we are
 > tracking: [LESSONS.md](LESSONS.md). Full rules: [CLAUDE.md](CLAUDE.md).
 
 **How to read this page:** §1 is the rules (read every time). §2 is how the
@@ -21,9 +22,9 @@ something.
 
 | # | Rule | Enforced by |
 |---|------|-------------|
-| 1 | **The harness owns all logging.** Agents can never read, write, skip or call the log. | Only the work dir is mounted; nothing from the log goes into a tool result. Tests: `test_log_and_output_directories_not_reachable`, `test_no_log_content_reaches_the_model` |
+| 1 | **The harness owns all logging.** Agents can never read, write, skip or call the log. | Nothing from the host is mounted into the container; the log lives only on the host, and nothing from it goes into a tool result. Tests: `test_log_and_output_directories_not_reachable`, `test_no_log_content_reaches_the_model` |
 | 2 | **Agents act only through harness tools.** Every call is validated and logged, including rejected and malformed ones. | `Harness.handle_tool_call` logs before doing anything. Tests: `test_malformed_run_python_rejected_and_logged`, `test_unknown_tool_rejected_and_logged` |
-| 3 | **`runs/` is immutable.** Never edit, delete, rename or regenerate. New runs only through the harness. | Run folders are created fresh and never reused; output files can't overwrite. Beyond that: discipline and git. |
+| 3 | **`runs/` is immutable.** Never edit, delete, rename or regenerate. New runs only through the harness. | Run folders are created fresh and never reused; output files can't overwrite. `verify.py` detects any later edit to the log or outputs (`tests/test_verify.py`, `test_tampered_copy_of_a_real_run_fails_verify`). `.gitattributes` stops git converting line endings in `runs/` (`test_run_records_are_never_line_ending_converted`). Beyond that: discipline and git. |
 | 4 | **Experiments are configs, not code changes.** If a run seems to need a harness edit, stop and ask Sean. | Discipline. |
 | 5 | **Never expose the known answer.** Not in prompts, configs, tool results or the sandbox. It lives only in the analysis code. | Analysis is imported only after the run; its results go to the index, never the log. Tests: `test_analysis_not_imported_until_run_ends`, `test_analysis_result_not_in_log`. Prompts and configs: Sean's care. |
 | 6 | **The API key never enters the container.** | Docker passes no host environment in. Test: `test_api_key_never_enters_container` |
@@ -40,9 +41,9 @@ something.
 | **After every call, list `/work`, `/tmp` and `/dev/shm`**: names, sizes, times, never contents. Nothing is wiped. | All three keep state between calls; only `/work` is archived. The listing makes hidden state visible (LESSONS.md §2). | `test_listing_covers_work_tmp_and_shm_without_contents`, `test_listing_shows_state_persisting_between_calls` |
 | **No processes outlive a `run_python` call.** | A leftover process could hang the harness or act between calls. | `test_background_processes_do_not_survive`, `test_detached_process_holding_stdout_does_not_hang`, `test_killed_processes_do_not_exhaust_process_limit` |
 | **Workspace archives are never auto-extracted.** Inspect the listing first. | An archive made in agent space can hold links and `../` paths. | The harness only reads tar headers (`inspect_archive`). |
-| **Nothing that can fail before a run creates a run folder.** | Run folders are permanent, so junk must never be created. | Config, files, imports, topology, logger trial write and clean tree are all checked first. Tests in `tests/test_run.py` |
-| **Clean git tree required to start, ignoring `runs/`.** | `commit.txt` must identify the exact code, prompts and config. `runs/` holds none of those. | `clean_commit`, tests in `tests/test_run.py`. *CLAUDE.md wording not yet updated (needs Sean's yes).* |
-| **Every run is committed to git the moment it ends**, including failed and aborted runs. Only that run's folder and `runs/index.jsonl` are committed; nothing else is staged. Nothing is pushed: **push yourself after each batch.** | The final hash sits beside the log, so until it is committed someone could rewrite both. A commit (and later a push) anchors the run outside its folder. | `test_every_run_is_committed_with_folder_and_index`, `test_commit_run_commits_only_the_run`. If the commit fails, the command says so and exits with an error. *CLAUDE.md still says "after each batch" (needs Sean's yes).* |
+| **Nothing that can fail before a run creates a run folder.** | Run folders are permanent, so junk must never be created. | Config, files, imports, topology, logger and verifier trial run and clean tree are all checked first. Tests in `tests/test_run.py` |
+| **Clean git tree required to start, ignoring `runs/`.** | `commit.txt` must identify the exact code, prompts and config. `runs/` holds none of those. | `clean_commit`, tests in `tests/test_run.py` |
+| **Every run is committed to git the moment it ends**, including failed and aborted runs. Only that run's folder and `runs/index.jsonl` are committed; nothing else is staged. Nothing is pushed: **push yourself after each batch.** | The final hash sits beside the log, so until it is committed someone could rewrite both. A commit (and later a push) anchors the run outside its folder. | `test_every_run_is_committed_with_folder_and_index`, `test_commit_run_commits_only_the_run`. If the commit fails, the command says so and exits with an error. |
 | **Analysis results go in the index only, never in the log.** | The log records what happened. Grading can be redone later without contradicting it. | `test_analysis_result_not_in_log` |
 | **No model fallback.** A refusal is logged and ends the agent. | A fallback would switch to a different LLM mid-run. | `harness/agent.py` sends no `fallbacks` parameter. |
 | **API retries happen in the harness, logged; SDK retries are off.** | Every failure and wait is in the record. | `test_client_with_sdk_retries_refused`, retry tests |
@@ -92,7 +93,7 @@ Experiment code is named in the config as `module.path:name`, for example
 | `Logger(path)` | Opens a new file (`"x"` mode) |
 | `append(agent, kind, data) -> str` | Positional arguments; `data` is a JSON-able dict; written and synced at once |
 | `close() -> str` | Called once per run, always; returns the final hash |
-| `verify(log_path, expected_final_hash) -> (ok, message)` | Checks the chain and the files in `log_path.parent / "outputs"` against their logged hashes |
+| `verify(log_path, expected_final_hash) -> (ok, problems)` | Checks the chain and the files in `log_path.parent / "outputs"` against their logged hashes. Returns **every** problem: `{"kind", "line", "detail"}` (+ `"file"`). Local checks, so one tampered line = one problem. Never raises. Spec: `tests/test_verify.py` |
 
 ### What an agent sees
 
@@ -122,8 +123,9 @@ runs/                              each run is committed to git when it ends
 
 Each index line has: run id, time, experiment, design, config, commit,
 topology, model, effort, number of agents, run status, each agent's status,
-accepted submissions, tokens, wall clock, final log hash, storage sizes,
-analysis result or analysis error. Verify result is added in M2.
+accepted submissions, tokens, wall clock, final log hash, verify result
+(`ok`, problem count, first 10 problems), storage sizes, analysis result or
+analysis error.
 
 ### Harness internals
 
@@ -169,7 +171,7 @@ analysis result or analysis error. Verify result is added in M2.
 
 | Step | Where | What happens | Log entries |
 |------|-------|--------------|-------------|
-| 1. Checks | harness | Validate config and referenced files; import submission model and checks; topology implemented; logger trial write; clean tree. **Fail here = no run folder.** | (none) |
+| 1. Checks | harness | Validate config and referenced files; import submission model and checks; topology implemented; logger and verifier trial run; clean tree. **Fail here = no run folder.** | (none) |
 | 2. Run folder | harness | Create folder; copy config and design; write commit | (none) |
 | 3. Setup | harness, docker | Create Logger and Harness; record image ID, Python versions, packages, SDK | `run_start`, `system_prompt` |
 | 4. Start agent | docker | Start this agent's container with an empty `/work` | `agent_start` |
@@ -178,7 +180,7 @@ analysis result or analysis error. Verify result is added in M2.
 | | | Repeat 5–6 until the agent ends | `api_error` (each failed attempt) |
 | 7. Agent ends | harness | Record how it ended | `agent_end` |
 | 8. Tidy up | docker, harness | Archive `/work`, inspect it, remove the container (which discards `/work`) | `workspace_archive` (or `workspace_archive_failed`), `container_stop` |
-| 9. Close | harness | Close the log; write final hash | `run_end` (or `run_error` before it) |
+| 9. Close | harness | Close the log; write final hash; run `verify` on the log and outputs | `run_end` (or `run_error` before it) |
 | 10. Grade | harness | Import analysis; call it; append the index line | (index only) |
 | 11. Commit | harness, git | Commit the run folder and the index line, nothing else; print the commit hash. Not pushed. | (git history) |
 

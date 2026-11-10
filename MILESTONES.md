@@ -104,13 +104,22 @@ Checkpoint: `m1-single-run`
 
 ---
 
-## M2 — Real logger and verifier
+## M2 — Real logger and verifier ✅
 
 Done when: the harness uses `harness/logger.py`, and `verify.py` passes on a
 real run log and fails on tampered copies.
 
-- [ ] **SEAN, blocking:** write `logger.py` and `verify.py`
-- [ ] **SEAN:** `verify.py` also rehashes every file in `outputs/` and compares
+- [x] **SEAN, blocking:** write `logger.py` and `verify.py`
+- [x] Contract for `verify` (agreed 2026-11-10): `verify(log_path,
+      expected_final_hash=None) -> (ok, problems)`. `problems` lists **every**
+      problem, each a dict with `kind`, `line` (1-based, or `None`) and
+      `detail`; file problems add `file` (relative to `outputs/`). Kinds:
+      `edited_entry`, `broken_link`, `unreadable_line`,
+      `incomplete_last_line`, `final_hash_mismatch`, `file_altered`,
+      `file_missing`, `file_extra`. Checks are local (each line against its
+      own hash and the previous line's *stored* hash), so one tampered line
+      is reported once. Never raises. Full spec: top of `tests/test_verify.py`
+- [x] **SEAN:** `verify.py` also rehashes every file in `outputs/` and compares
       with the hash recorded in the log, and reports files with no log entry
       (decided 2026-11-09). Where the hashes are recorded:
       - `execution` entries: `data.files` = `{file name: sha256}`, files in
@@ -119,13 +128,25 @@ real run log and fails on tampered copies.
       - `workspace_archive` entries: `data.file` + `data.sha256` (the tar), and
         `data.errors_file_sha256` for `<file>.err`, in `outputs/<agent>/`
       - the `agent` field of each entry names the `<agent>` folder
-- [ ] Tests for them (I write these): chain verifies; an edited entry is
-      detected; a deleted or reordered line is detected; a truncated log is
-      detected through the recorded final hash; a half-written last line is
-      detected; an altered, missing or extra file in `outputs/` is detected
-- [ ] Swap the dummy logger out of the run path (tests may keep it)
-- [ ] `verify.py` runs automatically at the end of every run; result logged
-      in the index
+- [x] Tests for them: `tests/test_verify.py` (15 tests, including lines
+      not in exact canonical form, e.g. a hidden duplicate key). They skip
+      until both files work, then run automatically. Checked for
+      consistency against a throwaway reference outside the repo
+- [x] Tamper trials on a real run folder: edited, missing, extra,
+      symlinked and CRLF-converted outputs; edited, garbage, half-written,
+      reformatted and deleted log lines. Each is reported as the right kind
+      at the right line; the untouched folder verifies clean
+- [x] `.gitattributes`: `\n` line endings everywhere, and `runs/` never
+      converted, so a Windows checkout can't make outputs look altered
+- [x] Swap the dummy logger out of the run path. The command line uses
+      `Logger`; the Docker end-to-end tests use the real logger and
+      verifier, and a tampered copy of that real run fails verify (unit
+      tests keep the dummy)
+- [x] `verify.py` runs automatically at the end of every run; the index
+      line gets `verify: {ok, problem_count, problems (first 10)}`. A crash or
+      malformed answer becomes a `verifier_error` problem. Before any run
+      folder exists, the logger and verifier get a trial run on a one-entry
+      scratch log, so an unfinished verifier is caught early
 
 Checkpoint: `m2-hash-chain`
 

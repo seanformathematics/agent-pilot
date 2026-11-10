@@ -17,8 +17,13 @@ def record_commit(run_dir, index_path, status):
     return f"commit-of-{run_dir.name}"
 
 
+def clean_verifier(log_path, expected_final_hash):
+    return True, []
+
+
 def toy_run(tmp_path, responses, config_path=TOY_CONFIG, logger_factory=DummyLogger,
-            sandbox_factory=FakeSandbox, client=None, commit_result=record_commit):
+            sandbox_factory=FakeSandbox, client=None, commit_result=record_commit,
+            verifier=clean_verifier):
     return run_experiment(
         config_path,
         client or FakeClient(responses),
@@ -27,6 +32,7 @@ def toy_run(tmp_path, responses, config_path=TOY_CONFIG, logger_factory=DummyLog
         runs_dir=tmp_path / "runs",
         get_commit=lambda: "abc123",
         commit_result=commit_result,
+        verifier=verifier,
     )
 
 
@@ -193,7 +199,8 @@ def test_dirty_tree_refused_before_run_folder(tmp_path):
 
     with pytest.raises(RuntimeError):
         run_experiment(TOY_CONFIG, FakeClient([]), DummyLogger, sandbox_factory=FakeSandbox,
-                       runs_dir=tmp_path / "runs", get_commit=dirty, commit_result=record_commit)
+                       runs_dir=tmp_path / "runs", get_commit=dirty, commit_result=record_commit,
+                       verifier=clean_verifier)
     assert not (tmp_path / "runs").exists()
 
 
@@ -304,3 +311,63 @@ def test_commit_run_commits_only_the_run(scratch_repo):
     status = subprocess.run(["git", "status", "--porcelain"], cwd=scratch_repo,
                             capture_output=True, text=True, check=True).stdout
     assert "code.py" in status  # still pending, not swept into the run commit
+
+
+# ----- the verifier ------------------------------------------------------------
+
+def test_verify_called_with_log_and_final_hash_and_recorded(tmp_path):
+    seen = []
+
+    def spy(log_path, expected_final_hash):
+        if log_path.name == "log.jsonl":
+            seen.append((log_path.parent.name, expected_final_hash))
+        return True, []
+
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)], verifier=spy)
+    assert seen == [(record["run_id"], record["final_log_hash"])]
+    assert record["verify"] == {"ok": True, "problem_count": 0, "problems": []}
+
+
+def test_many_problems_counted_first_few_kept(tmp_path):
+    problems = [{"kind": "edited_entry", "line": n, "detail": "hash mismatch"} for n in range(1, 151)]
+
+    def damaged(log_path, expected_final_hash):
+        if log_path.name == "check.jsonl":
+            return True, []  # the trial log is fine
+        return False, problems
+
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)], verifier=damaged)
+    assert record["verify"]["ok"] is False
+    assert record["verify"]["problem_count"] == 150
+    assert record["verify"]["problems"] == problems[:10]
+    assert record["status"] == "completed"  # how the run went and whether its record verifies are separate
+    assert record["git_commit"]             # a failed verification is still committed, as evidence
+
+
+def test_crashing_verifier_reported_as_a_problem(tmp_path):
+    def crashing(log_path, expected_final_hash):
+        if log_path.name == "check.jsonl":
+            return True, []
+        raise ValueError("boom")
+
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)], verifier=crashing)
+    assert record["verify"]["ok"] is False
+    assert record["verify"]["problems"][0]["kind"] == "verifier_error"
+
+
+def test_unimplemented_verifier_refused_before_run_folder(tmp_path):
+    def skeleton(log_path, expected_final_hash):
+        return None  # what `...` returns
+
+    with pytest.raises(RuntimeError, match="verifier rejected"):
+        toy_run(tmp_path, [], verifier=skeleton)
+    assert not (tmp_path / "runs").exists()
+
+
+def test_verifier_rejecting_clean_trial_log_refused(tmp_path):
+    def always_unhappy(log_path, expected_final_hash):
+        return False, [{"kind": "edited_entry", "line": 1, "detail": "?"}]
+
+    with pytest.raises(RuntimeError, match="verifier rejected"):
+        toy_run(tmp_path, [], verifier=always_unhappy)
+    assert not (tmp_path / "runs").exists()

@@ -32,6 +32,7 @@ tests/            Tests; tests/fixtures/toy_sum/ is the toy experiment for harne
 README.md         At a glance: rules, interfaces, architecture
 MILESTONES.md     Plan and checkpoints
 LESSONS.md        Meta-lessons about running agent experiments
+.gitattributes    Line endings: \n everywhere; runs/ is never converted (its hashes must match)
 ```
 
 ## Invariants — never violate these

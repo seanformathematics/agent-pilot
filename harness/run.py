@@ -7,7 +7,7 @@ In order:
   1. Validate the config and everything it points to: prompt files, design,
      submission model, sanity checks. A bad config fails here, before any
      run folder exists. The analysis code is NOT imported yet.
-     The logger gets a trial write to a scratch file.
+     The logger and verifier get a trial run on a scratch log.
   2. Refuse to start unless the git tree is clean (ignoring runs/), so the
      commit identifies the exact code, prompts, design and config.
   3. Create runs/<date>_<experiment>_<topology>_<nnn>/ holding exact copies
@@ -16,6 +16,7 @@ In order:
      sandbox packages, SDK version, then every system prompt.
   5. Run the topology. Whatever happens (success, error, Ctrl-C) the
      containers are stopped, the log is closed and its final hash written.
+     Then verify.py checks the log and the output files.
   6. After the log is closed: import the analysis entry point and call it
      with the accepted submissions, then append one line to runs/index.jsonl.
      This happens for failed and aborted runs too.
@@ -47,6 +48,9 @@ from harness.config import REPO_ROOT, load_config, load_object, repo_path
 from harness.harness import Harness
 from harness.sandbox import Sandbox
 from harness.topologies import TOPOLOGIES
+from harness.verify import verify
+
+MAX_PROBLEMS_IN_INDEX = 10
 
 RUNS_DIR = REPO_ROOT / "runs"
 
@@ -82,17 +86,43 @@ def clean_commit(repo: Path = REPO_ROOT) -> str:
     ).stdout.strip()
 
 
-def check_logger(logger_factory) -> None:
-    """Make sure the logger really writes, using a scratch file, before any
-    run folder exists. A run folder can never be deleted, so a broken logger
-    must be caught first."""
-    with tempfile.TemporaryDirectory(prefix="residency-logger-check-") as scratch:
+def check_record_keepers(logger_factory, verifier) -> None:
+    """Trial-run the logger and verifier on a scratch log before any run
+    folder exists. A run folder can never be deleted, so a broken logger or
+    verifier must be caught first. A one-entry log must verify cleanly."""
+    with tempfile.TemporaryDirectory(prefix="residency-record-check-") as scratch:
         path = Path(scratch) / "check.jsonl"
         logger = logger_factory(path)
         logger.append("harness", "logger_check", {})
-        logger.close()
+        final_hash = logger.close()
         if not path.exists() or path.stat().st_size == 0:
             raise RuntimeError("the logger wrote nothing; is harness/logger.py implemented?")
+        result = run_verifier(verifier, path, final_hash)
+        if not result["ok"]:
+            raise RuntimeError(f"the verifier rejected a clean one-entry trial log: {result['problems']}")
+
+
+def run_verifier(verifier, log_path: Path, final_hash: str) -> dict:
+    """Call verify.py and summarise its answer for the index.
+
+    verify(log_path, expected_final_hash) must return (ok, problems), where
+    problems is a list of dicts with at least "kind", "line" and "detail".
+    A crash or a malformed answer is itself reported as a problem.
+    """
+    try:
+        answer = verifier(log_path, final_hash)
+        if not (isinstance(answer, tuple) and len(answer) == 2
+                and isinstance(answer[0], bool) and isinstance(answer[1], list)):
+            raise TypeError(f"verify must return (ok, problems); got {answer!r}")
+        ok, problems = answer
+    except Exception as error:
+        ok = False
+        problems = [{"kind": "verifier_error", "line": None, "detail": f"{type(error).__name__}: {error}"}]
+    return {
+        "ok": ok and not problems,
+        "problem_count": len(problems),
+        "problems": problems[:MAX_PROBLEMS_IN_INDEX],
+    }
 
 
 def create_run_dir(runs_dir: Path, experiment: str, topology: str) -> Path:
@@ -180,22 +210,23 @@ def run_experiment(
     runs_dir: Path = RUNS_DIR,
     get_commit=clean_commit,
     commit_result=commit_run,
+    verifier=verify,
 ) -> dict:
     """Run one config end to end.
 
     Returns the line written to runs/index.jsonl, plus "git_commit" (the hash
     of the commit holding the run) or "git_commit_error".
 
-    ``logger_factory``, ``sandbox_factory``, ``get_commit`` and
-    ``commit_result`` are passed in so tests can supply fakes; the command
-    line always uses the real ones.
+    ``logger_factory``, ``sandbox_factory``, ``get_commit``,
+    ``commit_result`` and ``verifier`` are passed in so tests can supply
+    fakes; the command line always uses the real ones.
     """
     config_path = Path(config_path).resolve()
     config_label = (str(config_path.relative_to(REPO_ROOT))
                     if config_path.is_relative_to(REPO_ROOT) else str(config_path))
     config = load_config(config_path)
     check_config_files(config)
-    check_logger(logger_factory)
+    check_record_keepers(logger_factory, verifier)
     commit = get_commit()
 
     run_dir = create_run_dir(Path(runs_dir), config.experiment, config.topology)
@@ -243,6 +274,8 @@ def run_experiment(
         final_hash = logger.close()
         (run_dir / "final_hash.txt").write_text(f"{final_hash}\n")
 
+    verification = run_verifier(verifier, run_dir / "log.jsonl", final_hash)
+
     submissions = harness.accepted_submissions if harness else []
     record = {
         "run_id": run_dir.name,
@@ -261,6 +294,7 @@ def run_experiment(
         "tokens_used": tokens_used,
         "wall_clock_s": wall_clock_s,
         "final_log_hash": final_hash,
+        "verify": verification,
         "storage_bytes": {
             "log": (run_dir / "log.jsonl").stat().st_size,
             "outputs": directory_bytes(run_dir / "outputs"),
@@ -296,12 +330,17 @@ def main(argv: list[str]) -> int:
     print(f"tokens:     {record['tokens_used']}   wall clock: {record['wall_clock_s']} s")
     print(f"final hash: {record['final_log_hash']}")
     print(f"folder:     {RUNS_DIR / record['run_id']}")
+    verification = record["verify"]
+    if verification["ok"]:
+        print("verify:     ok")
+    else:
+        print(f"VERIFY FAILED: {verification['problem_count']} problem(s); first: {verification['problems'][:3]}")
     if record["git_commit"]:
         print(f"committed:  {record['git_commit']}  (not pushed)")
     else:
         print(f"NOT COMMITTED: {record['git_commit_error']}")
         print("              commit the run folder and runs/index.jsonl by hand.")
-    return 0 if record["status"] == "completed" and record["git_commit"] else 1
+    return 0 if record["status"] == "completed" and verification["ok"] and record["git_commit"] else 1
 
 
 if __name__ == "__main__":

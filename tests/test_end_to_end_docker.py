@@ -1,15 +1,18 @@
-"""A full single-agent run of the toy experiment: fake model, real container."""
+"""A full single-agent run of the toy experiment: fake model, real container,
+real logger and real verifier."""
 
 import json
+import shutil
 import subprocess
 import tarfile
 
 import pytest
 
+from harness.logger import Logger
 from harness.run import run_experiment
 from harness.sandbox import Sandbox
 from tests.conftest import TOY_CONFIG, FakeClient, tool_call
-from tests.fixtures.dummy_logger import DummyLogger
+from harness.verify import verify
 
 IMAGE = "residency-sandbox:py3.14"
 
@@ -35,11 +38,12 @@ def test_toy_run_end_to_end(tmp_path):
             "print(total)\n")}),
         tool_call("submit_result", {"total": 1555, "method_notes": "sum() in Python."}),
     ])
-    record = run_experiment(TOY_CONFIG, client, DummyLogger, sandbox_factory=Sandbox,
+    record = run_experiment(TOY_CONFIG, client, Logger, sandbox_factory=Sandbox,
                             runs_dir=tmp_path / "runs", get_commit=lambda: "abc123",
                             commit_result=lambda run_dir, index_path, status: "not-a-real-commit")
 
     assert record["status"] == "completed"
+    assert record["verify"] == {"ok": True, "problem_count": 0, "problems": []}
     assert record["analysis"] == {"estimate": 1555, "passed": True}
 
     tool_result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])
@@ -57,3 +61,21 @@ def test_toy_run_end_to_end(tmp_path):
     assert {"kind": "container_stop", "data": {"workspace_archived": True}}.items() <= \
         next(e for e in log if e["kind"] == "container_stop").items()
     assert record["storage_bytes"]["workspace_archives"]["solver-0"] > 0
+
+
+def test_tampered_copy_of_a_real_run_fails_verify(tmp_path):
+    client = FakeClient([
+        tool_call("run_python", {"code": "print(1555)\n"}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "printed it."}),
+    ])
+    record = run_experiment(TOY_CONFIG, client, Logger, sandbox_factory=Sandbox,
+                            runs_dir=tmp_path / "runs", get_commit=lambda: "abc123",
+                            commit_result=lambda run_dir, index_path, status: "not-a-real-commit")
+    assert record["verify"]["ok"]
+
+    copy = tmp_path / "copy"
+    shutil.copytree(tmp_path / "runs" / record["run_id"], copy)
+    (copy / "outputs" / "solver-0" / "solver-0-0001.out").write_text("1554\n")
+    ok, problems = verify(copy / "log.jsonl", record["final_log_hash"])
+    assert not ok
+    assert [(p["kind"], p["file"]) for p in problems] == [("file_altered", "solver-0/solver-0-0001.out")]

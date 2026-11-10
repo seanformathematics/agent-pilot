@@ -1,0 +1,6 @@
+# Line endings: store and check out text as \n on every platform.
+* text=auto eol=lf
+
+# Run records are tamper-evident: their SHA-256 hashes are in the log.
+# Never convert their line endings, or every hash would look altered.
+runs/** -text
