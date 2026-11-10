@@ -198,7 +198,7 @@ Checkpoint: `m3-first-live-run`
 
 ---
 
-## M4 — `independent` topology
+## M4 — `independent` topology ✅
 
 Done when: n fresh single-agent runs of one config each have their own
 harness, container and log, cannot see each other, and are recorded as one
@@ -227,11 +227,20 @@ run folder with one index line.
       tests in `tests/test_independent.py` and a real-Docker end-to-end test
       showing agents can't see each other's `/work` or `/tmp`
 - [x] CLAUDE.md "Runs" and README updated (Sean approved 2026-11-10)
-- [ ] One live independent toy run (~4¢); read it together
-- [ ] Re-verify invariants, tag
-
-Later, if wanted: run agents in parallel (now sequential: simplest, and
-the record is easier to read).
+- [x] One live independent toy run: `2026-11-10_toy_sum_independent_001`
+      (harness commit `f63fc68`). All three agents submitted 1555 in 2
+      turns; verify and `verify_independent` clean; key absent; 7,379
+      tokens, $0.0375 (LESSONS.md §3)
+- [x] `batch_end` field renamed `agent_run_statuses` (it holds each agent's
+      run status, not the agent's own status as `agent_statuses` does in the
+      index). Applies to runs after `2026-11-10_toy_sum_independent_001`
+- [x] Sean read the log (2026-11-10). His one question: agents ran in
+      sequence. Decided: **sequential is preferred for now**. It gives no
+      channel between agents, and every agent gets the same machine, so
+      timing (e.g. whether code finishes before its timeout) never depends on
+      how many other agents are running. Parallel runs stay possible; see
+      "Later"
+- [x] Re-verify invariants, tag
 
 Checkpoint: `m4-independent`
 
@@ -258,6 +267,25 @@ Checkpoint: `m5-ising-ready`
 - `one_shot` and `hierarchical` topologies. `hierarchical` needs design
   decisions from SEAN first: message routing, round limits, what a supervisor
   can see.
+- **Parallel independent agents** (when wall-clock time matters, e.g. long
+  Ising runs). A config setting such as `max_parallel` (default 1, so it is
+  recorded in every run) and each container pinned to its own CPUs
+  (`--cpuset-cpus`), so agents never compete for CPU. Work: Ctrl-C and error
+  handling across agents running at once. Memory bounds it: on the laptop
+  (8 CPUs, 8 GB for Docker, 2 GB per container) about three at once.
+- **Run on EC2** (when the laptop isn't enough). The harness is plain
+  Python plus Docker and moves unchanged; one large instance with pinned
+  CPUs is the simple route (one instance per agent is much more work).
+  Needs care:
+  1. The machine is part of the experiment: log instance type, CPU model
+     and core count; prefer a dedicated instance (no noisy neighbours).
+  2. CPU architecture (x86 vs Graviton ARM) can change numpy results in the
+     last digits; a rebuilt image is an experimental change anyway. Pick
+     one and keep it for all of Phase 1.
+  3. The API key reaches the instance's environment without touching disk
+     (e.g. AWS Secrets Manager at launch), never in a setup script.
+  4. Run commits made on EC2 must get back to the repo (push with a deploy
+     key, or copy the commits back).
 - Idea (2026-11-10): in `hierarchical`, let the supervisor allocate token
   budgets to workers within a hard total from the config. The harness
   enforces both the total and each allocation; the allocations are logged,

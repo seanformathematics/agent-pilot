@@ -4,11 +4,11 @@ Controlled experiments **on** LLM agents doing computational physics. The
 physics is the testbed; the agents are the subject; the harness is the
 instrument.
 
-> **Status (2026-11-10):** M0–M3 done (tags `m0-harness-core`,
-> `m1-single-run`, `m2-hash-chain`, `m3-first-live-run`). The first live run
-> against the real API (`runs/2026-11-10_toy_sum_single_001`) completed,
-> verified and was committed. **In progress: M4**, the `independent`
-> topology: built and tested, waiting on its first live run. Full plan: [MILESTONES.md](MILESTONES.md). Lessons we are
+> **Status (2026-11-10):** M0–M4 done (tags `m0-harness-core`,
+> `m1-single-run`, `m2-hash-chain`, `m3-first-live-run`, `m4-independent`):
+> live `single` and `independent` toy runs completed, verified and were
+> committed. **Next: M5**, Ising readiness, which waits on Sean's
+> `experiments/ising/`. Full plan: [MILESTONES.md](MILESTONES.md). Lessons we are
 > tracking: [LESSONS.md](LESSONS.md). Full rules: [CLAUDE.md](CLAUDE.md).
 
 **How to read this page:** §1 is the rules (read every time). §2 is how the

@@ -375,7 +375,7 @@ def run_independent(config, run_dir: Path, client, logger_factory, sandbox_facto
         try:
             batch.append("harness", "batch_end", {
                 "status": status,
-                "agent_statuses": {a: r["status"] for a, r in agent_runs.items()},
+                "agent_run_statuses": {a: r["status"] for a, r in agent_runs.items()},
                 "tokens_used": sum(r["tokens_used"] for r in agent_runs.values()),
             })
         except Exception:

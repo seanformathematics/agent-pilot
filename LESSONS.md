@@ -80,12 +80,19 @@ input / output tokens):
 |-----|-------|-------|--------|-------|------|
 | smoke test (temp folder, not recorded), 2026-11-10 | 2 | — | — | 2,453 | ~$0.013 |
 | `2026-11-10_toy_sum_single_001` | 2 | 2,293 | 166 | 2,459 | $0.0125 |
+| `2026-11-10_toy_sum_independent_001` (3 agents) | 2 each | 6,879 | 500 | 7,379 | $0.0375 |
 
 **First observation.** The pre-run estimate was ~$0.10 per toy run; the
 real cost is about 8× lower. Input dominates (~93% of tokens): every turn
 resends the system prompt, tool schemas and the history so far, so input
 grows with the number of turns. Ising runs will have many more turns and
 larger tool outputs, so expect cost to scale faster than linearly in turns.
+
+**Independent runs scale linearly, as expected.** Three agents cost three
+single runs (2,459–2,460 tokens each); nothing is shared between them, so
+there is no saving and no overhead. On a trivial task the three agents
+wrote identical code and gave identical answers; spread between agents
+only becomes informative on harder tasks.
 
 **Questions to answer as runs accumulate:**
 - How do tokens scale with turns, and with the size of tool results?

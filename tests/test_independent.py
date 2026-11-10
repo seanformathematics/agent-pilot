@@ -93,6 +93,7 @@ def test_batch_log_records_each_agents_final_hash(finished):
     for entry, agent in zip(entries[1:4], AGENTS):
         assert entry["data"]["agent_id"] == agent
         assert entry["data"]["final_log_hash"] == (run_dir / agent / "final_hash.txt").read_text().strip()
+    assert entries[-1]["data"]["agent_run_statuses"] == {a: "completed" for a in AGENTS}
 
 
 def test_each_agent_log_is_a_complete_record_of_that_agent_only(finished):
