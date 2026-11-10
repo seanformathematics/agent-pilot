@@ -32,6 +32,10 @@ Each run_python call:
      kills leftover processes again from a separate docker exec
   5. builds what the agent sees from the saved head and the rolling tail,
      capped at output_cap (head and tail kept, truncation noted)
+  6. lists every writable place the agent can keep things (/work, /tmp,
+     /dev/shm): type, size, modification time and path, never contents.
+     `find` runs inside the container and streams the listing out, so the
+     host still never reads /work. Saved as <exec_id>.files.jsonl
 
 When the agent has ended (see Harness.stop_agent):
   1. archive_workspace: `tar` runs inside the container, as the agent user,
@@ -49,6 +53,7 @@ time limit; 137 means it was SIGKILLed, either because it ignored SIGTERM for
 5 more seconds, or because it hit the memory limit.
 """
 
+import json
 import os
 import re
 import stat
@@ -68,6 +73,9 @@ EXEC_ID_PATTERN = re.compile(r"[A-Za-z0-9_-]+")
 ARCHIVE_CHUNK_BYTES = 1 << 20  # read the tar stream 1 MiB at a time
 ARCHIVE_TIMEOUT_S = 300
 MAX_FLAGGED_MEMBERS = 100  # how many flagged archive entries to list in the log
+SCRATCH_DIRS = ("/work", "/tmp", "/dev/shm")  # everywhere the agent can write
+LISTING_MAX_BYTES = 5 * 1024 * 1024  # raw `find` output read per listing
+LISTING_TIMEOUT_S = 60
 
 # PID 1 inside the container. Ignoring SIGCHLD tells the kernel to reap
 # finished child processes automatically, so killed processes never pile up
@@ -226,6 +234,8 @@ class Sandbox:
         reason = classify_exit(exit_code, duration_s, timeout_s, host_timeout)
         stdout, stdout_truncated = agent_view(stdout_path, out_stats, self.output_cap)
         stderr, stderr_truncated = agent_view(stderr_path, err_stats, self.output_cap)
+        listing_path = output_dir / f"{exec_id}.files.jsonl"
+        filesystem = self.list_scratch_dirs(listing_path)
 
         result = {
             "exit_code": exit_code,
@@ -246,8 +256,40 @@ class Sandbox:
             "stderr_stored_bytes": err_stats["stored"],
             "storage_truncated": (out_stats["stored"] < out_stats["total"]
                                   or err_stats["stored"] < err_stats["total"]),
+            "listing_path": str(listing_path),
+            "filesystem": filesystem,
         }
         return result, details
+
+    def list_scratch_dirs(self, listing_path: Path) -> dict:
+        """Write a listing of /work, /tmp and /dev/shm to ``listing_path``.
+
+        One JSON line per entry: dir, path, type (f file, d directory,
+        l symlink, p pipe, s socket), bytes, mtime (seconds since 1970).
+        Never contents. Returns a short summary for the log.
+        """
+        command = ["docker", "exec", self.container_id, "find", *SCRATCH_DIRS, "-mindepth", "1",
+                   "-printf", "%y\\t%s\\t%T@\\t%p\\0"]
+        raw, truncated, exit_code = read_command_output(command, LISTING_MAX_BYTES, LISTING_TIMEOUT_S)
+        if truncated:
+            raw = raw[: raw.rfind(b"\0") + 1]  # drop the last, partial entry
+
+        summary = {d: {"entries": 0, "files": 0, "file_bytes": 0} for d in SCRATCH_DIRS}
+        with create_new_file(listing_path) as f:
+            for item in raw.split(b"\0"):
+                parts = item.split(b"\t", 3)
+                if len(parts) != 4:
+                    continue
+                kind, size, mtime, path = (part.decode("utf-8", errors="surrogateescape") for part in parts)
+                top = next((d for d in SCRATCH_DIRS if path == d or path.startswith(d + "/")), None)
+                record = {"dir": top, "path": path, "type": kind, "bytes": int(size), "mtime": float(mtime)}
+                f.write((json.dumps(record) + "\n").encode("utf-8"))
+                if top:
+                    summary[top]["entries"] += 1
+                    if kind == "f":
+                        summary[top]["files"] += 1
+                        summary[top]["file_bytes"] += int(size)
+        return {"dirs": summary, "listing_truncated": truncated, "find_exit_code": exit_code}
 
     def archive_workspace(self, archive_path: Path, max_bytes: int) -> dict:
         """Stream a tar of /work into ``archive_path``, stopping at ``max_bytes``.
@@ -347,6 +389,35 @@ class Sandbox:
             check=False,
             timeout=HOST_MARGIN_S,
         )
+
+
+def read_command_output(command: list[str], max_bytes: int, timeout_s: float) -> tuple[bytes, bool, int]:
+    """Run a command and read at most ``max_bytes`` of its stdout.
+
+    Returns ``(output, truncated, exit_code)``. Stops the command if it
+    produces more, or runs longer than ``timeout_s``. Memory stays bounded.
+    """
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    timer = threading.Timer(timeout_s, process.kill)
+    timer.start()
+    chunks = []
+    received = 0
+    truncated = False
+    try:
+        while chunk := process.stdout.read(STREAM_CHUNK_BYTES):
+            room = max_bytes - received
+            if len(chunk) > room:
+                chunks.append(chunk[:room])
+                truncated = True
+                process.kill()
+                break
+            chunks.append(chunk)
+            received += len(chunk)
+    finally:
+        timer.cancel()
+        process.stdout.close()
+        exit_code = process.wait()
+    return b"".join(chunks), truncated, exit_code
 
 
 def drain_stream(pipe, file, store_limit: int, tail_bytes: int, stats: dict) -> None:

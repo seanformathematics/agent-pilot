@@ -11,6 +11,7 @@ contains log contents, log paths or hashes.
 
 import hashlib
 import json
+import math
 import subprocess
 from pathlib import Path
 
@@ -19,6 +20,12 @@ from pydantic import ValidationError
 from harness import tools
 from harness.config import RunConfig, load_object, repo_path
 from harness.sandbox import Sandbox, inspect_archive
+
+NON_FINITE_MESSAGE = (
+    "Submission not accepted: these fields are NaN or infinite: {fields}. "
+    "Non-finite numbers are not accepted. If the quantity diverges or is "
+    "undefined, report that the way the submission schema provides."
+)
 
 SUBMIT_RESULT_DESCRIPTION = (
     "Submit your final result. The input is checked and you get either an "
@@ -252,6 +259,7 @@ class Harness:
             "stderr_bytes": details["stderr_bytes"],
             "stdout_stored_bytes": details["stdout_stored_bytes"],
             "stderr_stored_bytes": details["stderr_stored_bytes"],
+            "filesystem": details["filesystem"],  # summary; full listing is the .files.jsonl
             "files": hash_execution_files(details),
         })
         if details["storage_truncated"]:
@@ -280,15 +288,23 @@ class Harness:
         except ValidationError as error:
             return self._reject_submission(agent_id, tool_use_id, attempt, f"Invalid submission:\n{error}")
 
+        # NaN and infinity can't be written to a valid JSON log, and Pydantic
+        # turns the strings "NaN" or "inf" into those values without complaint.
+        bad_fields = non_finite_fields(submission.model_dump())
+        if bad_fields:
+            text = NON_FINITE_MESSAGE.format(fields=", ".join(bad_fields))
+            return self._reject_submission(agent_id, tool_use_id, attempt, text)
+
         problems = self.sanity_checks(submission, self.task_for(agent_id)) if self.sanity_checks else []
         if problems:
             text = "Submission not accepted:\n" + "\n".join(f"- {p}" for p in problems)
             return self._reject_submission(agent_id, tool_use_id, attempt, text)
 
-        record = {"agent_id": agent_id, "attempt": attempt, "submission": submission.model_dump()}
+        record = {"agent_id": agent_id, "attempt": attempt, "submission": submission.model_dump(mode="json")}
+        # Log first: a submission counts as accepted only once it is in the log.
+        self.log(agent_id, "submission_accepted", record)
         self.accepted_submissions.append(record)
         self._done.add(agent_id)
-        self.log(agent_id, "submission_accepted", record)
         return "Submission accepted.", False
 
     def _reject_submission(self, agent_id, tool_use_id, attempt, text) -> tuple[str, bool]:
@@ -311,11 +327,24 @@ class Harness:
             raise ValueError(f"work_root {self.work_root} must not overlap run_dir {self.run_dir}")
 
 
+def non_finite_fields(value, path: str = "") -> list[str]:
+    """Names of every NaN or infinite float inside nested dicts and lists."""
+    if isinstance(value, float) and not math.isfinite(value):
+        return [path or "(value)"]
+    if isinstance(value, dict):
+        return [name for key, item in value.items()
+                for name in non_finite_fields(item, f"{path}.{key}" if path else str(key))]
+    if isinstance(value, (list, tuple)):
+        return [name for index, item in enumerate(value)
+                for name in non_finite_fields(item, f"{path}[{index}]")]
+    return []
+
+
 def hash_execution_files(details: dict) -> dict:
-    """``{file name: sha256}`` for the .py/.out/.err of one execution."""
+    """``{file name: sha256}`` for the .py/.out/.err/.files.jsonl of one execution."""
     return {
         Path(details[key]).name: sha256_file(Path(details[key]))
-        for key in ("script_path", "stdout_path", "stderr_path")
+        for key in ("script_path", "stdout_path", "stderr_path", "listing_path")
     }
 
 

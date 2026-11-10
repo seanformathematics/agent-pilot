@@ -76,7 +76,7 @@ def test_execution_files_archived_and_hashed(make_harness):
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     files = entries_of(logger, "execution")[0]["data"]["files"]
-    assert set(files) == {"solver-0-0001.py", "solver-0-0001.out", "solver-0-0001.err"}
+    assert set(files) == {"solver-0-0001.py", "solver-0-0001.out", "solver-0-0001.err", "solver-0-0001.files.jsonl"}
     for name, digest in files.items():
         import hashlib
         assert hashlib.sha256((harness.run_dir / "outputs" / "solver-0" / name).read_bytes()).hexdigest() == digest
@@ -364,3 +364,74 @@ def test_workspace_archived_after_agent_ends_then_deleted(make_harness):
     assert hashlib.sha256(path.read_bytes()).hexdigest() == archive["sha256"]
     assert archive["contents"]["members"] == 1
     assert not (harness.work_root / "solver-0").exists()
+
+
+# ----- non-finite numbers in submissions -----------------------------------
+
+from tests.conftest import make_message
+
+
+def config_with_submission_model(toy_config, ref):
+    return toy_config.model_copy(update={"submission_model": ref, "sanity_checks": None})
+
+
+@pytest.mark.parametrize("bad", ["NaN", "nan", "Infinity", "-inf"])
+def test_non_finite_submission_rejected_and_logged(make_harness, toy_config, bad):
+    config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:ValueSubmission")
+    outcome, harness, logger, client = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", {"value": bad}),
+        tool_call("submit_result", {"value": 2.5}),
+    ], config=config)
+    rejection = entries_of(logger, "rejection")[0]["data"]["message"]
+    assert "NaN or infinite: value" in rejection
+    assert "Submissions remaining: 2" in rejection
+    assert entries_of(logger, "tool_call")[1]["data"]["input"] == {"value": bad}  # raw input kept
+    assert harness.accepted_submissions == [
+        {"agent_id": "solver-0", "attempt": 2, "submission": {"value": 2.5, "samples": []}}]
+    assert outcome["status"] == "submitted"
+
+
+def test_non_finite_inside_a_list_is_named(make_harness, toy_config):
+    config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:ValueSubmission")
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", {"value": 1.0, "samples": [1.0, "inf"]}),
+        text_reply("ok"),
+    ], config=config)
+    assert "samples[1]" in entries_of(logger, "rejection")[0]["data"]["message"]
+
+
+def test_divergence_reported_through_schema_flag(make_harness, toy_config):
+    config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:DivergenceAwareSubmission")
+    _, harness, _, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", {"is_finite": False}),
+    ], config=config)
+    assert harness.accepted_submissions[0]["submission"] == {"is_finite": False, "value": None}
+
+
+def test_finite_float_type_rejects_nan_at_validation(make_harness, toy_config):
+    config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:DivergenceAwareSubmission")
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", {"is_finite": True, "value": "NaN"}),
+        text_reply("ok"),
+    ], config=config)
+    assert "finite number" in entries_of(logger, "rejection")[0]["data"]["message"]
+
+
+def test_submission_counts_only_once_logged(make_harness):
+    harness, logger = make_harness()
+
+    def refuse_submissions(agent, kind, data, original=logger.append):
+        if kind == "submission_accepted":
+            raise ValueError("logger refused the entry")
+        return original(agent, kind, data)
+
+    logger.append = refuse_submissions
+    harness.start_agent("solver-0")
+    with pytest.raises(ValueError):
+        harness.handle_tool_call("solver-0", "toolu_x", "submit_result", GOOD_SUBMISSION)
+    assert harness.accepted_submissions == []
+    assert not harness.is_done("solver-0")

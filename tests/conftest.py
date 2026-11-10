@@ -114,7 +114,7 @@ class FakeSandbox:
         failed = code == "fail"
         stdout, stderr = ("", "boom\n") if failed else ("ok\n", "")
         paths = {}
-        for suffix, text in ((".py", code), (".out", stdout), (".err", stderr)):
+        for suffix, text in ((".py", code), (".out", stdout), (".err", stderr), (".files.jsonl", "")):
             path = Path(output_dir) / f"{exec_id}{suffix}"
             path.write_text(text)
             paths[suffix] = str(path)
@@ -123,7 +123,8 @@ class FakeSandbox:
         details = {"end_reason": "exited", "script_path": paths[".py"], "stdout_path": paths[".out"],
                    "stderr_path": paths[".err"], "stdout_bytes": len(stdout), "stderr_bytes": len(stderr),
                    "stdout_stored_bytes": len(stdout), "stderr_stored_bytes": len(stderr),
-                   "storage_truncated": False}
+                   "storage_truncated": False, "listing_path": paths[".files.jsonl"],
+                   "filesystem": {"dirs": {}, "listing_truncated": False, "find_exit_code": 0}}
         return result, details
 
 

@@ -36,7 +36,8 @@ def test_toy_run_end_to_end(tmp_path):
         tool_call("submit_result", {"total": 1555, "method_notes": "sum() in Python."}),
     ])
     record = run_experiment(TOY_CONFIG, client, DummyLogger, sandbox_factory=Sandbox,
-                            runs_dir=tmp_path / "runs", get_commit=lambda: "abc123")
+                            runs_dir=tmp_path / "runs", get_commit=lambda: "abc123",
+                            commit_result=lambda run_dir, index_path, status: "not-a-real-commit")
 
     assert record["status"] == "completed"
     assert record["analysis"] == {"estimate": 1555, "passed": True}

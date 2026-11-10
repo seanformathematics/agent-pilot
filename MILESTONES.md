@@ -1,7 +1,9 @@
 # Milestones — harness build for the toy test and Phase 1
 
 Each milestone ends in a **checkpoint**: the full test suite passes (including
-the Docker tests), the work is committed, and the commit is tagged `mN-<name>`.
+the Docker tests), README.md is brought up to date (status line, rules,
+interfaces, architecture), the work is committed, and the commit is tagged
+`mN-<name>`.
 A checkpoint is the point we can always return to and say exactly what
 existed.
 
@@ -66,11 +68,30 @@ SEAN (non-blocking, defaults in brackets):
   capped, hashed, never auto-extracted; then the workspace is deleted
 - Tracebacks: plain stdin (no source lines) or a small launcher that restores
   them? [plain stdin, as specified]
+- Set `/tmp` and `/dev/shm` sizes in the config so runs match across
+  machines (OrbStack gives `/dev/shm` ~4 GB; most Docker setups 64 MB)?
+  [yes; see LESSONS.md §2]
 - Add `harness/config.py` and `harness/run.py` to the CLAUDE.md layout, and
   note the `runs/` exclusion in its "Clean tree required" rule? [yes, once
   you agree; CLAUDE.md is yours]
+- Change CLAUDE.md's "Commit `runs/` to git after each batch of runs" to
+  "the harness commits each run when it ends; push after each batch"?
+  [yes, once you agree]
 
 Checkpoint: `m1-single-run`
+
+---
+
+## Between M1 and M2
+
+- [x] Submissions must be finite; divergence reported via a schema field
+      (pattern: `tests/fixtures/float_schemas.py`); logged before accepted
+- [x] After every call, list `/work`, `/tmp`, `/dev/shm` (LESSONS.md §2)
+- [x] Toy prompt states the sandbox's real rules (README rule)
+- [x] Every run committed to git when it ends: its folder and the index
+      line only; never pushed automatically
+- [x] README.md: rules, interfaces, architecture at a glance
+- [x] Test: the API key never enters the container
 
 ---
 
@@ -84,7 +105,8 @@ real run log and fails on tampered copies.
       with the hash recorded in the log, and reports files with no log entry
       (decided 2026-11-09). Where the hashes are recorded:
       - `execution` entries: `data.files` = `{file name: sha256}`, files in
-        `outputs/<agent>/` (the `.py`, `.out` and `.err` of each execution)
+        `outputs/<agent>/` (the `.py`, `.out`, `.err` and `.files.jsonl`
+        listing of each execution)
       - `workspace_archive` entries: `data.file` + `data.sha256` (the tar), and
         `data.errors_file_sha256` for `<file>.err`, in `outputs/<agent>/`
       - the `agent` field of each entry names the `<agent>` folder

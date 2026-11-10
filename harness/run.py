@@ -19,6 +19,9 @@ In order:
   6. After the log is closed: import the analysis entry point and call it
      with the accepted submissions, then append one line to runs/index.jsonl.
      This happens for failed and aborted runs too.
+  7. Commit exactly two paths to git: this run's folder and runs/index.jsonl.
+     Nothing else is staged or committed. Nothing is pushed. If the commit
+     fails, the record on disk is untouched and the failure is reported.
 
 The analysis result goes only into the index, never into the log: the log
 records what happened during the run, and grading can be redone later
@@ -120,6 +123,23 @@ def host_metadata() -> dict:
 
 # ----- after the run -------------------------------------------------------
 
+def commit_run(run_dir: Path, index_path: Path, status: str, repo: Path = REPO_ROOT) -> str:
+    """Commit this run's folder and the index, and nothing else. Returns the commit hash.
+
+    `git commit -- <paths>` commits only those paths, even if other changes
+    happen to be staged. Your git identity and hooks apply as usual.
+    """
+    paths = [str(run_dir), str(index_path)]
+    subprocess.run(["git", "add", "--", *paths], cwd=repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "commit", "--quiet", "-m", f"run: {run_dir.name} ({status})", "--", *paths],
+        cwd=repo, check=True, capture_output=True, text=True,
+    )
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=repo, check=True, capture_output=True, text=True,
+    ).stdout.strip()
+
+
 def run_analysis(config, submissions: list[dict]) -> dict:
     """Import and call the analysis entry point. Errors are recorded, not raised."""
     try:
@@ -159,11 +179,16 @@ def run_experiment(
     sandbox_factory=Sandbox,
     runs_dir: Path = RUNS_DIR,
     get_commit=clean_commit,
+    commit_result=commit_run,
 ) -> dict:
-    """Run one config end to end. Returns the line written to runs/index.jsonl.
+    """Run one config end to end.
 
-    ``logger_factory``, ``sandbox_factory`` and ``get_commit`` are passed in
-    so tests can supply fakes; the command line always uses the real ones.
+    Returns the line written to runs/index.jsonl, plus "git_commit" (the hash
+    of the commit holding the run) or "git_commit_error".
+
+    ``logger_factory``, ``sandbox_factory``, ``get_commit`` and
+    ``commit_result`` are passed in so tests can supply fakes; the command
+    line always uses the real ones.
     """
     config_path = Path(config_path).resolve()
     config_label = (str(config_path.relative_to(REPO_ROOT))
@@ -248,10 +273,19 @@ def run_experiment(
         },
         **run_analysis(config, submissions),
     }
-    append_index_line(Path(runs_dir) / "index.jsonl", record)
+    index_path = Path(runs_dir) / "index.jsonl"
+    append_index_line(index_path, record)
+
+    outcome = {**record, "git_commit": None, "git_commit_error": None}
+    try:
+        outcome["git_commit"] = commit_result(run_dir, index_path, status)
+    except (subprocess.CalledProcessError, OSError) as error:
+        detail = getattr(error, "stderr", "") or ""
+        outcome["git_commit_error"] = f"{type(error).__name__}: {error} {detail}".strip()
+
     if status == "aborted":
         raise KeyboardInterrupt
-    return record
+    return outcome
 
 
 def main(argv: list[str]) -> int:
@@ -267,7 +301,12 @@ def main(argv: list[str]) -> int:
     print(f"tokens:     {record['tokens_used']}   wall clock: {record['wall_clock_s']} s")
     print(f"final hash: {record['final_log_hash']}")
     print(f"folder:     {RUNS_DIR / record['run_id']}")
-    return 0 if record["status"] == "completed" else 1
+    if record["git_commit"]:
+        print(f"committed:  {record['git_commit']}  (not pushed)")
+    else:
+        print(f"NOT COMMITTED: {record['git_commit_error']}")
+        print("              commit the run folder and runs/index.jsonl by hand.")
+    return 0 if record["status"] == "completed" and record["git_commit"] else 1
 
 
 if __name__ == "__main__":

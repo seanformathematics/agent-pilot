@@ -375,3 +375,79 @@ def test_describe_image():
     assert facts["image_id"].startswith("sha256:")
     assert facts["python_version"].startswith("3.14")
     assert any(line.startswith("numpy==") for line in facts["packages"])
+
+
+def test_api_key_never_enters_container(make_sandbox, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-must-not-leak")
+    box = make_sandbox()
+    code = (
+        "import os, pathlib\n"
+        "leaks = [k for k, v in os.environ.items() if 'ANTHROPIC' in k or 'sk-ant' in v]\n"
+        "print(leaks)\n"
+    )
+    result, _ = run(box, code)
+    assert result["stdout"] == "[]\n"
+    inspect = subprocess.run(
+        ["docker", "inspect", "--format", "{{json .Config.Env}}", box.container_id],
+        capture_output=True, text=True, check=True,
+    )
+    assert "sk-ant" not in inspect.stdout and "ANTHROPIC" not in inspect.stdout
+
+
+# ----- listing of writable places after each call ------------------------
+
+def read_listing(details):
+    with open(details["listing_path"]) as f:
+        return [json.loads(line) for line in f]
+
+
+def test_listing_covers_work_tmp_and_shm_without_contents(make_sandbox):
+    box = make_sandbox()
+    code = (
+        "open('/work/a.txt', 'w').write('SECRET-CONTENT-A')\n"
+        "open('/tmp/b.bin', 'wb').write(b'x' * 1234)\n"
+        "open('/dev/shm/c', 'w').write('SECRET-CONTENT-C')\n"
+    )
+    _, details = run(box, code)
+    listing = read_listing(details)
+    by_path = {e["path"]: e for e in listing}
+    assert by_path["/work/a.txt"]["bytes"] == 16 and by_path["/work/a.txt"]["dir"] == "/work"
+    assert by_path["/tmp/b.bin"]["bytes"] == 1234 and by_path["/tmp/b.bin"]["type"] == "f"
+    assert by_path["/dev/shm/c"]["dir"] == "/dev/shm"
+    assert all(e["mtime"] > 1.7e9 for e in listing)
+    with open(details["listing_path"]) as f:
+        assert "SECRET-CONTENT" not in f.read()
+    summary = details["filesystem"]["dirs"]
+    assert summary["/tmp"] == {"entries": 1, "files": 1, "file_bytes": 1234}
+    assert details["filesystem"]["listing_truncated"] is False
+
+
+def test_listing_shows_state_persisting_between_calls(make_sandbox):
+    box = make_sandbox()
+    run(box, "open('/tmp/kept.txt', 'w').write('hidden state')")
+    _, details = run(box, "print('a later call that writes nothing')")
+    assert "/tmp/kept.txt" in {e["path"] for e in read_listing(details)}
+
+
+def test_listing_handles_awkward_file_names(make_sandbox):
+    box = make_sandbox()
+    _, details = run(box, "open('/work/tab\\tand\\nnewline.txt', 'w').write('x')")
+    assert "/work/tab\tand\nnewline.txt" in {e["path"] for e in read_listing(details)}
+
+
+def test_listing_records_symlinks_without_following(make_sandbox):
+    box = make_sandbox()
+    _, details = run(box, "import os; os.symlink('/etc/passwd', '/work/link')")
+    entry = next(e for e in read_listing(details) if e["path"] == "/work/link")
+    assert entry["type"] == "l"
+
+
+def test_listing_is_capped(make_sandbox, monkeypatch):
+    import harness.sandbox as sandbox_module
+    monkeypatch.setattr(sandbox_module, "LISTING_MAX_BYTES", 2000)
+    box = make_sandbox()
+    _, details = run(box, "import os\nfor i in range(500): open(f'/work/file_{i:04d}.txt', 'w').close()")
+    assert details["filesystem"]["listing_truncated"] is True
+    listing = read_listing(details)
+    assert 0 < len(listing) < 500
+    assert all(e["path"].startswith("/work/file_") for e in listing)  # no half-read entries
