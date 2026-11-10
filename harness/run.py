@@ -207,12 +207,11 @@ def run_experiment(
     (run_dir / "outputs").mkdir()
 
     logger = logger_factory(run_dir / "log.jsonl")
-    work_root = Path(tempfile.mkdtemp(prefix="residency-work-"))
     harness = None
     outcomes = []
     status = "completed"
     try:
-        harness = Harness(config, run_dir, work_root, logger, sandbox_factory)
+        harness = Harness(config, run_dir, logger, sandbox_factory)
         harness.start_run({
             "run_id": run_dir.name,
             "started_at": started_at,
@@ -243,10 +242,6 @@ def run_experiment(
             pass
         final_hash = logger.close()
         (run_dir / "final_hash.txt").write_text(f"{final_hash}\n")
-        try:
-            work_root.rmdir()  # empty unless a workspace had to be kept
-        except OSError:
-            pass
 
     submissions = harness.accepted_submissions if harness else []
     record = {

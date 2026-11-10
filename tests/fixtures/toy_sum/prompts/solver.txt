@@ -7,6 +7,7 @@ You have two tools:
 About the sandbox:
 - Your working directory is /work. Files you write there are kept for the whole task and saved when you finish.
 - /tmp and /dev/shm are for temporary files. They are kept between your run_python calls but discarded when you finish.
+- /work, /tmp and /dev/shm are limited in size, and their contents count toward the sandbox's memory.
 - Each run_python call is a fresh Python process. Variables do not carry over between calls; files do. Nothing keeps running after a call returns.
 - Your code is saved as /tmp/run_python/<call id>.py and run as a normal script, so tracebacks refer to that file.
 

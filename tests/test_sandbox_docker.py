@@ -37,7 +37,7 @@ def make_sandbox(tmp_path):
     started = []
 
     def make(name="agent", **kwargs):
-        box = Sandbox(IMAGE, tmp_path / "work" / name, **kwargs)
+        box = Sandbox(IMAGE, **kwargs)
         box.start()
         box.test_output_dir = tmp_path / "outputs" / name
         box.test_output_dir.mkdir(parents=True)
@@ -156,9 +156,43 @@ def test_harness_creates_no_files_in_work(make_sandbox):
     box = make_sandbox()
     result, details = run(box, "print('hello')")
     assert result["stdout"] == "hello\n"
-    assert os.listdir(box.work_dir) == []
+    assert details["filesystem"]["dirs"]["/work"]["entries"] == 0
     for key in ("script_path", "stdout_path", "stderr_path"):
         assert os.path.dirname(details[key]) == str(box.test_output_dir)
+
+
+def test_work_is_private_memory_with_a_quota(make_sandbox):
+    box = make_sandbox(work_mb=64)
+    code = (
+        "import os\n"
+        "line = [l for l in open('/proc/mounts') if ' /work ' in l][0].split()\n"
+        "st = os.stat('/work')\n"
+        "print(line[2], oct(st.st_mode & 0o777), st.st_uid)\n"
+    )
+    result, _ = run(box, code)
+    assert result["stdout"] == "tmpfs 0o700 1000\n"
+
+
+def test_filling_work_stops_at_quota_not_host_disk(make_sandbox):
+    box = make_sandbox(work_mb=32)
+    code = (
+        "chunk = b'x' * (1024 * 1024)\n"
+        "with open('/work/fill.bin', 'wb') as f:\n"
+        "    for _ in range(100):\n"
+        "        f.write(chunk)\n"
+    )
+    result, _ = run(box, code)
+    assert result["exit_code"] != 0
+    assert "No space left on device" in result["stderr"]
+
+
+def test_nothing_from_host_is_mounted(make_sandbox):
+    box = make_sandbox()
+    inspect = subprocess.run(
+        ["docker", "inspect", "--format", "{{json .Mounts}}", box.container_id],
+        capture_output=True, text=True, check=True,
+    )
+    assert json.loads(inspect.stdout) == []
 
 
 def test_record_files_hold_code_and_full_output(make_sandbox):
@@ -299,11 +333,9 @@ def test_root_filesystem_is_read_only(make_sandbox):
 
 # ----- isolation ---------------------------------------------------------
 
-def test_work_dir_must_be_fresh(tmp_path):
-    existing = tmp_path / "already-here"
-    existing.mkdir()
-    with pytest.raises(FileExistsError):
-        Sandbox(IMAGE, existing).start()
+def test_work_starts_empty(make_sandbox):
+    _, details = run(make_sandbox(), "pass")
+    assert details["filesystem"]["dirs"]["/work"] == {"entries": 0, "files": 0, "file_bytes": 0}
 
 
 def test_two_agents_cannot_see_each_others_files(make_sandbox):
@@ -335,10 +367,7 @@ def test_log_and_output_directories_not_reachable(make_sandbox, tmp_path):
         ["docker", "inspect", "--format", "{{json .Mounts}}", box.container_id],
         capture_output=True, text=True, check=True,
     )
-    binds = [m for m in json.loads(inspect.stdout) if m["Type"] == "bind"]
-    assert len(binds) == 1
-    assert binds[0]["Destination"] == "/work"
-    assert binds[0]["Source"].endswith("work/agent")
+    assert json.loads(inspect.stdout) == []  # no host directory is mounted at all
 
 
 def test_stop_removes_container(make_sandbox):
@@ -398,14 +427,7 @@ def test_archive_cap_stops_huge_sparse_file_quickly(make_sandbox):
     assert time.monotonic() - start < 30
 
 
-def test_locked_workspace_is_still_cleared_and_removed(make_sandbox):
-    box = make_sandbox()
-    run(box, "import os; os.makedirs('/work/a/b'); open('/work/a/b/f','w').write('x');"
-             " os.chmod('/work/a/b', 0); os.chmod('/work/a', 0)")
-    assert box.clear_workspace() is True
-    box.stop()
-    assert box.remove_work_dir() is True
-    assert not box.work_dir.exists()
+
 
 
 def test_stored_output_cap_keeps_true_tail_for_agent(make_sandbox):
@@ -419,9 +441,9 @@ def test_stored_output_cap_keeps_true_tail_for_agent(make_sandbox):
     assert result["stdout"].endswith("END-OF-OUTPUT\n")  # the real end, past the saved part
 
 
-def test_stored_cap_smaller_than_agent_cap_refused(tmp_path):
+def test_stored_cap_smaller_than_agent_cap_refused():
     with pytest.raises(ValueError):
-        Sandbox(IMAGE, tmp_path / "w", output_cap=1000, stored_output_cap=500)
+        Sandbox(IMAGE, output_cap=1000, stored_output_cap=500)
 
 
 def test_describe_image():
@@ -446,7 +468,6 @@ def test_api_key_never_enters_container(make_sandbox, monkeypatch):
         capture_output=True, text=True, check=True,
     )
     assert "sk-ant" not in inspect.stdout and "ANTHROPIC" not in inspect.stdout
-
 
 # ----- listing of writable places after each call ------------------------
 

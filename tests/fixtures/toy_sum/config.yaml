@@ -33,7 +33,8 @@ limits:
 
 sandbox:
   image: residency-sandbox:py3.14
-  memory_mb: 1024               # everything in the container, including /tmp and /dev/shm contents
+  memory_mb: 2048               # everything in the container, including /work, /tmp and /dev/shm contents
+  work_mb: 256                 # /work size (in memory; the agent's disk quota)
   tmp_mb: 256                  # /tmp size (in memory)
   shm_mb: 256                  # /dev/shm size (in memory)
   cpus: 1.0

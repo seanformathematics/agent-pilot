@@ -70,3 +70,10 @@ def test_old_memory_string_rejected():
     raw["sandbox"]["memory"] = "1g"
     with pytest.raises(ValidationError):
         RunConfig.model_validate(raw)
+
+
+def test_work_larger_than_memory_rejected():
+    raw = toy_raw()
+    raw["sandbox"]["work_mb"] = raw["sandbox"]["memory_mb"] + 1
+    with pytest.raises(ValidationError, match="work_mb"):
+        RunConfig.model_validate(raw)

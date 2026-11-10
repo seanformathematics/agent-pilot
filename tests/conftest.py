@@ -75,8 +75,7 @@ class FakeSandbox:
     Code that is exactly "fail" exits 1; anything else exits 0 printing "ok".
     """
 
-    def __init__(self, image, work_dir, memory_mb, tmp_mb, shm_mb, cpus, pids_limit, output_cap, stored_output_cap):
-        self.work_dir = Path(work_dir)
+    def __init__(self, image, memory_mb, work_mb, tmp_mb, shm_mb, cpus, pids_limit, output_cap, stored_output_cap):
         self.container_id = None
 
     @staticmethod
@@ -84,7 +83,6 @@ class FakeSandbox:
         return {"image": image, "image_id": "sha256:fake", "python_version": "3.14 (fake)", "packages": []}
 
     def start(self):
-        self.work_dir.mkdir(parents=True, exist_ok=False)
         self.container_id = f"fake-{uuid.uuid4().hex[:8]}"
 
     def stop(self):
@@ -102,13 +100,6 @@ class FakeSandbox:
         return {"archive_path": str(archive_path), "errors_path": str(errors_path),
                 "bytes": Path(archive_path).stat().st_size, "truncated": False,
                 "timed_out": False, "exit_code": 0, "tar_errors": ""}
-
-    def clear_workspace(self):
-        return True
-
-    def remove_work_dir(self):
-        self.work_dir.rmdir()
-        return True
 
     def run_python(self, code, timeout_s, exec_id, output_dir):
         failed = code == "fail"
@@ -145,7 +136,7 @@ def make_harness(tmp_path, toy_config):
         run_dir = tmp_path / "run"
         run_dir.mkdir()
         logger = DummyLogger(run_dir / "log.jsonl")
-        harness = Harness(config or toy_config, run_dir, tmp_path / "work", logger, sandbox_factory)
+        harness = Harness(config or toy_config, run_dir, logger, sandbox_factory)
         harness.start_run({"commit": "test", "image_id": "test"})
         return harness, logger
 

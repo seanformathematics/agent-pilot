@@ -5,16 +5,19 @@ entirely to the agent. Code goes into the container on stdin, and output
 comes back through stdout/stderr pipes straight into files the harness owns,
 in the run's outputs directory. Nothing in /work is ever trusted or touched.
 
-One Sandbox per agent. Its working directory on the host is created empty at
-start and mounted at /work. It is the only thing mounted: logs never are.
+One Sandbox per agent. Its /work is an in-memory filesystem (tmpfs) of fixed
+size, owned by the agent user and created empty with the container. Nothing
+from the host is mounted at all, so logs can never be reached, agent files
+never exist on the host, and an agent can never fill the host's disk.
+Removing the container discards /work.
 
 Container settings:
   * no network
   * memory, CPU and process-count limits from config (swap disabled)
-  * /tmp and /dev/shm sizes from config; both live in memory and count
-    against the memory limit
   * all Linux capabilities dropped, no privilege escalation
-  * read-only root filesystem; only /work and a small /tmp are writable
+  * read-only root filesystem; only /work, /tmp and /dev/shm are writable
+  * /work, /tmp and /dev/shm sizes from config; all three live in memory
+    and count against the memory limit
   * PID 1 is a tiny Python "reaper" that ignores SIGCHLD, so the kernel
     cleans up finished processes instead of leaving zombies that would use
     up the process limit
@@ -49,9 +52,7 @@ When the agent has ended (see Harness.stop_agent):
   2. inspect_archive: lists the archive's members without extracting
      anything, and flags links, absolute or "../" paths, special files and
      setuid bits. Nothing is ever extracted automatically.
-  3. clear_workspace: deletes the contents of /work from inside the
-     container, so the host never walks agent-made files.
-  4. stop, then remove_work_dir: removes the now-empty directory on the host.
+  3. stop: removes the container, and /work with it.
 
 Exit codes from `timeout`: 124 means the code was stopped by SIGTERM at the
 time limit; 137 means it was SIGKILLed, either because it ignored SIGTERM for
@@ -76,6 +77,7 @@ KILL_GRACE_S = 5  # seconds between SIGTERM and SIGKILL
 HOST_MARGIN_S = 10  # host-side backstop on top of the code's own limit
 EXEC_ID_PATTERN = re.compile(r"[A-Za-z0-9_-]+")
 LAUNCHER = "/opt/harness/launcher.py"  # in the image; see docker/launcher.py
+AGENT_UID = 1000  # the `agent` user created in docker/Dockerfile
 ARCHIVE_CHUNK_BYTES = 1 << 20  # read the tar stream 1 MiB at a time
 ARCHIVE_TIMEOUT_S = 300
 MAX_FLAGGED_MEMBERS = 100  # how many flagged archive entries to list in the log
@@ -100,8 +102,8 @@ class Sandbox:
     def __init__(
         self,
         image: str,
-        work_dir: Path,
         memory_mb: int = 1024,
+        work_mb: int = 256,
         tmp_mb: int = 256,
         shm_mb: int = 256,
         cpus: float = 1.0,
@@ -112,8 +114,8 @@ class Sandbox:
         if stored_output_cap < output_cap:
             raise ValueError("stored_output_cap must be at least output_cap")
         self.image = image
-        self.work_dir = Path(work_dir)
         self.memory_mb = memory_mb
+        self.work_mb = work_mb
         self.tmp_mb = tmp_mb
         self.shm_mb = shm_mb
         self.cpus = cpus
@@ -140,14 +142,9 @@ class Sandbox:
         }
 
     def start(self) -> None:
-        """Create the empty working directory and start the container.
-
-        The working directory must not already exist, so every agent starts
-        with an empty /work and nothing carries over.
-        """
+        """Start the container with a fresh, empty, in-memory /work."""
         if self.container_id is not None:
             raise RuntimeError("sandbox already started")
-        self.work_dir.mkdir(parents=True, exist_ok=False)
         command = [
             "docker", "run", "--detach",
             "--network", "none",
@@ -160,7 +157,7 @@ class Sandbox:
             "--read-only",
             "--tmpfs", f"/tmp:size={self.tmp_mb}m",
             "--shm-size", f"{self.shm_mb}m",
-            "--mount", f"type=bind,source={self.work_dir.resolve()},target=/work",
+            "--tmpfs", f"/work:size={self.work_mb}m,uid={AGENT_UID},gid={AGENT_UID},mode=0700",
             self.image,
             "python", "-c", REAPER,
         ]
@@ -360,33 +357,6 @@ class Sandbox:
             "exit_code": exit_code,
             "tar_errors": tar_errors,
         }
-
-    def clear_workspace(self) -> bool:
-        """Delete everything in /work from inside the container.
-
-        Runs as the agent user, who owns every file there. Permissions are
-        opened up first, in case the agent locked a directory. Returns True
-        if /work is empty afterwards.
-        """
-        if self.container_id is None:
-            raise RuntimeError("sandbox not started")
-        self._kill_leftover_processes()
-        script = ("chmod -R u+rwX /work 2>/dev/null; "
-                  "find /work -mindepth 1 -delete 2>/dev/null; "
-                  'test -z "$(ls -A /work)"')
-        completed = subprocess.run(
-            ["docker", "exec", self.container_id, "sh", "-c", script],
-            capture_output=True, check=False, timeout=ARCHIVE_TIMEOUT_S,
-        )
-        return completed.returncode == 0
-
-    def remove_work_dir(self) -> bool:
-        """Remove the host working directory if it is empty. Returns True if removed."""
-        try:
-            os.rmdir(self.work_dir)  # refuses to remove a non-empty directory
-            return True
-        except OSError:
-            return False
 
     def _kill_leftover_processes(self) -> None:
         """Kill everything the agent user runs, except PID 1 (the reaper).

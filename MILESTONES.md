@@ -96,6 +96,8 @@ Checkpoint: `m1-single-run`
       line only; never pushed automatically
 - [x] README.md: rules, interfaces, architecture at a glance
 - [x] Test: the API key never enters the container
+- [x] `/work` is an in-memory filesystem with a quota (`work_mb`); nothing
+      from the host is mounted, so an agent can't fill the laptop's disk
 - [x] Launcher in the image: tracebacks with source lines; fixes
       `multiprocessing`, which failed for code piped in on stdin under
       Python 3.14

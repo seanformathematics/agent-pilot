@@ -54,5 +54,6 @@ def test_toy_run_end_to_end(tmp_path):
     metadata = log[0]["data"]["metadata"]
     assert metadata["sandbox"]["image_id"].startswith("sha256:")
     assert any(p.startswith("numpy==") for p in metadata["sandbox"]["packages"])
-    assert "workspace_deleted" in [e["kind"] for e in log]
+    assert {"kind": "container_stop", "data": {"workspace_archived": True}}.items() <= \
+        next(e for e in log if e["kind"] == "container_stop").items()
     assert record["storage_bytes"]["workspace_archives"]["solver-0"] > 0

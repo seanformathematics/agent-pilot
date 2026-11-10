@@ -49,7 +49,8 @@ class Limits(Strict):
 
 class SandboxConfig(Strict):
     image: str
-    memory_mb: int = Field(ge=64)  # everything in the container: processes, /tmp and /dev/shm contents
+    memory_mb: int = Field(ge=64)  # everything in the container: processes and the contents of /work, /tmp, /dev/shm
+    work_mb: int = Field(ge=1)     # size of /work (in memory, counts against memory_mb)
     tmp_mb: int = Field(ge=1)      # size of /tmp (in memory, counts against memory_mb)
     shm_mb: int = Field(ge=1)      # size of /dev/shm (in memory, counts against memory_mb)
     cpus: float = Field(gt=0)
@@ -58,7 +59,7 @@ class SandboxConfig(Strict):
 
     @model_validator(mode="after")
     def folders_fit_in_memory(self):
-        for name in ("tmp_mb", "shm_mb"):
+        for name in ("work_mb", "tmp_mb", "shm_mb"):
             if getattr(self, name) > self.memory_mb:
                 raise ValueError(f"{name} ({getattr(self, name)}) is larger than memory_mb ({self.memory_mb})")
         return self

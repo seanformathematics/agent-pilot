@@ -8,9 +8,7 @@ import httpx2 as httpx
 import pytest
 
 from harness.agent import Agent
-from harness.harness import Harness
 from tests.conftest import FakeClient, entries_of, sent_to_model, text_reply, tool_call
-from tests.fixtures.dummy_logger import DummyLogger
 
 GOOD_SUBMISSION = {"total": 1555, "method_notes": "Summed with Python's sum()."}
 
@@ -342,28 +340,22 @@ def test_analysis_not_imported_during_run(make_harness):
     assert "tests.fixtures.toy_sum.analysis" not in sys.modules
 
 
-def test_work_root_must_not_overlap_run_dir(tmp_path, toy_config):
-    run_dir = tmp_path / "run"
-    run_dir.mkdir()
-    logger = DummyLogger(run_dir / "log.jsonl")
-    with pytest.raises(ValueError, match="must not overlap"):
-        Harness(toy_config, run_dir, run_dir / "work", logger)
 
 
 # ----- end of agent: archive, then container, then workspace -------------
 
-def test_workspace_archived_after_agent_ends_then_deleted(make_harness):
+def test_workspace_archived_after_agent_ends_then_container_removed(make_harness):
     _, harness, logger, _ = run_agent(make_harness, [tool_call("submit_result", GOOD_SUBMISSION)])
     kinds = [e["kind"] for e in logger.entries]
-    order = [kinds.index(k) for k in ("agent_end", "workspace_archive", "container_stop", "workspace_deleted")]
+    order = [kinds.index(k) for k in ("agent_end", "workspace_archive", "container_stop")]
     assert order == sorted(order)
+    assert entries_of(logger, "container_stop")[0]["data"] == {"workspace_archived": True}
 
     archive = entries_of(logger, "workspace_archive")[0]["data"]
     path = harness.run_dir / "outputs" / "solver-0" / archive["file"]
     import hashlib
     assert hashlib.sha256(path.read_bytes()).hexdigest() == archive["sha256"]
     assert archive["contents"]["members"] == 1
-    assert not (harness.work_root / "solver-0").exists()
 
 
 # ----- non-finite numbers in submissions -----------------------------------

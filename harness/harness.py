@@ -40,14 +40,11 @@ class Harness:
         self,
         config: RunConfig,
         run_dir: Path,
-        work_root: Path,
         logger,
         sandbox_factory=Sandbox,
     ) -> None:
         self.config = config
         self.run_dir = Path(run_dir).resolve()
-        self.work_root = Path(work_root).resolve()
-        self._check_work_root_is_separate()
         self._logger = logger  # harness-owned; never handed to agents
         self._sandbox_factory = sandbox_factory
 
@@ -88,14 +85,14 @@ class Harness:
             self.log("harness", "system_prompt", {"role": role, "text": text})
 
     def start_agent(self, agent_id: str) -> None:
-        """Start this agent's sandbox with a fresh, empty working directory."""
+        """Start this agent's sandbox with a fresh, empty, in-memory /work."""
         if agent_id in self._sandboxes:
             raise RuntimeError(f"agent {agent_id!r} already started")
         limits = self.config.limits
         box = self._sandbox_factory(
             image=self.config.sandbox.image,
-            work_dir=self.work_root / agent_id,
             memory_mb=self.config.sandbox.memory_mb,
+            work_mb=self.config.sandbox.work_mb,
             tmp_mb=self.config.sandbox.tmp_mb,
             shm_mb=self.config.sandbox.shm_mb,
             cpus=self.config.sandbox.cpus,
@@ -114,9 +111,8 @@ class Harness:
         """Finish with an agent's sandbox, after the agent has ended.
 
         In order: archive /work into the run's outputs, inspect the archive
-        without extracting it, clear /work from inside the container, remove
-        the container, then remove the empty host directory. If archiving
-        fails, the workspace is kept on the host and that is logged.
+        without extracting it, then remove the container, which discards
+        /work. If archiving fails, that is logged; /work is still discarded.
         """
         box = self._sandboxes.get(agent_id)
         if box is None or box.container_id is None:
@@ -134,7 +130,6 @@ class Harness:
         except (OSError, subprocess.SubprocessError) as error:
             self.log(agent_id, "workspace_archive_failed", {"error": f"{type(error).__name__}: {error}"})
 
-        cleared = False
         if archived:
             self.workspace_archive_bytes[agent_id] = info["bytes"]
             self.log(agent_id, "workspace_archive", {
@@ -152,18 +147,9 @@ class Harness:
             if info["truncated"] or info["timed_out"]:
                 self.log(agent_id, "flag", {"reason": "workspace_archive_incomplete",
                                             "truncated": info["truncated"], "timed_out": info["timed_out"]})
-            cleared = box.clear_workspace()
 
         box.stop()
-        self.log(agent_id, "container_stop", {})
-
-        if cleared and box.remove_work_dir():
-            self.log(agent_id, "workspace_deleted", {})
-        else:
-            self.log(agent_id, "workspace_kept", {
-                "path": str(box.work_dir),
-                "reason": "archive failed" if not archived else "workspace not empty after clearing",
-            })
+        self.log(agent_id, "container_stop", {"workspace_archived": archived})
 
     # ----- what agents are given ---------------------------------------
 
@@ -321,12 +307,6 @@ class Harness:
 
     def _allowed_tools(self, agent_id: str) -> list[str]:
         return self.config.roles[self._agents[agent_id].role].tools
-
-    def _check_work_root_is_separate(self) -> None:
-        """Work directories are mounted into containers, so they must never
-        overlap the run directory, where logs and archived outputs live."""
-        if self.work_root.is_relative_to(self.run_dir) or self.run_dir.is_relative_to(self.work_root):
-            raise ValueError(f"work_root {self.work_root} must not overlap run_dir {self.run_dir}")
 
 
 def non_finite_fields(value, path: str = "") -> list[str]:
