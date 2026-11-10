@@ -195,8 +195,8 @@ analysis result or analysis error. Verify result is added in M2.
 |---------|-------|
 | Network | none |
 | Privileges | all Linux capabilities dropped; no privilege escalation; runs as user `agent` |
-| Filesystem | read-only, except `/work` (agent's, archived at the end), `/tmp` (256 MB) and `/dev/shm` (Docker's default). All three are listed after every call. |
-| Limits | memory (no swap), CPUs, process count: from config |
+| Filesystem | read-only, except `/work` (agent's, archived at the end), `/tmp` (`tmp_mb`) and `/dev/shm` (`shm_mb`). All three are listed after every call. |
+| Limits | `memory_mb` (no swap; includes whatever is stored in `/tmp` and `/dev/shm`), CPUs, process count: from config |
 | PID 1 | tiny Python reaper, so killed processes don't pile up as zombies |
 | Per call | `timeout -k 5 <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs |
 | Launcher | `docker/launcher.py`, read-only in the image. Saves the code as `/tmp/run_python/<exec_id>.py` and runs it as a normal script: tracebacks and warnings show source lines (launcher frames hidden), `__file__` is set, `multiprocessing` works. |

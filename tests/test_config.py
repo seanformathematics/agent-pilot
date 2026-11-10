@@ -56,3 +56,17 @@ def test_load_object():
     assert load_object("tests.fixtures.toy_sum.schemas:SumSubmission") is SumSubmission
     with pytest.raises(ValueError):
         load_object("tests.fixtures.toy_sum.schemas.SumSubmission")
+
+
+def test_tmp_larger_than_memory_rejected():
+    raw = toy_raw()
+    raw["sandbox"]["tmp_mb"] = raw["sandbox"]["memory_mb"] + 1
+    with pytest.raises(ValidationError, match="larger than memory_mb"):
+        RunConfig.model_validate(raw)
+
+
+def test_old_memory_string_rejected():
+    raw = toy_raw()
+    raw["sandbox"]["memory"] = "1g"
+    with pytest.raises(ValidationError):
+        RunConfig.model_validate(raw)

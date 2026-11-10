@@ -11,6 +11,8 @@ start and mounted at /work. It is the only thing mounted: logs never are.
 Container settings:
   * no network
   * memory, CPU and process-count limits from config (swap disabled)
+  * /tmp and /dev/shm sizes from config; both live in memory and count
+    against the memory limit
   * all Linux capabilities dropped, no privilege escalation
   * read-only root filesystem; only /work and a small /tmp are writable
   * PID 1 is a tiny Python "reaper" that ignores SIGCHLD, so the kernel
@@ -99,7 +101,9 @@ class Sandbox:
         self,
         image: str,
         work_dir: Path,
-        memory: str = "1g",
+        memory_mb: int = 1024,
+        tmp_mb: int = 256,
+        shm_mb: int = 256,
         cpus: float = 1.0,
         pids_limit: int = 256,
         output_cap: int = DEFAULT_OUTPUT_CAP,
@@ -109,7 +113,9 @@ class Sandbox:
             raise ValueError("stored_output_cap must be at least output_cap")
         self.image = image
         self.work_dir = Path(work_dir)
-        self.memory = memory
+        self.memory_mb = memory_mb
+        self.tmp_mb = tmp_mb
+        self.shm_mb = shm_mb
         self.cpus = cpus
         self.pids_limit = pids_limit
         self.output_cap = output_cap
@@ -145,14 +151,15 @@ class Sandbox:
         command = [
             "docker", "run", "--detach",
             "--network", "none",
-            "--memory", self.memory,
-            "--memory-swap", self.memory,  # same value = no swap
+            "--memory", f"{self.memory_mb}m",
+            "--memory-swap", f"{self.memory_mb}m",  # same value = no swap
             "--cpus", str(self.cpus),
             "--pids-limit", str(self.pids_limit),
             "--cap-drop", "ALL",
             "--security-opt", "no-new-privileges",
             "--read-only",
-            "--tmpfs", "/tmp:size=256m",
+            "--tmpfs", f"/tmp:size={self.tmp_mb}m",
+            "--shm-size", f"{self.shm_mb}m",
             "--mount", f"type=bind,source={self.work_dir.resolve()},target=/work",
             self.image,
             "python", "-c", REAPER,

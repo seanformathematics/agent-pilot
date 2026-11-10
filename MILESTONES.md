@@ -1,9 +1,17 @@
 # Milestones — harness build for the toy test and Phase 1
 
-Each milestone ends in a **checkpoint**: the full test suite passes (including
-the Docker tests), README.md is brought up to date (status line, rules,
-interfaces, architecture), the work is committed, and the commit is tagged
-`mN-<name>`.
+Each milestone ends in a **checkpoint**:
+
+1. The full test suite passes, including the Docker tests.
+2. **Invariant re-verification.** Walk through every invariant and rule in
+   CLAUDE.md and README §1 and confirm each still holds in the code. Check
+   that each "Enforced by" entry is still true; anything that drifted is
+   fixed or raised with Sean before tagging. (`tests/test_docs.py`
+   automatically checks that every test the README cites still exists.)
+3. README.md is brought up to date (status line, rules, interfaces,
+   architecture).
+4. The work is committed, the commit message records the re-verification
+   result, and the commit is tagged `mN-<name>`.
 A checkpoint is the point we can always return to and say exactly what
 existed.
 
@@ -68,17 +76,11 @@ SEAN (non-blocking, defaults in brackets):
   capped, hashed, never auto-extracted; then the workspace is deleted
 - Tracebacks: plain stdin (no source lines) or a small launcher that restores
   them? [plain stdin, as specified]
-- Set `/tmp` and `/dev/shm` sizes in the config so runs match across
-  machines (OrbStack gives `/dev/shm` ~4 GB; most Docker setups 64 MB)?
-  [yes; see LESSONS.md §2]
-- Add `harness/config.py` and `harness/run.py` to the CLAUDE.md layout, and
-  note the `runs/` exclusion in its "Clean tree required" rule? [yes, once
-  you agree; CLAUDE.md is yours]
-- Update CLAUDE.md's Sandbox "Execution" bullet: code now runs through
-  `/opt/harness/launcher.py` (still arrives on stdin) [yes, once you agree]
-- Change CLAUDE.md's "Commit `runs/` to git after each batch of runs" to
-  "the harness commits each run when it ends; push after each batch"?
-  [yes, once you agree]
+- ~~`/tmp` and `/dev/shm` sizes~~ Done 2026-11-10: `tmp_mb`, `shm_mb` and
+  `memory_mb` in the config
+- ~~CLAUDE.md updates~~ Done 2026-11-10: layout, Runs rules (clean tree
+  ignores `runs/`; harness commits each run), Sandbox reduced to principles,
+  milestone re-verification rule
 
 Checkpoint: `m1-single-run`
 

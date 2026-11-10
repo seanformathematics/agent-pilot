@@ -75,7 +75,7 @@ class FakeSandbox:
     Code that is exactly "fail" exits 1; anything else exits 0 printing "ok".
     """
 
-    def __init__(self, image, work_dir, memory, cpus, pids_limit, output_cap, stored_output_cap):
+    def __init__(self, image, work_dir, memory_mb, tmp_mb, shm_mb, cpus, pids_limit, output_cap, stored_output_cap):
         self.work_dir = Path(work_dir)
         self.container_id = None
 

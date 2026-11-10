@@ -95,7 +95,9 @@ class Harness:
         box = self._sandbox_factory(
             image=self.config.sandbox.image,
             work_dir=self.work_root / agent_id,
-            memory=self.config.sandbox.memory,
+            memory_mb=self.config.sandbox.memory_mb,
+            tmp_mb=self.config.sandbox.tmp_mb,
+            shm_mb=self.config.sandbox.shm_mb,
             cpus=self.config.sandbox.cpus,
             pids_limit=self.config.sandbox.pids_limit,
             output_cap=limits.output_cap_chars,

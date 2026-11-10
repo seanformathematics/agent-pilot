@@ -15,18 +15,23 @@ Efficiency is not the goal. Legibility and trustworthiness of the record are.
 
 ```
 harness/          Reusable machinery shared by all experiments
+  run.py          Command line and run lifecycle: checks, run folder, index, git commit
+  config.py       Config schema (Pydantic) and loading
   agent.py        Agent class: system prompt + message history + tool-use loop
   harness.py      Harness class: tool dispatch, validation, logging calls, budgets
-  sandbox.py      Docker execution: run_python, timeouts, output capping
+  sandbox.py      Docker execution: run_python, output streaming, listings, workspace archive
   logger.py       HAND-WRITTEN — hash-chained append-only log
-  verify.py       HAND-WRITTEN — recomputes and checks a run's hash chain
+  verify.py       HAND-WRITTEN — checks the hash chain and the output files' hashes
   topologies.py   One function per topology (see below)
   tools.py        Tool definitions and their Pydantic input models
 experiments/      SEAN'S — the science. Do not create or edit anything here.
   ising/          (designs, prompts, configs, submission schema, analysis)
-docker/           Dockerfile for the sandbox image
+docker/           Dockerfile and launcher.py for the sandbox image
 runs/             Run outputs only
-tests/
+tests/            Tests; tests/fixtures/toy_sum/ is the toy experiment for harness work
+README.md         At a glance: rules, interfaces, architecture
+MILESTONES.md     Plan and checkpoints
+LESSONS.md        Meta-lessons about running agent experiments
 ```
 
 ## Invariants — never violate these
@@ -79,17 +84,19 @@ Flag and log any `submit_result` that is not preceded by at least one successful
 
 ## Sandbox (`harness/sandbox.py`, `docker/`)
 
-- One container **per agent**, each with its own fresh working directory mounted at `/work` (read-write). Agents never share a container or a working directory — a shared filesystem would be a sideways communication channel. Containers start when the agent starts and stop when it finishes; nothing carries over between agents or runs.
-- Logs are **not** mounted anywhere.
-- Packages are fixed in the image and listed in the system prompt. Changing the image is an experimental change: record it.
-- **The harness never reads or writes anything in `/work`.** `/work` belongs entirely to the agent; nothing in it is trusted. The harness only creates the empty directory before the container starts.
-- Network disabled; all Linux capabilities dropped; no privilege escalation; read-only root filesystem (only `/work` and a small `/tmp` are writable). Memory, CPU and process-count limits from config.
-- PID 1 in the container is a minimal reaper (Python ignoring `SIGCHLD`) so killed processes never accumulate as zombies against the process limit.
-- Execution: code goes in on **stdin** (`docker exec -i <container> sh -c "timeout -k 5 <T> python -; kill -9 -1"`). stdout and stderr flow through pipes **directly into files in the run's outputs directory** on the host; they never pass through `/work` or accumulate in harness memory. The code itself is saved alongside as `<exec_id>.py`.
-- No lingering processes: `kill -9 -1` runs as the agent user as soon as Python exits, killing everything else the agent owns, so a detached process cannot hold the pipes open. After every call the harness runs the same kill again from a separate `docker exec`, and the `docker exec` call itself has a host-side wall-clock limit slightly above T as a backstop. (Root inside the container cannot do this kill: with capabilities dropped it may not signal another user's processes.)
-- Cap each stream returned to the agent (default 10,000 chars), keeping head and tail with a truncation note, read from the harness's own output files. Record the SHA-256 of the full `.py`/`.out`/`.err` in the log.
-- Second layer: harness output files are created with `O_EXCL | O_NOFOLLOW` (never overwrite, never follow a symlink) and read with `O_NOFOLLOW`.
-- Exit 124 = timeout, 137 = killed (timeout or memory limit) — log these distinctly where possible.
+Principles only. Mechanics live in the `harness/sandbox.py` module documentation and README §3, next to the code they describe.
+
+- One container **per agent**, each with its own fresh, empty `/work`. Agents never share a container or a working directory — a shared filesystem would be a sideways communication channel. Nothing carries over between agents or runs.
+- Logs are **never** mounted anywhere. **The harness never reads or writes inside `/work`**: it belongs entirely to the agent, and nothing in it is trusted.
+- Hardened: no network, all Linux capabilities dropped, no privilege escalation, read-only except `/work`, `/tmp` and `/dev/shm`. Memory, CPU, process count and the sizes of `/tmp` and `/dev/shm` come from config.
+- No process outlives a `run_python` call.
+- Code arrives on **stdin** and runs as a normal script via the launcher baked into the image (`docker/launcher.py`).
+- Output is streamed into harness-owned files in the run's outputs, capped (separately for what is stored and what the agent sees), and hashed into the log.
+- After every call, `/work`, `/tmp` and `/dev/shm` are listed (names, sizes, times — never contents).
+- When an agent ends, `/work` is archived out of the container, capped, hashed, and **never auto-extracted**; then the container and workspace are removed.
+- System prompts describe the sandbox truthfully. **If sandbox behaviour changes, the prompts change in the same commit.**
+- Packages are fixed in the image and listed in the system prompt. **Changing the image is an experimental change**: each run logs the image ID.
+- Exit 124 = timeout, 137 = killed (timeout or memory limit) — logged distinctly.
 
 ## Logging (`harness/logger.py`, `harness/verify.py`)
 
@@ -100,11 +107,11 @@ Flag and log any `submit_result` that is not preceded by at least one successful
 
 ## Runs (`runs/`)
 
-Each run gets `runs/<date>_<experiment>_<topology>_<nnn>/` containing: `config.yaml` (exact copy), `design.md` (exact copy of the design the config names), `commit.txt`, `log.jsonl`, `outputs/` and the final hash. Every config names the design it implements. Nothing in a run folder is edited after the run ends.
+Each run gets `runs/<date>_<experiment>_<topology>_<nnn>/` containing: `config.yaml` (exact copy), `design.md` (exact copy of the design the config names), `commit.txt`, `log.jsonl`, `outputs/` and `final_hash.txt`. Every config names the design it implements. Nothing in a run folder is edited after the run ends.
 
-- **Clean tree required.** The harness refuses to start a run if the git working tree has uncommitted changes, so `commit.txt` always identifies the exact code, prompts, design and config used.
-- **Run index.** At the end of every run (including failed or aborted ones), the harness appends one line to `runs/index.jsonl`: run id, timestamp, experiment, design, config, commit, topology, number of agents, status, tokens used, wall-clock time, final log hash, and (filled in by the experiment's analysis entry point, not by agents) Tc estimate and pass/fail.
-- Commit `runs/` to git after each batch of runs. If outputs grow large, keep their SHA-256 hashes in git and store the files elsewhere.
+- **Clean tree required.** The harness refuses to start a run if the git working tree has uncommitted changes outside `runs/` (finished runs land there between commits and hold no code, prompts or configs), so `commit.txt` always identifies the exact code, prompts, design and config used.
+- **Run index.** At the end of every run (including failed or aborted ones), the harness appends one line to `runs/index.jsonl`: run id, timestamp, experiment, design, config, commit, topology, number of agents, status, tokens used, wall-clock time, final log hash, storage sizes, and (filled in by the experiment's analysis entry point, not by agents) `estimate` and `passed`. Full field list: README §2.
+- **The harness commits each run when it ends**: its folder and the index line, nothing else. It never pushes; **push after each batch.** If outputs grow large, keep their SHA-256 hashes in git and store the files elsewhere.
 
 ## Conventions
 
@@ -132,4 +139,5 @@ Each run gets `runs/<date>_<experiment>_<topology>_<nnn>/` containing: `config.y
 
 - Explain changes in plain terms; he is a physicist learning the engineering side.
 - Ask before changing any harness interface or any invariant above.
+- **At every milestone checkpoint, re-verify the whole project against the invariants and rules in this file and README §1**, and note the result in the checkpoint commit (see MILESTONES.md).
 - When unsure whether something is harness (shared) or experiment (specific), ask. If it's experiment, it's Sean's.

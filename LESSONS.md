@@ -57,6 +57,9 @@ log entry carries a per-folder summary. Nothing is wiped.
 - What do practitioners at Anthropic do about agent scratch space in
   evaluation harnesses? (Ask, if the residency happens.)
 
-**Related, still open:** `/dev/shm` is about 4 GB under OrbStack but 64 MB
-under most other Docker setups, and `/tmp` is fixed at 256 MB in code.
-Setting both in the config would make runs identical across machines.
+**Related, resolved 2026-11-10:** `/dev/shm` was about 4 GB under OrbStack
+but 64 MB under most other Docker setups, and `/tmp` was fixed at 256 MB in
+code. Both are now set in the config (`tmp_mb`, `shm_mb`), so they are
+recorded in every run and identical across machines. Lesson: anything the
+environment decides silently is an uncontrolled variable; make it a config
+value.

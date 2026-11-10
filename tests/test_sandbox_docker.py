@@ -267,7 +267,7 @@ def test_killed_processes_do_not_exhaust_process_limit(make_sandbox):
 # ----- resource limits ---------------------------------------------------
 
 def test_memory_limit_kills_code(make_sandbox):
-    box = make_sandbox(memory="256m")
+    box = make_sandbox(memory_mb=256)
     result, details = run(box, "x = b'a' * (800 * 1024 * 1024); print(len(x))")
     assert result["exit_code"] == 137
     assert result["timed_out"] is False
@@ -507,3 +507,15 @@ def test_listing_is_capped(make_sandbox, monkeypatch):
     listing = read_listing(details)
     assert 0 < len(listing) < 500
     assert all(e["path"].startswith("/work/file_") for e in listing)  # no half-read entries
+
+
+def test_tmp_and_shm_sizes_come_from_settings(make_sandbox):
+    box = make_sandbox(memory_mb=512, tmp_mb=100, shm_mb=50)
+    code = (
+        "import os\n"
+        "for d in ('/tmp', '/dev/shm'):\n"
+        "    s = os.statvfs(d)\n"
+        "    print(d, s.f_blocks * s.f_frsize // (1024 * 1024))\n"
+    )
+    result, _ = run(box, code)
+    assert result["stdout"] == "/tmp 100\n/dev/shm 50\n"

@@ -33,7 +33,9 @@ limits:
 
 sandbox:
   image: residency-sandbox:py3.14
-  memory: 1g
+  memory_mb: 1024               # everything in the container, including /tmp and /dev/shm contents
+  tmp_mb: 256                  # /tmp size (in memory)
+  shm_mb: 256                  # /dev/shm size (in memory)
   cpus: 1.0
   pids_limit: 256
   workspace_archive_max_mb: 100  # cap on the tar of /work kept after each agent ends

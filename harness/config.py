@@ -49,10 +49,19 @@ class Limits(Strict):
 
 class SandboxConfig(Strict):
     image: str
-    memory: str
+    memory_mb: int = Field(ge=64)  # everything in the container: processes, /tmp and /dev/shm contents
+    tmp_mb: int = Field(ge=1)      # size of /tmp (in memory, counts against memory_mb)
+    shm_mb: int = Field(ge=1)      # size of /dev/shm (in memory, counts against memory_mb)
     cpus: float = Field(gt=0)
     pids_limit: int = Field(ge=16)
     workspace_archive_max_mb: int = Field(ge=1)  # cap on the tar of /work kept after the agent ends
+
+    @model_validator(mode="after")
+    def folders_fit_in_memory(self):
+        for name in ("tmp_mb", "shm_mb"):
+            if getattr(self, name) > self.memory_mb:
+                raise ValueError(f"{name} ({getattr(self, name)}) is larger than memory_mb ({self.memory_mb})")
+        return self
 
 
 class RunConfig(Strict):
