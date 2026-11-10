@@ -11,12 +11,22 @@ In order:
   2. Refuse to start unless the git tree is clean (ignoring runs/), so the
      commit identifies the exact code, prompts, design and config.
   3. Create runs/<date>_<experiment>_<topology>_<nnn>/ holding exact copies
-     of the config and design, commit.txt, log.jsonl and outputs/.
-  4. Log the setup first: config, commit, Docker image ID, Python versions,
-     sandbox packages, SDK version, then every system prompt.
-  5. Run the topology. Whatever happens (success, error, Ctrl-C) the
-     containers are stopped, the log is closed and its final hash written.
-     Then verify.py checks the log and the output files.
+     of the config and design, and commit.txt.
+  4. Run it. One harness means one log ("one harness, one log; folders
+     nest the way harnesses nest"):
+       single       log.jsonl, outputs/ and final_hash.txt in the run folder.
+       independent  one subfolder per agent, each laid out like a single
+                    run with its own harness, container and log; plus
+                    batch.jsonl and final_hash.txt at the top, recording each
+                    agent's final log hash so the batch can't be quietly
+                    edited.
+     Each log starts with the setup: config, commit, Docker image ID,
+     Python versions, sandbox packages, SDK version, then every system
+     prompt. Whatever happens (success, error, Ctrl-C) the containers are
+     stopped, every log is closed and its final hash written.
+  5. Verify: verify.py checks each log and its output files; for
+     independent, verify_independent also checks that the subfolders match
+     what batch.jsonl recorded.
   6. After the log is closed: import the analysis entry point and call it
      with the accepted submissions, then append one line to runs/index.jsonl.
      This happens for failed and aborted runs too.
@@ -29,6 +39,7 @@ records what happened during the run, and grading can be redone later
 without contradicting it.
 """
 
+import functools
 import json
 import os
 import platform
@@ -47,10 +58,18 @@ import pydantic
 from harness.config import REPO_ROOT, load_config, load_object, repo_path
 from harness.harness import Harness
 from harness.sandbox import Sandbox
-from harness.topologies import TOPOLOGIES
+from harness.topologies import TOPOLOGIES, single_agent
 from harness.verify import verify
 
 MAX_PROBLEMS_IN_INDEX = 10
+
+# `independent` is a batch of whole runs, so run_independent below runs it,
+# not a function in harness/topologies.py.
+IMPLEMENTED_TOPOLOGIES = set(TOPOLOGIES) | {"independent"}
+
+# What sits at the top of an independent run folder, besides one subfolder
+# per agent. Anything else there is reported by verify_independent.
+INDEPENDENT_TOP_LEVEL = {"config.yaml", "design.md", "commit.txt", "batch.jsonl", "final_hash.txt"}
 
 RUNS_DIR = REPO_ROOT / "runs"
 
@@ -65,7 +84,7 @@ def check_config_files(config) -> None:
     load_object(config.submission_model)
     if config.sanity_checks:
         load_object(config.sanity_checks)
-    if config.topology not in TOPOLOGIES:
+    if config.topology not in IMPLEMENTED_TOPOLOGIES:
         raise NotImplementedError(f"topology {config.topology!r} is not implemented yet")
 
 
@@ -103,11 +122,17 @@ def check_record_keepers(logger_factory, verifier) -> None:
 
 
 def run_verifier(verifier, log_path: Path, final_hash: str) -> dict:
-    """Call verify.py and summarise its answer for the index.
+    """Call verify.py on one log and summarise its answer for the index."""
+    return summarise_problems(call_verifier(verifier, log_path, final_hash))
+
+
+def call_verifier(verifier, log_path: Path, final_hash: str | None) -> list[dict]:
+    """Call verify.py and return its full list of problems (empty = clean).
 
     verify(log_path, expected_final_hash) must return (ok, problems), where
     problems is a list of dicts with at least "kind", "line" and "detail".
-    A crash or a malformed answer is itself reported as a problem.
+    A crash or a malformed answer is itself reported as a problem, and so is
+    ok=False with no problems listed.
     """
     try:
         answer = verifier(log_path, final_hash)
@@ -115,11 +140,17 @@ def run_verifier(verifier, log_path: Path, final_hash: str) -> dict:
                 and isinstance(answer[0], bool) and isinstance(answer[1], list)):
             raise TypeError(f"verify must return (ok, problems); got {answer!r}")
         ok, problems = answer
+        if not ok and not problems:
+            problems = [{"kind": "verifier_error", "line": None, "detail": "verify said not ok but listed no problems"}]
     except Exception as error:
-        ok = False
         problems = [{"kind": "verifier_error", "line": None, "detail": f"{type(error).__name__}: {error}"}]
+    return problems
+
+
+def summarise_problems(problems: list[dict]) -> dict:
+    """The index's verify field: ok, how many problems, the first few."""
     return {
-        "ok": ok and not problems,
+        "ok": not problems,
         "problem_count": len(problems),
         "problems": problems[:MAX_PROBLEMS_IN_INDEX],
     }
@@ -200,6 +231,241 @@ def append_index_line(index_path: Path, record: dict) -> None:
         os.fsync(f.fileno())
 
 
+# ----- one harness, one log ------------------------------------------------
+
+def record_one_log(config, folder: Path, client, logger_factory, sandbox_factory,
+                   metadata: dict, play) -> dict:
+    """Run one harness in ``folder``, recording everything in one hash-chained log.
+
+    ``folder`` gets log.jsonl, outputs/ and final_hash.txt. ``play(harness,
+    client)`` runs the agents and returns their outcomes. Whatever happens
+    (success, error, Ctrl-C) the containers are stopped, run_end is logged,
+    the log is closed and its final hash written. Ctrl-C is not re-raised
+    here: the status says "aborted" and the caller decides.
+
+    A single run is one of these in the run folder; an independent run is
+    one per agent, each in its own subfolder.
+    """
+    start = time.monotonic()
+    (folder / "outputs").mkdir()
+    logger = logger_factory(folder / "log.jsonl")
+    harness = None
+    outcomes = []
+    status = "completed"
+    try:
+        harness = Harness(config, folder, logger, sandbox_factory)
+        harness.start_run(metadata)
+        if (folder / "log.jsonl").stat().st_size == 0:
+            raise RuntimeError("the logger wrote nothing; is harness/logger.py implemented?")
+        outcomes = play(harness, client)
+    except KeyboardInterrupt:
+        status = "aborted"
+    except Exception as error:
+        status = "error"
+        try:
+            logger.append("harness", "run_error", {
+                "type": type(error).__name__, "message": str(error), "traceback": traceback.format_exc()})
+        except Exception:
+            pass  # the logger itself may be what failed
+    finally:
+        wall_clock_s = round(time.monotonic() - start, 3)
+        tokens_used = harness.tokens_used if harness else 0
+        try:
+            logger.append("harness", "run_end", {
+                "status": status, "agents": outcomes, "tokens_used": tokens_used, "wall_clock_s": wall_clock_s})
+        except Exception:
+            pass
+        final_hash = logger.close()
+        (folder / "final_hash.txt").write_text(f"{final_hash}\n")
+    return {
+        "status": status,
+        "outcomes": outcomes,
+        "tokens_used": tokens_used,
+        "wall_clock_s": wall_clock_s,
+        "final_hash": final_hash,
+        "submissions": harness.accepted_submissions if harness else [],
+        "workspace_archive_bytes": dict(harness.workspace_archive_bytes) if harness else {},
+    }
+
+
+# ----- the two shapes of run folder ----------------------------------------
+
+def run_single_log(config, run_dir: Path, client, logger_factory, sandbox_factory,
+                   metadata: dict, verifier) -> dict:
+    """single (and later hierarchical): one harness, so one log in the run folder."""
+    result = record_one_log(config, run_dir, client, logger_factory, sandbox_factory,
+                            metadata, TOPOLOGIES[config.topology])
+    return {
+        "status": result["status"],
+        "outcomes": result["outcomes"],
+        "tokens_used": result["tokens_used"],
+        "final_hash": result["final_hash"],
+        "submissions": result["submissions"],
+        "verify": run_verifier(verifier, run_dir / "log.jsonl", result["final_hash"]),
+        "storage_bytes": {
+            "log": (run_dir / "log.jsonl").stat().st_size,
+            "outputs": directory_bytes(run_dir / "outputs"),
+            "workspace_archives": result["workspace_archive_bytes"],
+        },
+        "extra": {},
+    }
+
+
+def run_independent(config, run_dir: Path, client, logger_factory, sandbox_factory,
+                    metadata: dict, verifier) -> dict:
+    """independent: one fresh harness per agent, one after another.
+
+    Each agent gets its own subfolder, run_dir/<agent id>/, laid out exactly
+    like a single run (log.jsonl, outputs/, final_hash.txt), with its own
+    harness, container, token budget and hash chain. Nothing is shared
+    between them.
+
+    A small top-level log, batch.jsonl, ties the batch together: the config
+    and setup, then each agent's status and final log hash as it ends. Its
+    own final hash goes in run_dir/final_hash.txt. So deleting, swapping or
+    rewriting a whole agent's subfolder is caught, even though that
+    subfolder's own log would still verify on its own.
+
+    If one agent's run fails with an error, the next agent still runs: they
+    are independent. Ctrl-C stops the batch; agents not yet started are
+    logged as not started.
+    """
+    batch = logger_factory(run_dir / "batch.jsonl")
+    status = "completed"
+    agent_runs = {}
+    try:
+        batch.append("harness", "batch_start", {
+            "config": config.model_dump(),
+            "metadata": metadata,
+            "agents": [agent.id for agent in config.agents],
+        })
+        if (run_dir / "batch.jsonl").stat().st_size == 0:
+            raise RuntimeError("the logger wrote nothing; is harness/logger.py implemented?")
+        for agent in config.agents:
+            if status == "aborted":
+                batch.append("harness", "agent_not_started", {"agent_id": agent.id})
+                continue
+            folder = run_dir / agent.id
+            folder.mkdir()
+            play = functools.partial(single_agent, agent_id=agent.id)
+            result = record_one_log(config, folder, client, logger_factory, sandbox_factory,
+                                    {**metadata, "independent_agent": agent.id}, play)
+            agent_runs[agent.id] = result
+            batch.append("harness", "agent_run_end", {
+                "agent_id": agent.id,
+                "status": result["status"],
+                "final_log_hash": result["final_hash"],
+                "tokens_used": result["tokens_used"],
+                "wall_clock_s": result["wall_clock_s"],
+            })
+            if result["status"] == "aborted":
+                status = "aborted"
+            elif result["status"] == "error" and status == "completed":
+                status = "error"
+    except KeyboardInterrupt:
+        status = "aborted"
+    except Exception as error:
+        status = "error"
+        try:
+            batch.append("harness", "batch_error", {
+                "type": type(error).__name__, "message": str(error), "traceback": traceback.format_exc()})
+        except Exception:
+            pass
+    finally:
+        try:
+            batch.append("harness", "batch_end", {
+                "status": status,
+                "agent_statuses": {a: r["status"] for a, r in agent_runs.items()},
+                "tokens_used": sum(r["tokens_used"] for r in agent_runs.values()),
+            })
+        except Exception:
+            pass
+        final_hash = batch.close()
+        (run_dir / "final_hash.txt").write_text(f"{final_hash}\n")
+
+    logs = [run_dir / "batch.jsonl"] + [run_dir / a / "log.jsonl" for a in agent_runs]
+    return {
+        "status": status,
+        "outcomes": [o for r in agent_runs.values() for o in r["outcomes"]],
+        "tokens_used": sum(r["tokens_used"] for r in agent_runs.values()),
+        "final_hash": final_hash,
+        "submissions": [s for r in agent_runs.values() for s in r["submissions"]],
+        "verify": summarise_problems(verify_independent(run_dir, final_hash, verifier)),
+        "storage_bytes": {
+            "log": sum(p.stat().st_size for p in logs if p.is_file()),
+            "outputs": sum(directory_bytes(run_dir / a / "outputs") for a in agent_runs),
+            "workspace_archives": {a: b for r in agent_runs.values()
+                                   for a, b in r["workspace_archive_bytes"].items()},
+        },
+        "extra": {
+            "agent_runs": {
+                a: {"status": r["status"], "tokens_used": r["tokens_used"],
+                    "wall_clock_s": r["wall_clock_s"], "final_log_hash": r["final_hash"]}
+                for a, r in agent_runs.items()
+            },
+        },
+    }
+
+
+def verify_independent(run_dir: Path, expected_final_hash: str | None, verifier=verify) -> list[dict]:
+    """Check a whole independent run folder; return every problem found.
+
+    Uses only Sean's verify() for the hash chains, then checks that the two
+    levels agree:
+      1. batch.jsonl verifies against expected_final_hash (or, if None, the
+         top-level final_hash.txt).
+      2. Each agent that batch.jsonl says ended: its subfolder's log
+         verifies against the final hash the BATCH LOG recorded, and its
+         final_hash.txt says the same.
+      3. The run folder holds nothing else: no unrecorded subfolders or files.
+    Each problem gets a "log" key naming the log it belongs to. Can be run
+    on a finished run folder at any time; never raises.
+    """
+    run_dir = Path(run_dir)
+    batch_log = run_dir / "batch.jsonl"
+    try:
+        if expected_final_hash is None:
+            expected_final_hash = (run_dir / "final_hash.txt").read_text().strip()
+    except OSError as error:
+        return [{"kind": "file_missing", "line": None, "detail": f"final_hash.txt: {error}",
+                 "log": "batch.jsonl"}]
+    problems = [{**p, "log": "batch.jsonl"} for p in call_verifier(verifier, batch_log, expected_final_hash)]
+
+    ended = {}  # agent id -> the final log hash recorded in the batch log
+    try:
+        for number, line in enumerate(batch_log.read_text(encoding="utf-8").splitlines(), start=1):
+            entry = json.loads(line)
+            if entry.get("kind") == "agent_run_end":
+                ended[entry["data"]["agent_id"]] = (entry["data"]["final_log_hash"], number)
+    except Exception as error:
+        problems.append({"kind": "unreadable_line", "line": None, "log": "batch.jsonl",
+                         "detail": f"could not read agent results from batch.jsonl: {type(error).__name__}: {error}"})
+
+    for agent_id, (logged_hash, number) in ended.items():
+        label = f"{agent_id}/log.jsonl"
+        log_path = run_dir / agent_id / "log.jsonl"
+        if not log_path.is_file():
+            problems.append({"kind": "file_missing", "line": number, "log": "batch.jsonl",
+                             "detail": f"batch.jsonl records agent {agent_id!r}, but {label} is missing"})
+            continue
+        problems += [{**p, "log": label} for p in call_verifier(verifier, log_path, logged_hash)]
+        try:
+            written = (run_dir / agent_id / "final_hash.txt").read_text().strip()
+        except OSError:
+            written = None
+        if written != logged_hash:
+            problems.append({"kind": "final_hash_mismatch", "line": number, "log": label,
+                             "detail": f"{agent_id}/final_hash.txt doesn't match the hash batch.jsonl recorded"})
+
+    if run_dir.is_dir():
+        for path in sorted(run_dir.iterdir()):
+            expected_dir = path.name in ended and path.is_dir() and not path.is_symlink()
+            if path.name not in INDEPENDENT_TOP_LEVEL and not expected_dir:
+                problems.append({"kind": "file_extra", "line": None, "log": "batch.jsonl", "file": path.name,
+                                 "detail": "in the run folder, but not recorded in batch.jsonl"})
+    return problems
+
+
 # ----- the whole run -------------------------------------------------------
 
 def run_experiment(
@@ -235,48 +501,19 @@ def run_experiment(
     shutil.copyfile(config_path, run_dir / "config.yaml")
     shutil.copyfile(repo_path(config.design), run_dir / "design.md")
     (run_dir / "commit.txt").write_text(commit + "\n")
-    (run_dir / "outputs").mkdir()
 
-    logger = logger_factory(run_dir / "log.jsonl")
-    harness = None
-    outcomes = []
-    status = "completed"
-    try:
-        harness = Harness(config, run_dir, logger, sandbox_factory)
-        harness.start_run({
-            "run_id": run_dir.name,
-            "started_at": started_at,
-            "commit": commit,
-            "config_path": config_label,
-            "sandbox": sandbox_factory.describe_image(config.sandbox.image),
-            **host_metadata(),
-        })
-        if (run_dir / "log.jsonl").stat().st_size == 0:
-            raise RuntimeError("the logger wrote nothing; is harness/logger.py implemented?")
-        outcomes = TOPOLOGIES[config.topology](harness, client)
-    except KeyboardInterrupt:
-        status = "aborted"
-    except Exception as error:
-        status = "error"
-        try:
-            logger.append("harness", "run_error", {
-                "type": type(error).__name__, "message": str(error), "traceback": traceback.format_exc()})
-        except Exception:
-            pass  # the logger itself may be what failed
-    finally:
-        wall_clock_s = round(time.monotonic() - start, 3)
-        tokens_used = harness.tokens_used if harness else 0
-        try:
-            logger.append("harness", "run_end", {
-                "status": status, "agents": outcomes, "tokens_used": tokens_used, "wall_clock_s": wall_clock_s})
-        except Exception:
-            pass
-        final_hash = logger.close()
-        (run_dir / "final_hash.txt").write_text(f"{final_hash}\n")
+    metadata = {
+        "run_id": run_dir.name,
+        "started_at": started_at,
+        "commit": commit,
+        "config_path": config_label,
+        "sandbox": sandbox_factory.describe_image(config.sandbox.image),
+        **host_metadata(),
+    }
+    shape = run_independent if config.topology == "independent" else run_single_log
+    result = shape(config, run_dir, client, logger_factory, sandbox_factory, metadata, verifier)
+    wall_clock_s = round(time.monotonic() - start, 3)
 
-    verification = run_verifier(verifier, run_dir / "log.jsonl", final_hash)
-
-    submissions = harness.accepted_submissions if harness else []
     record = {
         "run_id": run_dir.name,
         "timestamp": started_at,
@@ -288,31 +525,28 @@ def run_experiment(
         "model": config.model,
         "effort": config.effort,
         "n_agents": len(config.agents),
-        "status": status,
-        "agent_statuses": {o["agent_id"]: o["status"] for o in outcomes},
-        "accepted_submissions": len(submissions),
-        "tokens_used": tokens_used,
+        "status": result["status"],
+        "agent_statuses": {o["agent_id"]: o["status"] for o in result["outcomes"]},
+        "accepted_submissions": len(result["submissions"]),
+        "tokens_used": result["tokens_used"],
         "wall_clock_s": wall_clock_s,
-        "final_log_hash": final_hash,
-        "verify": verification,
-        "storage_bytes": {
-            "log": (run_dir / "log.jsonl").stat().st_size,
-            "outputs": directory_bytes(run_dir / "outputs"),
-            "workspace_archives": dict(harness.workspace_archive_bytes) if harness else {},
-        },
-        **run_analysis(config, submissions),
+        "final_log_hash": result["final_hash"],
+        "verify": result["verify"],
+        "storage_bytes": result["storage_bytes"],
+        **result["extra"],
+        **run_analysis(config, result["submissions"]),
     }
     index_path = Path(runs_dir) / "index.jsonl"
     append_index_line(index_path, record)
 
     outcome = {**record, "git_commit": None, "git_commit_error": None}
     try:
-        outcome["git_commit"] = commit_result(run_dir, index_path, status)
+        outcome["git_commit"] = commit_result(run_dir, index_path, result["status"])
     except (subprocess.CalledProcessError, OSError) as error:
         detail = getattr(error, "stderr", "") or ""
         outcome["git_commit_error"] = f"{type(error).__name__}: {error} {detail}".strip()
 
-    if status == "aborted":
+    if result["status"] == "aborted":
         raise KeyboardInterrupt
     return outcome
 

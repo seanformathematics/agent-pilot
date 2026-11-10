@@ -62,14 +62,14 @@ To build and test the harness, use a **toy experiment under `tests/fixtures/`** 
 
 - An **agent** is a conversation, not a process: a system prompt, a message list and a loop that calls `client.messages.create`, executes requested tools via the harness, appends `tool_result`s (matching `tool_use_id`) and repeats until the agent submits, stops or hits the turn limit.
 - One **Agent** class serves all roles. Roles differ by system prompt and tool list, both set by config. Avoid subclasses unless a role truly needs different loop behavior.
-- One **Harness** instance per experiment run, shared by all agents in that run (dependency injection). It is the only object that touches the sandbox, the log and the budget.
+- One **Harness** instance per log, shared by all agents that log records (dependency injection): one per run for `single` and `hierarchical`, one per agent for `independent`. It is the only object that touches the sandbox, the log and the budget.
 - The **orchestrator** is plain Python in `topologies.py`, never an LLM. It dispatches tasks and collects results; it does not interpret physics.
 - The **outer experiment loop** stops on programmatic criteria (convergence tests, round/compute caps), never on an agent's say-so and never on distance to the known answer.
 
 ## Topologies (`harness/topologies.py`)
 
 - `single` — one agent, end to end.
-- `independent` — n separate single-agent runs of the same task, each with a fresh harness.
+- `independent` — n separate single-agent runs of the same task (same role and task for every agent, checked when the config loads), each with a fresh harness (so its own log, container and budget), in one run folder.
 - `one_shot` — fixed task specs dispatched to isolated workers; one input, one output each; no inter-agent messages; deterministic final sweep.
 - `hierarchical` — a supervisor agent directs workers via `send_message` (types: task, result, query, directive). No sideways worker-to-worker messages. Round limits and budgets enforced by the harness.
 
@@ -109,7 +109,11 @@ Principles only. Mechanics live in the `harness/sandbox.py` module documentation
 
 ## Runs (`runs/`)
 
-Each run gets `runs/<date>_<experiment>_<topology>_<nnn>/` containing: `config.yaml` (exact copy), `design.md` (exact copy of the design the config names), `commit.txt`, `log.jsonl`, `outputs/` and `final_hash.txt`. Every config names the design it implements. Nothing in a run folder is edited after the run ends.
+Each run gets `runs/<date>_<experiment>_<topology>_<nnn>/` containing: `config.yaml` (exact copy), `design.md` (exact copy of the design the config names) and `commit.txt`, then the record. Every config names the design it implements. Nothing in a run folder is edited after the run ends.
+
+- **One harness, one log; folders nest the way harnesses nest.** Each harness writes `log.jsonl`, `outputs/` and `final_hash.txt` in its own folder, so every log has the same shape and `verify.py` checks each unchanged.
+  - `single` (and later `hierarchical`, one shared harness): those files sit in the run folder.
+  - `independent`: one subfolder per agent, `runs/<run>/<agent id>/`, each a complete single-agent record. At the top, `batch.jsonl` (hash-chained) records the setup and each agent's status and final log hash, and `final_hash.txt` holds its last hash. Verification checks every log and that the subfolders match `batch.jsonl`, so a deleted, added or swapped subfolder is caught.
 
 - **Clean tree required.** The harness refuses to start a run if the git working tree has uncommitted changes outside `runs/` (finished runs land there between commits and hold no code, prompts or configs), so `commit.txt` always identifies the exact code, prompts, design and config used.
 - **Run index.** At the end of every run (including failed or aborted ones), the harness appends one line to `runs/index.jsonl`: run id, timestamp, experiment, design, config, commit, topology, number of agents, status, tokens used, wall-clock time, final log hash, storage sizes, and (filled in by the experiment's analysis entry point, not by agents) `estimate` and `passed`. Full field list: README §2.

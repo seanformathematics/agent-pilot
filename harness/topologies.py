@@ -8,8 +8,10 @@ Each function takes a ready Harness (which owns the sandboxes, the log and
 the budget) and an API client, and returns one outcome dict per agent.
 Containers are always stopped, even if something fails mid-run.
 
-`independent` (n fresh single-agent runs) is a batch of whole runs, so it
-lives with run setup in harness/run.py rather than here (milestone M4).
+`independent` (n fresh single-agent runs) is a batch of whole runs, each
+with its own harness and log, so the batch itself is run by
+harness/run.py (`run_independent`). Each of its agents is played by
+`single_agent` below.
 """
 
 from harness.agent import Agent
@@ -17,7 +19,11 @@ from harness.agent import Agent
 
 def single(harness, client) -> list[dict]:
     """One agent, end to end."""
-    agent_id = harness.config.agents[0].id
+    return single_agent(harness, client, harness.config.agents[0].id)
+
+
+def single_agent(harness, client, agent_id: str) -> list[dict]:
+    """Run one named agent end to end on this harness."""
     harness.start_agent(agent_id)
     try:
         agent = Agent(agent_id, client, harness)

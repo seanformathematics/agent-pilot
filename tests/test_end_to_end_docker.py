@@ -102,3 +102,40 @@ def test_api_key_appears_nowhere_in_a_run_folder(tmp_path, monkeypatch):
     for path in files:
         assert secret.encode() not in path.read_bytes(), path
         assert b"sk-ant" not in path.read_bytes(), path
+
+
+def test_independent_run_end_to_end_agents_cannot_see_each_other(tmp_path):
+    # Three real containers in turn. Agent 0 leaves files in /work and /tmp;
+    # agents 1 and 2 look for them and must find nothing.
+    from harness.config import repo_path
+    look = ("import os\n"
+            "print(sorted(os.listdir('/work')), sorted(os.listdir('/tmp')))\n")
+    client = FakeClient([
+        tool_call("run_python", {"code": (
+            "open('/work/left-by-0.txt', 'w').write('hello')\n"
+            "open('/tmp/left-by-0.txt', 'w').write('hello')\n" + look)}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "0"}),
+        tool_call("run_python", {"code": look}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "1"}),
+        tool_call("run_python", {"code": look}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "2"}),
+    ])
+    record = run_experiment(repo_path("tests/fixtures/toy_sum/config_independent.yaml"), client, Logger,
+                            sandbox_factory=Sandbox, runs_dir=tmp_path / "runs", get_commit=lambda: "abc123",
+                            commit_result=lambda run_dir, index_path, status: "not-a-real-commit")
+
+    assert record["status"] == "completed"
+    assert record["verify"] == {"ok": True, "problem_count": 0, "problems": []}
+    assert record["analysis"] == {"estimate": 1555, "passed": True}
+
+    run_dir = tmp_path / "runs" / record["run_id"]
+    seen = {agent: (run_dir / agent / "outputs" / agent / f"{agent}-0001.out").read_text()
+            for agent in ("solver-0", "solver-1", "solver-2")}
+    assert seen["solver-0"].count("left-by-0.txt") == 2  # agent 0 sees its own files
+    for agent in ("solver-1", "solver-2"):
+        assert "left-by-0" not in seen[agent]
+        assert seen[agent].startswith("[] ")  # /work starts empty
+
+    images = {json.loads((run_dir / a / "log.jsonl").open().readline())["data"]["metadata"]["sandbox"]["image_id"]
+              for a in ("solver-0", "solver-1", "solver-2")}
+    assert len(images) == 1  # same image recorded in every agent's log

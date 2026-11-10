@@ -19,5 +19,7 @@ def analyze(submissions: list[dict]) -> dict:
     """
     if not submissions:
         return {"estimate": None, "passed": False}
-    final = submissions[-1]["submission"]["total"]
-    return {"estimate": final, "passed": final == TRUE_SUM}
+    totals = [item["submission"]["total"] for item in submissions]
+    # One agent (single) or several (independent): pass only if every
+    # accepted answer is right. The estimate is the last one accepted.
+    return {"estimate": totals[-1], "passed": all(t == TRUE_SUM for t in totals)}

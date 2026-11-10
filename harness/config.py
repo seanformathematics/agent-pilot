@@ -39,7 +39,7 @@ class AgentConfig(Strict):
 class Limits(Strict):
     max_turns: int = Field(ge=1)  # API calls per agent
     max_tokens_per_response: int = Field(ge=1)
-    max_total_tokens: int = Field(ge=1)  # input + output, whole run
+    max_total_tokens: int = Field(ge=1)  # input + output, per harness: the whole run, or each agent in independent
     max_timeout_s: int = Field(ge=1)  # upper bound on run_python timeout_s
     output_cap_chars: int = Field(ge=100)  # per stream, per execution, shown to the agent
     max_stored_output_mb: int = Field(ge=1)  # per stream, per execution, saved to disk
@@ -89,6 +89,11 @@ class RunConfig(Strict):
                 raise ValueError(f"agent {agent.id!r} has unknown role {agent.role!r}")
         if self.topology == "single" and len(self.agents) != 1:
             raise ValueError(f"the single topology needs exactly one agent, got {len(self.agents)}")
+        if self.topology == "independent":
+            # Independent runs repeat ONE task so the agents' behaviour can be
+            # compared; different tasks would confound that.
+            if len({(a.role, a.task) for a in self.agents}) != 1:
+                raise ValueError("the independent topology needs every agent to have the same role and task")
         for name, role in self.roles.items():
             if "send_message" in role.tools and self.topology != "hierarchical":
                 raise ValueError(f"role {name!r}: send_message is only allowed in the hierarchical topology")

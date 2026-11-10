@@ -1,7 +1,9 @@
 """The Harness: tool dispatch, validation, logging and budgets.
 
-One Harness per experiment run, shared by every agent in that run. It is the
-only object that touches the sandboxes, the log and the token budget. Agents
+One Harness per log, shared by every agent that log records: one per run
+for `single`, one per agent for `independent` (each agent then has its own
+log and budget). It is the only object that touches the sandboxes, the log
+and the token budget. Agents
 reach all of these only through ``handle_tool_call``, and the Agent class
 records API traffic through ``log`` and ``record_usage``.
 

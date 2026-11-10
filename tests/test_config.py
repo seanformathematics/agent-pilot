@@ -77,3 +77,11 @@ def test_work_larger_than_memory_rejected():
     raw["sandbox"]["work_mb"] = raw["sandbox"]["memory_mb"] + 1
     with pytest.raises(ValidationError, match="work_mb"):
         RunConfig.model_validate(raw)
+
+
+def test_independent_agents_must_share_role_and_task():
+    raw = yaml.safe_load(TOY_CONFIG.with_name("config_independent.yaml").read_text())
+    RunConfig.model_validate(raw)  # the fixture itself is fine
+    raw["agents"][1]["task"] = "Compute the sum of these integers: 1, 2."
+    with pytest.raises(ValidationError, match="same role and task"):
+        RunConfig.model_validate(raw)

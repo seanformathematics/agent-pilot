@@ -200,11 +200,38 @@ Checkpoint: `m3-first-live-run`
 
 ## M4 — `independent` topology
 
-Done when: n fresh single-agent runs of one config each produce their own run
-folder and index line, and cannot see each other.
+Done when: n fresh single-agent runs of one config each have their own
+harness, container and log, cannot see each other, and are recorded as one
+run folder with one index line.
 
-- [ ] SEAN: one run folder per agent, or one folder holding n agents?
-      [one folder per agent, sharing a batch id]
+- [x] **SEAN:** one folder per agent, or one folder holding n agents?
+      Decided 2026-11-10: **one run folder, one subfolder per agent**, so the
+      folder layout mirrors the agent topology. Rule: one harness, one log;
+      folders nest the way harnesses nest. Each subfolder is a complete
+      single-run record (`log.jsonl`, `outputs/`, `final_hash.txt`), so
+      `verify.py` checks it unchanged. A top-level hash-chained `batch.jsonl`
+      records each agent's final log hash, so the batch itself can't be
+      quietly edited
+- [x] `run_independent` in `harness/run.py`: agents run one after another,
+      each with a fresh Harness and Logger. A harness error in one agent
+      doesn't stop the others; Ctrl-C stops the batch and logs the rest as
+      not started
+- [x] `verify_independent`: Sean's `verify` on every log, plus cross-checks
+      (subfolder final hashes match `batch.jsonl`; nothing missing or extra)
+- [x] Every agent in an independent config must have the same role and task
+      (decided 2026-11-10: the point is to compare agents on one task);
+      checked when the config loads
+- [x] `limits` apply per agent (each has its own harness), so a batch can use
+      up to n × `max_total_tokens`
+- [x] Toy config `tests/fixtures/toy_sum/config_independent.yaml` (3 agents);
+      tests in `tests/test_independent.py` and a real-Docker end-to-end test
+      showing agents can't see each other's `/work` or `/tmp`
+- [x] CLAUDE.md "Runs" and README updated (Sean approved 2026-11-10)
+- [ ] One live independent toy run (~4¢); read it together
+- [ ] Re-verify invariants, tag
+
+Later, if wanted: run agents in parallel (now sequential: simplest, and
+the record is easier to read).
 
 Checkpoint: `m4-independent`
 
@@ -231,3 +258,7 @@ Checkpoint: `m5-ising-ready`
 - `one_shot` and `hierarchical` topologies. `hierarchical` needs design
   decisions from SEAN first: message routing, round limits, what a supervisor
   can see.
+- Idea (2026-11-10): in `hierarchical`, let the supervisor allocate token
+  budgets to workers within a hard total from the config. The harness
+  enforces both the total and each allocation; the allocations are logged,
+  and how a supervisor budgets is itself behaviour to study.
