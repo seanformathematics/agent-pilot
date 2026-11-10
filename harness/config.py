@@ -41,7 +41,8 @@ class Limits(Strict):
     max_tokens_per_response: int = Field(ge=1)
     max_total_tokens: int = Field(ge=1)  # input + output, whole run
     max_timeout_s: int = Field(ge=1)  # upper bound on run_python timeout_s
-    output_cap_chars: int = Field(ge=100)  # per stream, per execution
+    output_cap_chars: int = Field(ge=100)  # per stream, per execution, shown to the agent
+    max_stored_output_mb: int = Field(ge=1)  # per stream, per execution, saved to disk
     max_submissions: int = Field(ge=1)  # every submit_result call counts
     api_retries: int = Field(ge=0)  # retries of a failed API call; each one is logged
 
@@ -51,10 +52,11 @@ class SandboxConfig(Strict):
     memory: str
     cpus: float = Field(gt=0)
     pids_limit: int = Field(ge=16)
+    workspace_archive_max_mb: int = Field(ge=1)  # cap on the tar of /work kept after the agent ends
 
 
 class RunConfig(Strict):
-    experiment: str
+    experiment: str = Field(pattern=AGENT_ID_PATTERN)  # used in run folder names
     design: str
     topology: Literal["single", "independent", "one_shot", "hierarchical"]
     model: str
@@ -75,6 +77,8 @@ class RunConfig(Strict):
         for agent in self.agents:
             if agent.role not in self.roles:
                 raise ValueError(f"agent {agent.id!r} has unknown role {agent.role!r}")
+        if self.topology == "single" and len(self.agents) != 1:
+            raise ValueError(f"the single topology needs exactly one agent, got {len(self.agents)}")
         for name, role in self.roles.items():
             if "send_message" in role.tools and self.topology != "hierarchical":
                 raise ValueError(f"role {name!r}: send_message is only allowed in the hierarchical topology")

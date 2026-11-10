@@ -293,3 +293,85 @@ def test_stop_removes_container(make_sandbox):
     box.stop()
     gone = subprocess.run(["docker", "inspect", cid], capture_output=True)
     assert gone.returncode != 0
+
+
+# ----- workspace archive at the end of an agent -------------------------
+
+import tarfile
+
+from harness.sandbox import inspect_archive
+
+
+def test_archive_holds_agent_files(make_sandbox):
+    box = make_sandbox()
+    run(box, "import os; os.makedirs('/work/sub'); open('/work/sub/result.txt','w').write('42')")
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024)
+    assert info["truncated"] is False and info["exit_code"] == 0
+    summary = inspect_archive(box.test_output_dir / "ws.tar")
+    assert summary["complete"] is True
+    with tarfile.open(box.test_output_dir / "ws.tar") as tar:  # reading, not extracting
+        assert tar.extractfile("./sub/result.txt").read() == b"42"
+
+
+def test_archive_stores_links_not_host_files(make_sandbox, tmp_path):
+    host_secret = tmp_path / "host_secret.txt"
+    host_secret.write_text("HOST-ONLY-CONTENT")
+    box = make_sandbox()
+    run(box, f"import os; os.symlink({str(host_secret)!r}, '/work/sneaky')")
+    box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024)
+    assert b"HOST-ONLY-CONTENT" not in (box.test_output_dir / "ws.tar").read_bytes()
+    flagged = inspect_archive(box.test_output_dir / "ws.tar")["flagged"]
+    assert flagged == [{"name": "./sneaky", "type": "symlink", "reasons": ["link"], "target": str(host_secret)}]
+
+
+def test_archive_size_cap(make_sandbox):
+    box = make_sandbox()
+    run(box, "import os; open('/work/big.bin','wb').write(os.urandom(3 * 1024 * 1024))")
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=1024 * 1024)
+    assert info["truncated"] is True
+    assert os.path.getsize(box.test_output_dir / "ws.tar") == 1024 * 1024
+    assert inspect_archive(box.test_output_dir / "ws.tar")["complete"] is False
+
+
+def test_archive_cap_stops_huge_sparse_file_quickly(make_sandbox):
+    # A 20 GB sparse file costs the agent nothing but would stream 20 GB of zeros.
+    box = make_sandbox()
+    run(box, "f = open('/work/huge.bin','wb'); f.truncate(20 * 1024**3); f.close()")
+    import time
+    start = time.monotonic()
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=1024 * 1024)
+    assert info["truncated"] is True
+    assert time.monotonic() - start < 30
+
+
+def test_locked_workspace_is_still_cleared_and_removed(make_sandbox):
+    box = make_sandbox()
+    run(box, "import os; os.makedirs('/work/a/b'); open('/work/a/b/f','w').write('x');"
+             " os.chmod('/work/a/b', 0); os.chmod('/work/a', 0)")
+    assert box.clear_workspace() is True
+    box.stop()
+    assert box.remove_work_dir() is True
+    assert not box.work_dir.exists()
+
+
+def test_stored_output_cap_keeps_true_tail_for_agent(make_sandbox):
+    box = make_sandbox(output_cap=1000, stored_output_cap=100_000)
+    result, details = run(box, "print('H' * 600 + 'x' * 1_000_000 + 'END-OF-OUTPUT')")
+    assert os.path.getsize(details["stdout_path"]) == 100_000
+    assert details["stdout_bytes"] == 1_000_614
+    assert details["stdout_stored_bytes"] == 100_000
+    assert details["storage_truncated"] is True
+    assert result["stdout"].startswith("H" * 500)
+    assert result["stdout"].endswith("END-OF-OUTPUT\n")  # the real end, past the saved part
+
+
+def test_stored_cap_smaller_than_agent_cap_refused(tmp_path):
+    with pytest.raises(ValueError):
+        Sandbox(IMAGE, tmp_path / "w", output_cap=1000, stored_output_cap=500)
+
+
+def test_describe_image():
+    facts = Sandbox.describe_image(IMAGE)
+    assert facts["image_id"].startswith("sha256:")
+    assert facts["python_version"].startswith("3.14")
+    assert any(line.startswith("numpy==") for line in facts["packages"])

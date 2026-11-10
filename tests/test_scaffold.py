@@ -25,4 +25,4 @@ def test_run_python_input_rejects_bad_timeout():
 
 
 def test_all_topologies_registered():
-    assert set(TOPOLOGIES) == {"single", "independent", "one_shot", "hierarchical"}
+    assert set(TOPOLOGIES) == {"single"}

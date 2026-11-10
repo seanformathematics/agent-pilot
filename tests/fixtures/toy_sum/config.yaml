@@ -26,7 +26,8 @@ limits:
   max_tokens_per_response: 16000
   max_total_tokens: 200000     # input + output, whole run
   max_timeout_s: 120           # upper bound on run_python timeout_s
-  output_cap_chars: 10000      # per stream, per execution
+  output_cap_chars: 10000      # per stream, per execution, shown to the agent
+  max_stored_output_mb: 100    # per stream, per execution, saved to disk
   max_submissions: 3           # first attempt plus two resubmissions
   api_retries: 2               # retries of a failed API call, each logged
 
@@ -35,3 +36,4 @@ sandbox:
   memory: 1g
   cpus: 1.0
   pids_limit: 256
+  workspace_archive_max_mb: 100  # cap on the tar of /work kept after each agent ends

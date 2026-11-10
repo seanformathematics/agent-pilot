@@ -11,13 +11,14 @@ contains log contents, log paths or hashes.
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 from pydantic import ValidationError
 
 from harness import tools
 from harness.config import RunConfig, load_object, repo_path
-from harness.sandbox import Sandbox
+from harness.sandbox import Sandbox, inspect_archive
 
 SUBMIT_RESULT_DESCRIPTION = (
     "Submit your final result. The input is checked and you get either an "
@@ -61,6 +62,7 @@ class Harness:
         self._submit_attempts: dict[str, int] = {}
         self._done: set[str] = set()
         self.accepted_submissions: list[dict] = []
+        self.workspace_archive_bytes: dict[str, int] = {}
         self.tokens_used = 0
 
     # ----- run and agent lifecycle -------------------------------------
@@ -90,6 +92,7 @@ class Harness:
             cpus=self.config.sandbox.cpus,
             pids_limit=self.config.sandbox.pids_limit,
             output_cap=limits.output_cap_chars,
+            stored_output_cap=limits.max_stored_output_mb * 1024 * 1024,
         )
         box.start()
         self._sandboxes[agent_id] = box
@@ -99,11 +102,59 @@ class Harness:
         self.log(agent_id, "agent_start", {"container_id": box.container_id})
 
     def stop_agent(self, agent_id: str) -> None:
-        """Remove this agent's container."""
+        """Finish with an agent's sandbox, after the agent has ended.
+
+        In order: archive /work into the run's outputs, inspect the archive
+        without extracting it, clear /work from inside the container, remove
+        the container, then remove the empty host directory. If archiving
+        fails, the workspace is kept on the host and that is logged.
+        """
         box = self._sandboxes.get(agent_id)
-        if box is not None:
-            box.stop()
-            self.log(agent_id, "container_stop", {})
+        if box is None or box.container_id is None:
+            return
+
+        output_dir = self.run_dir / "outputs" / agent_id
+        output_dir.mkdir(parents=True, exist_ok=True)
+        archive_path = output_dir / f"{agent_id}-workspace.tar"
+        max_bytes = self.config.sandbox.workspace_archive_max_mb * 1024 * 1024
+
+        archived = False
+        try:
+            info = box.archive_workspace(archive_path, max_bytes)
+            archived = True
+        except (OSError, subprocess.SubprocessError) as error:
+            self.log(agent_id, "workspace_archive_failed", {"error": f"{type(error).__name__}: {error}"})
+
+        cleared = False
+        if archived:
+            self.workspace_archive_bytes[agent_id] = info["bytes"]
+            self.log(agent_id, "workspace_archive", {
+                "file": archive_path.name,
+                "sha256": sha256_file(archive_path),
+                "bytes": info["bytes"],
+                "max_bytes": max_bytes,
+                "truncated": info["truncated"],
+                "timed_out": info["timed_out"],
+                "tar_exit_code": info["exit_code"],
+                "tar_errors": info["tar_errors"],
+                "errors_file_sha256": sha256_file(Path(info["errors_path"])),
+                "contents": inspect_archive(archive_path),
+            })
+            if info["truncated"] or info["timed_out"]:
+                self.log(agent_id, "flag", {"reason": "workspace_archive_incomplete",
+                                            "truncated": info["truncated"], "timed_out": info["timed_out"]})
+            cleared = box.clear_workspace()
+
+        box.stop()
+        self.log(agent_id, "container_stop", {})
+
+        if cleared and box.remove_work_dir():
+            self.log(agent_id, "workspace_deleted", {})
+        else:
+            self.log(agent_id, "workspace_kept", {
+                "path": str(box.work_dir),
+                "reason": "archive failed" if not archived else "workspace not empty after clearing",
+            })
 
     # ----- what agents are given ---------------------------------------
 
@@ -199,8 +250,12 @@ class Harness:
             "end_reason": details["end_reason"],
             "stdout_bytes": details["stdout_bytes"],
             "stderr_bytes": details["stderr_bytes"],
+            "stdout_stored_bytes": details["stdout_stored_bytes"],
+            "stderr_stored_bytes": details["stderr_stored_bytes"],
             "files": hash_execution_files(details),
         })
+        if details["storage_truncated"]:
+            self.log(agent_id, "flag", {"reason": "stored_output_truncated", "exec_id": exec_id})
 
         succeeded = result["exit_code"] == 0 and not result["timed_out"]
         if succeeded:

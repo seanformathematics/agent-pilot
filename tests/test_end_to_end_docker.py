@@ -2,12 +2,14 @@
 
 import json
 import subprocess
+import tarfile
 
 import pytest
 
-from harness.agent import Agent
+from harness.run import run_experiment
 from harness.sandbox import Sandbox
-from tests.conftest import FakeClient, entries_of, tool_call
+from tests.conftest import TOY_CONFIG, FakeClient, tool_call
+from tests.fixtures.dummy_logger import DummyLogger
 
 IMAGE = "residency-sandbox:py3.14"
 
@@ -25,24 +27,31 @@ pytestmark = [
 ]
 
 
-def test_toy_run_end_to_end(make_harness):
-    harness, logger = make_harness(sandbox_factory=Sandbox)
+def test_toy_run_end_to_end(tmp_path):
     client = FakeClient([
-        tool_call("run_python", {"code": "print(sum([17, -4, 256, 1031, 9, -88, 42, 7, 300, -15]))"}),
+        tool_call("run_python", {"code": (
+            "total = sum([17, -4, 256, 1031, 9, -88, 42, 7, 300, -15])\n"
+            "open('/work/answer.txt', 'w').write(str(total))\n"
+            "print(total)\n")}),
         tool_call("submit_result", {"total": 1555, "method_notes": "sum() in Python."}),
     ])
-    agent = Agent("solver-0", client, harness)
-    harness.start_agent("solver-0")
-    try:
-        outcome = agent.run(harness.task_for("solver-0"))
-    finally:
-        harness.stop_agent("solver-0")
+    record = run_experiment(TOY_CONFIG, client, DummyLogger, sandbox_factory=Sandbox,
+                            runs_dir=tmp_path / "runs", get_commit=lambda: "abc123")
 
-    assert outcome["status"] == "submitted"
-    result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])
-    assert result["exit_code"] == 0 and result["stdout"] == "1555\n"
+    assert record["status"] == "completed"
+    assert record["analysis"] == {"estimate": 1555, "passed": True}
 
-    execution = entries_of(logger, "execution")[0]["data"]
-    assert execution["end_reason"] == "exited"
-    assert (harness.run_dir / "outputs" / "solver-0" / "solver-0-0001.out").read_text() == "1555\n"
-    assert entries_of(logger, "flag") == []
+    tool_result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])
+    assert tool_result["exit_code"] == 0 and tool_result["stdout"] == "1555\n"
+
+    outputs = tmp_path / "runs" / record["run_id"] / "outputs" / "solver-0"
+    assert (outputs / "solver-0-0001.out").read_text() == "1555\n"
+    with tarfile.open(outputs / "solver-0-workspace.tar") as tar:  # read, never extracted
+        assert tar.extractfile("./answer.txt").read() == b"1555"
+
+    log = [json.loads(line) for line in (tmp_path / "runs" / record["run_id"] / "log.jsonl").read_text().splitlines()]
+    metadata = log[0]["data"]["metadata"]
+    assert metadata["sandbox"]["image_id"].startswith("sha256:")
+    assert any(p.startswith("numpy==") for p in metadata["sandbox"]["packages"])
+    assert "workspace_deleted" in [e["kind"] for e in log]
+    assert record["storage_bytes"]["workspace_archives"]["solver-0"] > 0

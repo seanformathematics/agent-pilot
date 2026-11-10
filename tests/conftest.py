@@ -62,7 +62,7 @@ class FakeClient:
         if not self._responses:
             raise AssertionError("FakeClient ran out of scripted responses")
         response = self._responses.pop(0)
-        if isinstance(response, Exception):
+        if isinstance(response, BaseException):  # includes KeyboardInterrupt
             raise response
         return response
 
@@ -75,9 +75,13 @@ class FakeSandbox:
     Code that is exactly "fail" exits 1; anything else exits 0 printing "ok".
     """
 
-    def __init__(self, image, work_dir, memory, cpus, pids_limit, output_cap):
+    def __init__(self, image, work_dir, memory, cpus, pids_limit, output_cap, stored_output_cap):
         self.work_dir = Path(work_dir)
         self.container_id = None
+
+    @staticmethod
+    def describe_image(image):
+        return {"image": image, "image_id": "sha256:fake", "python_version": "3.14 (fake)", "packages": []}
 
     def start(self):
         self.work_dir.mkdir(parents=True, exist_ok=False)
@@ -85,6 +89,26 @@ class FakeSandbox:
 
     def stop(self):
         self.container_id = None
+
+    def archive_workspace(self, archive_path, max_bytes):
+        import io, tarfile
+        data = b"agent file contents\n"
+        with tarfile.open(archive_path, mode="x") as tar:
+            info = tarfile.TarInfo("./result.txt")
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+        errors_path = Path(str(archive_path) + ".err")
+        errors_path.write_text("")
+        return {"archive_path": str(archive_path), "errors_path": str(errors_path),
+                "bytes": Path(archive_path).stat().st_size, "truncated": False,
+                "timed_out": False, "exit_code": 0, "tar_errors": ""}
+
+    def clear_workspace(self):
+        return True
+
+    def remove_work_dir(self):
+        self.work_dir.rmdir()
+        return True
 
     def run_python(self, code, timeout_s, exec_id, output_dir):
         failed = code == "fail"
@@ -97,7 +121,9 @@ class FakeSandbox:
         result = {"exit_code": 1 if failed else 0, "stdout": stdout, "stderr": stderr,
                   "duration_s": 0.01, "timed_out": False, "truncated": False}
         details = {"end_reason": "exited", "script_path": paths[".py"], "stdout_path": paths[".out"],
-                   "stderr_path": paths[".err"], "stdout_bytes": len(stdout), "stderr_bytes": len(stderr)}
+                   "stderr_path": paths[".err"], "stdout_bytes": len(stdout), "stderr_bytes": len(stderr),
+                   "stdout_stored_bytes": len(stdout), "stderr_stored_bytes": len(stderr),
+                   "storage_truncated": False}
         return result, details
 
 

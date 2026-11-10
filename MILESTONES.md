@@ -28,31 +28,47 @@ Checkpoint: `m0-harness-core`
 
 ---
 
-## M1 — Run setup and the `single` topology
+## M1 — Run setup and the `single` topology ✅
 
 Done when: one command runs a config end to end with the fake client and a
 real container, and produces a complete run folder.
 
-- [ ] Refuse to start if the git tree is not clean
-- [ ] Create `runs/<date>_<experiment>_<topology>_<nnn>/` with exact copies
-      of the config and design, `commit.txt`, `log.jsonl`, `outputs/`
-- [ ] First log entries: config, commit, model, Docker image ID, host and
-      sandbox Python versions, SDK version, system prompts
-- [ ] `single` topology: start container, run agent, stop container, always
-      tidy up, even after an error
-- [ ] After the run: import the analysis entry point, call it with accepted
+- [x] Refuse to start if the git tree is not clean (`runs/` excluded, so
+      runs can be batched between commits; see note below)
+- [x] Create `runs/<date>_<experiment>_<topology>_<nnn>/` with exact copies
+      of the config and design, `commit.txt`, `log.jsonl`, `outputs/`,
+      `final_hash.txt`
+- [x] First log entries: config, commit, Docker image ID, sandbox Python
+      version and package list, host Python, SDK version, system prompts
+- [x] `single` topology: start container, run agent, stop container, always
+      tidy up, even after an error or Ctrl-C
+- [x] After the run: import the analysis entry point, call it with accepted
       submissions, write the final hash file, append to `runs/index.jsonl`
-      (also for failed and aborted runs)
-- [ ] Command-line entry point, e.g. `python -m harness.run <config>`
+      (also for failed and aborted runs). Analysis results go in the index
+      only, never in the log
+- [x] Command-line entry point: `python -m harness.run <config>`
+- [x] When an agent ends: tar of `/work` streamed out of the container into
+      the run's outputs (size-capped, hashed into the log), inspected without
+      extraction, then container and workspace removed
+- [x] Index line records storage: bytes of the log, of `outputs/`, and of
+      each workspace archive (see LESSONS.md §1)
+- [x] Stored output per execution capped (`max_stored_output_mb`; toy: 100),
+      with the agent still shown the true end of its output
+- [x] Nothing that can fail before the run creates a run folder: config,
+      referenced files, imports, topology, logger trial write, clean tree
+
+Note on the clean tree: a finished run writes into `runs/`, so a literal
+reading would block the next run until a commit. `runs/` holds no code,
+prompts or configs, so excluding it keeps the rule's purpose intact.
 
 SEAN (non-blocking, defaults in brackets):
-- What happens to the agent's `/work` after a run? [archive it into the run
-  folder, marked untrusted, with hashes]
+- ~~What happens to the agent's `/work` after a run?~~ Decided: tar archive,
+  capped, hashed, never auto-extracted; then the workspace is deleted
 - Tracebacks: plain stdin (no source lines) or a small launcher that restores
   them? [plain stdin, as specified]
-- Cap on output stored per execution? [100 MB per stream, then stop writing
-  and note it]
-- Add `harness/config.py` to the CLAUDE.md layout? [yes]
+- Add `harness/config.py` and `harness/run.py` to the CLAUDE.md layout, and
+  note the `runs/` exclusion in its "Clean tree required" rule? [yes, once
+  you agree; CLAUDE.md is yours]
 
 Checkpoint: `m1-single-run`
 
@@ -64,10 +80,18 @@ Done when: the harness uses `harness/logger.py`, and `verify.py` passes on a
 real run log and fails on tampered copies.
 
 - [ ] **SEAN, blocking:** write `logger.py` and `verify.py`
+- [ ] **SEAN:** `verify.py` also rehashes every file in `outputs/` and compares
+      with the hash recorded in the log, and reports files with no log entry
+      (decided 2026-11-09). Where the hashes are recorded:
+      - `execution` entries: `data.files` = `{file name: sha256}`, files in
+        `outputs/<agent>/` (the `.py`, `.out` and `.err` of each execution)
+      - `workspace_archive` entries: `data.file` + `data.sha256` (the tar), and
+        `data.errors_file_sha256` for `<file>.err`, in `outputs/<agent>/`
+      - the `agent` field of each entry names the `<agent>` folder
 - [ ] Tests for them (I write these): chain verifies; an edited entry is
       detected; a deleted or reordered line is detected; a truncated log is
       detected through the recorded final hash; a half-written last line is
-      detected
+      detected; an altered, missing or extra file in `outputs/` is detected
 - [ ] Swap the dummy logger out of the run path (tests may keep it)
 - [ ] `verify.py` runs automatically at the end of every run; result logged
       in the index
