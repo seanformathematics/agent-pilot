@@ -79,3 +79,26 @@ def test_tampered_copy_of_a_real_run_fails_verify(tmp_path):
     ok, problems = verify(copy / "log.jsonl", record["final_log_hash"])
     assert not ok
     assert [(p["kind"], p["file"]) for p in problems] == [("file_altered", "solver-0/solver-0-0001.out")]
+
+
+def test_api_key_appears_nowhere_in_a_run_folder(tmp_path, monkeypatch):
+    # The key lives only in the host environment. Nothing written for a run,
+    # including the log, outputs and the workspace tar, may contain it.
+    secret = "sk-ant-test-must-not-leak-0123456789"
+    monkeypatch.setenv("ANTHROPIC_API_KEY", secret)
+    client = FakeClient([
+        tool_call("run_python", {"code": (
+            "import os, json\n"
+            "print(json.dumps(dict(os.environ)))\n"
+            "open('/work/env.txt', 'w').write(json.dumps(dict(os.environ)))\n")}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "looked around."}),
+    ])
+    record = run_experiment(TOY_CONFIG, client, Logger, sandbox_factory=Sandbox,
+                            runs_dir=tmp_path / "runs", get_commit=lambda: "abc123",
+                            commit_result=lambda run_dir, index_path, status: "not-a-real-commit")
+    assert record["status"] == "completed"
+    files = [p for p in (tmp_path / "runs").rglob("*") if p.is_file()]
+    assert any(p.name == "log.jsonl" for p in files) and any(p.suffix == ".tar" for p in files)
+    for path in files:
+        assert secret.encode() not in path.read_bytes(), path
+        assert b"sk-ant" not in path.read_bytes(), path

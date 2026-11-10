@@ -371,3 +371,65 @@ def test_verifier_rejecting_clean_trial_log_refused(tmp_path):
     with pytest.raises(RuntimeError, match="verifier rejected"):
         toy_run(tmp_path, [], verifier=always_unhappy)
     assert not (tmp_path / "runs").exists()
+
+
+# ----- pre-run API check (command line only) ---------------------------------
+
+import anthropic  # noqa: E402
+
+from harness import run as run_module  # noqa: E402
+from tests.test_harness import api_status_error  # noqa: E402
+
+KEY = {"ANTHROPIC_API_KEY": "sk-ant-test-not-a-real-key"}
+
+
+class ModelsClient:
+    """Just enough client for check_api_access: models.retrieve()."""
+
+    def __init__(self, error=None):
+        self.asked = []
+        outer = self
+
+        class Models:
+            def retrieve(self, model):
+                outer.asked.append(model)
+                if error:
+                    raise error
+                return {"id": model}
+
+        self.models = Models()
+
+
+def test_api_check_passes_with_key_and_known_model():
+    client = ModelsClient()
+    assert run_module.check_api_access(client, "claude-opus-5-5", KEY) is None
+    assert client.asked == ["claude-opus-5-5"]
+
+
+def test_api_check_refuses_missing_key_without_calling_the_api():
+    client = ModelsClient()
+    for environ in ({}, {"ANTHROPIC_API_KEY": "  "}):
+        assert "not set" in run_module.check_api_access(client, "m", environ)
+    assert client.asked == []
+
+
+@pytest.mark.parametrize("cls, status, words", [
+    (anthropic.AuthenticationError, 401, "rejected"),
+    (anthropic.PermissionDeniedError, 403, "may not use"),
+    (anthropic.NotFoundError, 404, "not found"),
+    (anthropic.InternalServerError, 500, "could not reach"),
+])
+def test_api_check_explains_failures_without_showing_the_key(cls, status, words):
+    message = run_module.check_api_access(ModelsClient(api_status_error(cls, status)), "m", KEY)
+    assert words in message
+    assert KEY["ANTHROPIC_API_KEY"] not in message
+
+
+def test_failed_api_check_creates_no_run_folder(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(run_module, "RUNS_DIR", tmp_path / "runs")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    started = []
+    monkeypatch.setattr(run_module, "run_experiment", lambda *a, **k: started.append(a))
+    assert run_module.main(["harness.run", str(TOY_CONFIG)]) == 2
+    assert started == [] and not (tmp_path / "runs").exists()
+    assert "no run folder created" in capsys.readouterr().err

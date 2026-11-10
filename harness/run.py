@@ -317,6 +317,31 @@ def run_experiment(
     return outcome
 
 
+def check_api_access(client, model: str, environ=os.environ) -> str | None:
+    """Before a real run: is there a key, does it work, and does the model exist?
+
+    Returns None if all is well, else a message. Without this, a missing or
+    wrong key would only show up on the agent's first API call, after the
+    run folder exists, leaving a permanent failed run in runs/. Fetching a
+    model's details is free and spends no tokens. Nothing here is logged: no
+    run exists yet. The key itself is never printed.
+    """
+    if not environ.get("ANTHROPIC_API_KEY", "").strip():
+        return ("ANTHROPIC_API_KEY is not set in this shell. "
+                "Set it in the terminal (never in a file) and try again.")
+    try:
+        client.models.retrieve(model)
+    except anthropic.AuthenticationError:
+        return "the API key was rejected (401). Check the key in the Anthropic Console."
+    except anthropic.PermissionDeniedError:
+        return f"this key may not use model {model!r} (403)."
+    except anthropic.NotFoundError:
+        return f"model {model!r} was not found (404). Check the model name in the config."
+    except anthropic.APIError as error:
+        return f"could not reach the API: {type(error).__name__}: {error}"
+    return None
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         print("usage: python -m harness.run <path/to/config.yaml>", file=sys.stderr)
@@ -324,7 +349,12 @@ def main(argv: list[str]) -> int:
     from harness.agent import make_client
     from harness.logger import Logger
 
-    record = run_experiment(Path(argv[1]), make_client(), Logger)
+    client = make_client()
+    problem = check_api_access(client, load_config(Path(argv[1])).model)
+    if problem:
+        print(f"not started (no run folder created): {problem}", file=sys.stderr)
+        return 2
+    record = run_experiment(Path(argv[1]), client, Logger)
     print(f"run:        {record['run_id']}")
     print(f"status:     {record['status']}  agents: {record['agent_statuses']}")
     print(f"tokens:     {record['tokens_used']}   wall clock: {record['wall_clock_s']} s")

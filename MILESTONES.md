@@ -157,13 +157,39 @@ Checkpoint: `m2-hash-chain`
 Done when: one real `single` run of `toy_sum` completes, verifies, and is
 committed to `runs/`.
 
-- [ ] **SEAN, blocking:** go-ahead to spend API money, and a spending limit
+- [x] **SEAN, blocking:** go-ahead to spend API money, and a spending limit.
+      Agreed 2026-11-10: a Console spending limit of $20–25/month on the
+      project's key, and no more than ~5 live toy runs without checking in.
+      Expected cost ~$0.10 per toy run (claude-opus-5-5, $4 / $20 per million
+      input / output tokens); worst case ~$4–5, capped by `max_total_tokens`
 - [ ] **SEAN, blocking:** `ANTHROPIC_API_KEY` in your shell environment
       (never in a file)
-- [ ] One marked test that calls the real API, skipped by default
+- [x] One marked test that calls the real API, skipped by default:
+      `tests/test_live_api.py` (runs into a temp folder, commits nothing)
+- [x] Pre-run API check on the command line (`check_api_access`): key set,
+      key accepted, model exists. Free (no tokens). On failure, no run folder
+      is created
+- [x] A fake key appears nowhere in a run folder, including log, outputs and
+      workspace tar (`test_api_key_appears_nowhere_in_a_run_folder`)
 - [ ] Run it; read the log together; check `verify.py`, the index line and
       the analysis result
-- [ ] Commit the run folder
+- [ ] Commit the run folder (the harness does this itself) and record the
+      token count and cost in LESSONS.md
+
+**Runbook for the first live session**
+
+1. Sean: set the Console spending limit; in the terminal, `export
+   ANTHROPIC_API_KEY=...` (never in a file). OrbStack running.
+2. `git status` is clean (the harness refuses otherwise) and
+   `.venv/bin/python -m pytest -q` is green.
+3. Smoke test, not recorded: `.venv/bin/python -m pytest -m api
+   tests/test_live_api.py -v -s` (one toy run into a temp folder).
+4. The recorded run: `.venv/bin/python -m harness.run
+   tests/fixtures/toy_sum/config.yaml`. It checks the key first, then runs,
+   verifies, writes the index line and commits the run. It never pushes.
+5. Read the log together; check verify, the index line and the analysis.
+6. Re-verify invariants, update README and this file, tag
+   `m3-first-live-run`. Sean pushes.
 
 Checkpoint: `m3-first-live-run`
 
