@@ -198,9 +198,10 @@ analysis result or analysis error. Verify result is added in M2.
 | Filesystem | read-only, except `/work` (agent's, archived at the end), `/tmp` (256 MB) and `/dev/shm` (Docker's default). All three are listed after every call. |
 | Limits | memory (no swap), CPUs, process count: from config |
 | PID 1 | tiny Python reaper, so killed processes don't pile up as zombies |
-| Per call | `timeout -k 5 <T> python -` with code on stdin, then kill everything else the agent runs |
+| Per call | `timeout -k 5 <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs |
+| Launcher | `docker/launcher.py`, read-only in the image. Saves the code as `/tmp/run_python/<exec_id>.py` and runs it as a normal script: tracebacks and warnings show source lines (launcher frames hidden), `__file__` is set, `multiprocessing` works. |
 | Output | stored up to `max_stored_output_mb` per stream; agent sees head and true tail up to `output_cap_chars` |
-| Image | `docker/Dockerfile`: Python 3.14 slim + numpy, scipy. Changing it is an experimental change. |
+| Image | `docker/Dockerfile`: Python 3.14 slim + numpy, scipy + the launcher. Changing it is an experimental change; each run logs the image ID. |
 
 ### Code layout
 
@@ -219,6 +220,7 @@ analysis result or analysis error. Verify result is added in M2.
 | `tests/fixtures/toy_sum/` | Toy experiment for building and testing the harness | Claude |
 | `tests/fixtures/dummy_logger.py` | Stand-in logger for tests (no hashing) | Claude |
 | `docker/Dockerfile` | Sandbox image | Claude, changes recorded |
+| `docker/launcher.py` | Runs agent code from stdin as a normal script | Claude |
 
 ### Running the tests
 

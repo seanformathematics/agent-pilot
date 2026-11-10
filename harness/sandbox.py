@@ -20,8 +20,11 @@ Container settings:
 Each run_python call:
   1. writes the code to <output_dir>/<exec_id>.py on the host (the record)
   2. runs, inside the container, as the agent user:
-         timeout -k 5 <T> python - ; kill -9 -1
-     with the code on stdin. The `kill -9 -1` runs as soon as Python
+         timeout -k 5 <T> python /opt/harness/launcher.py <exec_id> ; kill -9 -1
+     with the code on stdin. The launcher (docker/launcher.py, baked into
+     the image) saves the code as /tmp/run_python/<exec_id>.py and runs it
+     as a normal script, so tracebacks show source lines and
+     multiprocessing works. The `kill -9 -1` runs as soon as Python
      finishes and kills everything else the agent user owns, so a detached
      process cannot hold the pipes open
   3. streams stdout and stderr through pipes in small chunks: each stream is
@@ -70,6 +73,7 @@ STREAM_CHUNK_BYTES = 64 * 1024
 KILL_GRACE_S = 5  # seconds between SIGTERM and SIGKILL
 HOST_MARGIN_S = 10  # host-side backstop on top of the code's own limit
 EXEC_ID_PATTERN = re.compile(r"[A-Za-z0-9_-]+")
+LAUNCHER = "/opt/harness/launcher.py"  # in the image; see docker/launcher.py
 ARCHIVE_CHUNK_BYTES = 1 << 20  # read the tar stream 1 MiB at a time
 ARCHIVE_TIMEOUT_S = 300
 MAX_FLAGGED_MEMBERS = 100  # how many flagged archive entries to list in the log
@@ -192,7 +196,7 @@ class Sandbox:
             f.write(code.encode("utf-8"))
 
         shell_line = (
-            f"timeout -k {KILL_GRACE_S} {timeout_s} python -; "
+            f"timeout -k {KILL_GRACE_S} {timeout_s} python {LAUNCHER} {exec_id}; "
             "rc=$?; kill -9 -1 2>/dev/null; exit $rc"
         )
         command = ["docker", "exec", "--interactive", self.container_id, "sh", "-c", shell_line]

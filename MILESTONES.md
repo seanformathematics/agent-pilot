@@ -74,6 +74,8 @@ SEAN (non-blocking, defaults in brackets):
 - Add `harness/config.py` and `harness/run.py` to the CLAUDE.md layout, and
   note the `runs/` exclusion in its "Clean tree required" rule? [yes, once
   you agree; CLAUDE.md is yours]
+- Update CLAUDE.md's Sandbox "Execution" bullet: code now runs through
+  `/opt/harness/launcher.py` (still arrives on stdin) [yes, once you agree]
 - Change CLAUDE.md's "Commit `runs/` to git after each batch of runs" to
   "the harness commits each run when it ends; push after each batch"?
   [yes, once you agree]
@@ -92,6 +94,9 @@ Checkpoint: `m1-single-run`
       line only; never pushed automatically
 - [x] README.md: rules, interfaces, architecture at a glance
 - [x] Test: the API key never enters the container
+- [x] Launcher in the image: tracebacks with source lines; fixes
+      `multiprocessing`, which failed for code piped in on stdin under
+      Python 3.14
 
 ---
 

@@ -82,11 +82,65 @@ def test_error_exit_and_stderr(make_sandbox):
     assert result["stderr"] == "bad\n"
 
 
-def test_traceback_names_the_line(make_sandbox):
-    result, _ = run(make_sandbox(), "x = 1\ny = x / 0\n")
+# ----- the launcher: agent code behaves like a normal script -------------
+
+def test_traceback_shows_source_lines_and_no_launcher_frames(make_sandbox):
+    code = ("def magnetisation(spins):\n"
+            "    return sum(spins) / len(spins)\n"
+            "\n"
+            "print(magnetisation([]))\n")
+    result, _ = run(make_sandbox(), code, exec_id="tb-check")
     assert result["exit_code"] == 1
-    assert 'File "<stdin>", line 2' in result["stderr"]
-    assert "ZeroDivisionError" in result["stderr"]
+    stderr = result["stderr"]
+    assert stderr.startswith("Traceback (most recent call last):\n")
+    assert 'File "/tmp/run_python/tb-check.py", line 4, in <module>' in stderr
+    assert "    return sum(spins) / len(spins)" in stderr      # the source line
+    assert "~~~~~~~~~~^~~~~~~~~~~~" in stderr                     # the pointer
+    assert "launcher" not in stderr and "runpy" not in stderr
+    assert stderr.rstrip().endswith("ZeroDivisionError: division by zero")
+
+
+def test_syntax_error_reported_like_a_script(make_sandbox):
+    result, _ = run(make_sandbox(), "for i in range(3)\n    print(i)\n", exec_id="syn")
+    assert result["exit_code"] == 1
+    assert 'File "/tmp/run_python/syn.py", line 1' in result["stderr"]
+    assert "SyntaxError: expected ':'" in result["stderr"]
+    assert "launcher" not in result["stderr"]
+
+
+def test_warnings_show_their_source_line(make_sandbox):
+    code = "import warnings\nwarnings.warn('watch out')\n"
+    result, _ = run(make_sandbox(), code)
+    assert "UserWarning: watch out" in result["stderr"]
+    assert "warnings.warn('watch out')" in result["stderr"]
+
+
+def test_multiprocessing_pool_works(make_sandbox):
+    code = (
+        "import multiprocessing as mp\n"
+        "def square(x):\n"
+        "    return x * x\n"
+        "if __name__ == '__main__':\n"
+        "    with mp.Pool(2) as pool:\n"
+        "        print(pool.map(square, range(5)))\n"
+    )
+    result, _ = run(make_sandbox(), code)
+    assert result["exit_code"] == 0, result["stderr"]
+    assert result["stdout"] == "[0, 1, 4, 9, 16]\n"
+
+
+def test_script_basics(make_sandbox):
+    code = ("import sys\n"
+            "print(__name__, __file__, sys.argv[0])\n"
+            "sys.exit(3)\n")
+    result, _ = run(make_sandbox(), code, exec_id="basics")
+    assert result["stdout"] == "__main__ /tmp/run_python/basics.py /tmp/run_python/basics.py\n"
+    assert result["exit_code"] == 3
+
+
+def test_launcher_cannot_be_modified_by_agent(make_sandbox):
+    result, _ = run(make_sandbox(), "open('/opt/harness/launcher.py', 'a').write('# changed')")
+    assert result["exit_code"] != 0
 
 
 def test_files_persist_between_calls(make_sandbox):
@@ -408,7 +462,7 @@ def test_listing_covers_work_tmp_and_shm_without_contents(make_sandbox):
         "open('/tmp/b.bin', 'wb').write(b'x' * 1234)\n"
         "open('/dev/shm/c', 'w').write('SECRET-CONTENT-C')\n"
     )
-    _, details = run(box, code)
+    _, details = run(box, code, exec_id="listing")
     listing = read_listing(details)
     by_path = {e["path"]: e for e in listing}
     assert by_path["/work/a.txt"]["bytes"] == 16 and by_path["/work/a.txt"]["dir"] == "/work"
@@ -417,8 +471,10 @@ def test_listing_covers_work_tmp_and_shm_without_contents(make_sandbox):
     assert all(e["mtime"] > 1.7e9 for e in listing)
     with open(details["listing_path"]) as f:
         assert "SECRET-CONTENT" not in f.read()
+    # /tmp also holds the launcher's copy of the code it ran
+    assert by_path["/tmp/run_python/listing.py"]["bytes"] == len(code)
     summary = details["filesystem"]["dirs"]
-    assert summary["/tmp"] == {"entries": 1, "files": 1, "file_bytes": 1234}
+    assert summary["/tmp"] == {"entries": 3, "files": 2, "file_bytes": 1234 + len(code)}
     assert details["filesystem"]["listing_truncated"] is False
 
 
