@@ -25,7 +25,7 @@ Container settings:
 Each run_python call:
   1. writes the code to <output_dir>/<exec_id>.py on the host (the record)
   2. runs, inside the container, as the agent user:
-         timeout -k 5 <T> python /opt/harness/launcher.py <exec_id> ; kill -9 -1
+         timeout -k <KILL_GRACE_S> <T> python /opt/harness/launcher.py <exec_id> ; kill -9 -1
      with the code on stdin. The launcher (docker/launcher.py, baked into
      the image) saves the code as /tmp/run_python/<exec_id>.py and runs it
      as a normal script, so tracebacks show source lines and
@@ -56,7 +56,7 @@ When the agent has ended (see Harness.stop_agent):
 
 Exit codes from `timeout`: 124 means the code was stopped by SIGTERM at the
 time limit; 137 means it was SIGKILLed, either because it ignored SIGTERM for
-5 more seconds, or because it hit the memory limit.
+KILL_GRACE_S more seconds, or because it hit the memory limit.
 """
 
 import json
@@ -70,8 +70,6 @@ import time
 from collections import Counter
 from pathlib import Path
 
-DEFAULT_OUTPUT_CAP = 10_000  # per stream shown to the agent, counted in bytes
-DEFAULT_STORED_OUTPUT_CAP = 100 * 1024 * 1024  # per stream saved to disk
 STREAM_CHUNK_BYTES = 64 * 1024
 KILL_GRACE_S = 5  # seconds between SIGTERM and SIGKILL
 HOST_MARGIN_S = 10  # host-side backstop on top of the code's own limit
@@ -84,6 +82,8 @@ MAX_FLAGGED_MEMBERS = 100  # how many flagged archive entries to list in the log
 SCRATCH_DIRS = ("/work", "/tmp", "/dev/shm")  # everywhere the agent can write
 LISTING_MAX_BYTES = 5 * 1024 * 1024  # raw `find` output read per listing
 LISTING_TIMEOUT_S = 60
+IMAGE_CHECK_TIMEOUT_S = 120  # each `docker run` in describe_image
+TAR_ERRORS_MAX_BYTES = 2000  # tar's stderr kept in the archive record
 
 # PID 1 inside the container. Ignoring SIGCHLD tells the kernel to reap
 # finished child processes automatically, so killed processes never pile up
@@ -102,15 +102,17 @@ class Sandbox:
     def __init__(
         self,
         image: str,
-        memory_mb: int = 1024,
-        work_mb: int = 256,
-        tmp_mb: int = 256,
-        shm_mb: int = 256,
-        cpus: float = 1.0,
-        pids_limit: int = 256,
-        output_cap: int = DEFAULT_OUTPUT_CAP,
-        stored_output_cap: int = DEFAULT_STORED_OUTPUT_CAP,
+        memory_mb: int,
+        work_mb: int,
+        tmp_mb: int,
+        shm_mb: int,
+        cpus: float,
+        pids_limit: int,
+        output_cap: int,         # bytes per stream shown to the agent
+        stored_output_cap: int,  # bytes per stream saved to disk
     ) -> None:
+        # No defaults: every value comes from the config (via Harness.start_agent),
+        # so nothing can silently fall back to a number written here.
         if stored_output_cap < output_cap:
             raise ValueError("stored_output_cap must be at least output_cap")
         self.image = image
@@ -130,7 +132,7 @@ class Sandbox:
         def inside(*args: str) -> str:
             completed = subprocess.run(
                 ["docker", "run", "--rm", "--network", "none", image, *args],
-                capture_output=True, text=True, check=True, timeout=120,
+                capture_output=True, text=True, check=True, timeout=IMAGE_CHECK_TIMEOUT_S,
             )
             return completed.stdout.strip()
 
@@ -347,7 +349,7 @@ class Sandbox:
                 exit_code = process.wait()
 
         self._kill_leftover_processes()  # a killed docker client can leave tar running
-        tar_errors, _, _ = read_capped(errors_path, 2000)
+        tar_errors, _, _ = read_capped(errors_path, TAR_ERRORS_MAX_BYTES)
         return {
             "archive_path": str(archive_path),
             "errors_path": str(errors_path),

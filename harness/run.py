@@ -55,7 +55,7 @@ from pathlib import Path
 import anthropic
 import pydantic
 
-from harness.config import REPO_ROOT, load_config, load_object, repo_path
+from harness.config import REPO_ROOT, load_config, load_object, load_prompt, repo_path
 from harness.harness import Harness
 from harness.sandbox import Sandbox
 from harness.topologies import TOPOLOGIES, single_agent
@@ -81,6 +81,8 @@ def check_config_files(config) -> None:
     for path in [config.design] + [role.system_prompt for role in config.roles.values()]:
         if not repo_path(path).is_file():
             raise FileNotFoundError(f"config refers to a missing file: {path}")
+    for role in config.roles.values():
+        load_prompt(role.system_prompt, config)  # raises on a bad placeholder
     load_object(config.submission_model)
     if config.sanity_checks:
         load_object(config.sanity_checks)

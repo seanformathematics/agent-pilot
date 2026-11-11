@@ -81,7 +81,7 @@ Who plugs into what. Arrows read "calls".
 | Piece | Shape | When it is used |
 |-------|-------|-----------------|
 | Config (YAML) | See the toy example: `tests/fixtures/toy_sum/config.yaml` | Read and validated first; a typo is an error |
-| Prompt files | Plain text, loaded verbatim | Logged and sent as system prompts |
+| Prompt files | Plain text; `{name}` placeholders filled from a fixed list of config values (`harness/config.py: prompt_values`); any other brace stops the run | Logged and sent as system prompts, filled in |
 | Design file | Markdown | Copied into every run folder |
 | `submission_model` | Pydantic `BaseModel` class | Becomes the `submit_result` schema the agent sees |
 | `sanity_checks` (optional) | `check(submission, task) -> list[str]`, empty means accepted | On every submission. **Must not look at the answer.** |
@@ -103,7 +103,7 @@ Experiment code is named in the config as `module.path:name`, for example
 
 | Tool | Input | Returns |
 |------|-------|---------|
-| `run_python` | `code`, `timeout_s` (default 60, capped by config) | JSON with exactly `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Error flag set if exit code ≠ 0 or timed out |
+| `run_python` | `code`, `timeout_s` (default `DEFAULT_TIMEOUT_S` in `harness/tools.py`, capped by `limits.max_timeout_s`) | JSON with exactly `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Error flag set if exit code ≠ 0 or timed out |
 | `submit_result` | The fields of the submission model | `"Submission accepted."`, or the specific problems and the submissions remaining |
 | `send_message` | Later (hierarchical topology) | |
 
@@ -145,7 +145,7 @@ logs the rest as `agent_not_started`.
 Each index line has: run id, time, experiment, design, config, commit,
 topology, model, effort, number of agents, run status, each agent's status,
 accepted submissions, tokens, wall clock, final log hash, verify result
-(`ok`, problem count, first 10 problems), storage sizes, analysis result or
+(`ok`, problem count, the first `MAX_PROBLEMS_IN_INDEX` problems), storage sizes, analysis result or
 analysis error. For an independent run: tokens and storage are totals over
 all agents; the final log hash is that of `batch.jsonl`; verify covers
 every log and the cross-checks, each problem naming its `log`; and
@@ -229,9 +229,9 @@ hash. The analysis gets every agent's accepted submissions in one list.
 | Filesystem | read-only, except three in-memory folders: `/work` (`work_mb`; the agent's, archived at the end), `/tmp` (`tmp_mb`) and `/dev/shm` (`shm_mb`). All three are listed after every call. Nothing from the host is mounted. |
 | Limits | `memory_mb` (no swap; a total budget for processes **and** whatever is stored in `/work`, `/tmp` and `/dev/shm`), CPUs, process count: from config |
 | PID 1 | tiny Python reaper, so killed processes don't pile up as zombies |
-| Per call | `timeout -k 5 <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs |
+| Per call | `timeout -k <KILL_GRACE_S> <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs |
 | Launcher | `docker/launcher.py`, read-only in the image. Saves the code as `/tmp/run_python/<exec_id>.py` and runs it as a normal script: tracebacks and warnings show source lines (launcher frames hidden), `__file__` is set, `multiprocessing` works. |
-| Output | stored up to `max_stored_output_mb` per stream; agent sees head and true tail up to `output_cap_chars` |
+| Output | stored up to `max_stored_output_mb` per stream; agent sees head and true tail up to `output_cap_bytes` |
 | Image | `docker/Dockerfile`: Python 3.14 slim + numpy, scipy + the launcher. Changing it is an experimental change; each run logs the image ID. |
 
 ### Code layout

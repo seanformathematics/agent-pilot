@@ -13,17 +13,36 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+# run_python's timeout when the agent doesn't pass one. Prompts can state it
+# as {default_timeout_s}; configs must allow at least this much (config.py).
+DEFAULT_TIMEOUT_S = 60
 
-class RunPythonInput(BaseModel):
-    """Input for ``run_python``."""
 
-    code: str = Field(description="Python source to execute in the sandbox.")
-    timeout_s: int = Field(
-        default=60,
-        ge=1,
-        le=600,
-        description="Wall-clock limit in seconds. The process is killed when it is exceeded.",
-    )
+RUN_PYTHON_DESCRIPTION = (
+    "Run Python code in an isolated sandbox. Returns exit code, stdout, stderr, "
+    "duration, and whether the run timed out or output was truncated."
+)
+
+
+def run_python_model(max_timeout_s: int) -> type[BaseModel]:
+    """The ``run_python`` input model, with the timeout ceiling from the config.
+
+    Built per run so the schema the agent is shown, the validation applied
+    and the limit in the config are one number, ``limits.max_timeout_s``.
+    """
+
+    class RunPythonInput(BaseModel):
+        """Input for ``run_python``."""
+
+        code: str = Field(description="Python source to execute in the sandbox.")
+        timeout_s: int = Field(
+            default=DEFAULT_TIMEOUT_S,
+            ge=1,
+            le=max_timeout_s,
+            description="Wall-clock limit in seconds. The process is killed when it is exceeded.",
+        )
+
+    return RunPythonInput
 
 
 class SendMessageInput(BaseModel):
@@ -53,13 +72,6 @@ def tool_definition(name: str, description: str, model: type[BaseModel]) -> dict
         "input_schema": model.model_json_schema(),
     }
 
-
-RUN_PYTHON = tool_definition(
-    "run_python",
-    "Run Python code in an isolated sandbox. Returns exit code, stdout, stderr, "
-    "duration, and whether the run timed out or output was truncated.",
-    RunPythonInput,
-)
 
 SEND_MESSAGE = tool_definition(
     "send_message",

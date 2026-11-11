@@ -10,10 +10,24 @@ import uuid
 
 import pytest
 
+from harness.config import load_config
 from harness.sandbox import Sandbox
 from harness.tools import RUN_PYTHON_RESULT_KEYS
+from tests.conftest import TOY_CONFIG
 
-IMAGE = "residency-sandbox:py3.14"
+# Settings come from the toy config, the same way the harness gets them.
+_TOY = load_config(TOY_CONFIG)
+IMAGE = _TOY.sandbox.image
+SETTINGS = {
+    "memory_mb": _TOY.sandbox.memory_mb,
+    "work_mb": _TOY.sandbox.work_mb,
+    "tmp_mb": _TOY.sandbox.tmp_mb,
+    "shm_mb": _TOY.sandbox.shm_mb,
+    "cpus": _TOY.sandbox.cpus,
+    "pids_limit": _TOY.sandbox.pids_limit,
+    "output_cap": _TOY.limits.output_cap_bytes,
+    "stored_output_cap": _TOY.limits.max_stored_output_mb * 1024 * 1024,
+}
 
 
 def _image_available() -> bool:
@@ -37,7 +51,7 @@ def make_sandbox(tmp_path):
     started = []
 
     def make(name="agent", **kwargs):
-        box = Sandbox(IMAGE, **kwargs)
+        box = Sandbox(IMAGE, **(SETTINGS | kwargs))  # a test may override a setting
         box.start()
         box.test_output_dir = tmp_path / "outputs" / name
         box.test_output_dir.mkdir(parents=True)
@@ -443,7 +457,7 @@ def test_stored_output_cap_keeps_true_tail_for_agent(make_sandbox):
 
 def test_stored_cap_smaller_than_agent_cap_refused():
     with pytest.raises(ValueError):
-        Sandbox(IMAGE, output_cap=1000, stored_output_cap=500)
+        Sandbox(IMAGE, **(SETTINGS | {"output_cap": 1000, "stored_output_cap": 500}))
 
 
 def test_describe_image():

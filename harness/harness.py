@@ -20,7 +20,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from harness import tools
-from harness.config import RunConfig, load_object, repo_path
+from harness.config import RunConfig, load_object, load_prompt
 from harness.sandbox import Sandbox, inspect_archive
 
 NON_FINITE_MESSAGE = (
@@ -54,10 +54,12 @@ class Harness:
         # deliberately NOT loaded here: it is only imported after the run.
         self.submission_model = load_object(config.submission_model)
         self.sanity_checks = load_object(config.sanity_checks) if config.sanity_checks else None
+        self.run_python_model = tools.run_python_model(config.limits.max_timeout_s)
 
-        # System prompts, read once so the logged text is exactly the sent text.
+        # System prompts, read and filled in once, so the logged text is
+        # exactly the sent text: what the agent saw, with the numbers in.
         self.system_prompts = {
-            name: repo_path(role.system_prompt).read_text(encoding="utf-8")
+            name: load_prompt(role.system_prompt, config)
             for name, role in config.roles.items()
         }
         self._agents = {agent.id: agent for agent in config.agents}
@@ -99,7 +101,7 @@ class Harness:
             shm_mb=self.config.sandbox.shm_mb,
             cpus=self.config.sandbox.cpus,
             pids_limit=self.config.sandbox.pids_limit,
-            output_cap=limits.output_cap_chars,
+            output_cap=limits.output_cap_bytes,
             stored_output_cap=limits.max_stored_output_mb * 1024 * 1024,
         )
         box.start()
@@ -166,7 +168,8 @@ class Harness:
         definitions = []
         for name in self._allowed_tools(agent_id):
             if name == "run_python":
-                definitions.append(tools.RUN_PYTHON)
+                definitions.append(tools.tool_definition(
+                    "run_python", tools.RUN_PYTHON_DESCRIPTION, self.run_python_model))
             elif name == "submit_result":
                 definitions.append(tools.tool_definition(
                     "submit_result", SUBMIT_RESULT_DESCRIPTION, self.submission_model))
@@ -225,13 +228,10 @@ class Harness:
 
     def _run_python(self, agent_id: str, tool_use_id: str, raw_input) -> tuple[str, bool]:
         try:
-            call = tools.RunPythonInput.model_validate(raw_input)
+            # The model also enforces 1 <= timeout_s <= limits.max_timeout_s.
+            call = self.run_python_model.model_validate(raw_input)
         except ValidationError as error:
             return self._reject(agent_id, tool_use_id, f"Invalid run_python input:\n{error}")
-        if call.timeout_s > self.config.limits.max_timeout_s:
-            return self._reject(
-                agent_id, tool_use_id,
-                f"timeout_s={call.timeout_s} exceeds the limit of {self.config.limits.max_timeout_s} seconds.")
 
         self._exec_counts[agent_id] += 1
         exec_id = f"{agent_id}-{self._exec_counts[agent_id]:04d}"

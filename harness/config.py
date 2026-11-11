@@ -15,6 +15,8 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from harness.tools import DEFAULT_TIMEOUT_S
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 ToolName = Literal["run_python", "submit_result", "send_message"]
@@ -26,7 +28,7 @@ class Strict(BaseModel):
 
 
 class RoleConfig(Strict):
-    system_prompt: str  # path to a text file, loaded verbatim
+    system_prompt: str  # path to a text file; see fill_prompt for {placeholders}
     tools: list[ToolName]
 
 
@@ -41,10 +43,19 @@ class Limits(Strict):
     max_tokens_per_response: int = Field(ge=1)
     max_total_tokens: int = Field(ge=1)  # input + output, per harness: the whole run, or each agent in independent
     max_timeout_s: int = Field(ge=1)  # upper bound on run_python timeout_s
-    output_cap_chars: int = Field(ge=100)  # per stream, per execution, shown to the agent
+    output_cap_bytes: int = Field(ge=100)  # per stream, per execution, shown to the agent
     max_stored_output_mb: int = Field(ge=1)  # per stream, per execution, saved to disk
     max_submissions: int = Field(ge=1)  # every submit_result call counts
     api_retries: int = Field(ge=0)  # retries of a failed API call; each one is logged
+
+    @model_validator(mode="after")
+    def default_timeout_allowed(self):
+        # Otherwise every run_python call without its own timeout_s is rejected.
+        if self.max_timeout_s < DEFAULT_TIMEOUT_S:
+            raise ValueError(
+                f"max_timeout_s ({self.max_timeout_s}) must be at least run_python's "
+                f"default timeout of {DEFAULT_TIMEOUT_S} seconds")
+        return self
 
 
 class SandboxConfig(Strict):
@@ -110,6 +121,53 @@ def load_config(path: Path) -> RunConfig:
 def repo_path(relative: str) -> Path:
     """Turn a path written in a config into an absolute path."""
     return REPO_ROOT / relative
+
+
+def prompt_values(config: RunConfig) -> dict[str, str]:
+    """The only values a prompt may contain as {name}, all taken from the config.
+
+    A fixed list on purpose: prompts can state limits the agent works within,
+    but never reach other config fields (such as the analysis entry point).
+    """
+    limits, sandbox = config.limits, config.sandbox
+    return {
+        "max_turns": str(limits.max_turns),
+        "max_submissions": str(limits.max_submissions),
+        "max_timeout_s": str(limits.max_timeout_s),
+        "default_timeout_s": str(DEFAULT_TIMEOUT_S),
+        "cpus": f"{sandbox.cpus:g}",  # 1.0 -> "1", 0.5 -> "0.5"
+        "memory_mb": str(sandbox.memory_mb),
+        "work_mb": str(sandbox.work_mb),
+        "tmp_mb": str(sandbox.tmp_mb),
+        "shm_mb": str(sandbox.shm_mb),
+    }
+
+
+def fill_prompt(text: str, values: dict[str, str]) -> str:
+    """Replace each {name} in a prompt with its value from ``prompt_values``.
+
+    Strict: once the known names are replaced, any brace left over (an
+    unknown or misspelled name, or a stray "{" or "}") is an error, so the
+    agent is never sent a literal placeholder. Plain replacement rather than
+    str.format, so nothing else in the text is interpreted.
+    """
+    for name, value in values.items():
+        text = text.replace("{" + name + "}", value)
+    leftovers = [
+        f"line {number}: {line.strip()}"
+        for number, line in enumerate(text.splitlines(), start=1)
+        if "{" in line or "}" in line
+    ]
+    if leftovers:
+        raise ValueError(
+            "prompt has unknown placeholders or stray braces "
+            f"(allowed: {', '.join('{' + n + '}' for n in values)}):\n" + "\n".join(leftovers))
+    return text
+
+
+def load_prompt(path: str, config: RunConfig) -> str:
+    """Read a prompt file and fill in its placeholders from the config."""
+    return fill_prompt(repo_path(path).read_text(encoding="utf-8"), prompt_values(config))
 
 
 def load_object(ref: str):
