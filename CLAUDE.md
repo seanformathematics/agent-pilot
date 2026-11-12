@@ -77,7 +77,7 @@ To build and test the harness, use a **toy experiment under `tests/fixtures/`** 
 
 All tool inputs are Pydantic models; schemas come from `model_json_schema()`; inputs are validated with `model_validate()` before anything runs.
 
-- `run_python(code: str, timeout_s: int = DEFAULT_TIMEOUT_S)` — runs code in the sandbox. Returns JSON with exactly these keys, always present: `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Set `is_error: true` on the `tool_result` when exit code ≠ 0 or timed out.
+- `run_python(code: str, timeout_s: int = limits.default_timeout_s)` — runs code in the sandbox. Returns JSON with exactly these keys, always present: `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Set `is_error: true` on the `tool_result` when exit code ≠ 0 or timed out.
 - `submit_result(...)` — generic mechanism; the schema is the experiment's submission model, named in the config (see Experiment interface). Validate, run experiment sanity checks, return a short acknowledgment or the specific validation error. Allow a small, configured number of resubmissions; log every attempt.
 - `send_message(...)` — hierarchical topology only; enabled per agent by config.
 
@@ -124,7 +124,7 @@ Each run gets `runs/<date>_<experiment>_<topology>_<nnn>/` containing: `config.y
 - Python 3.14 on both the host and the sandbox image (e.g. `python:3.14-slim`); record the exact version in each run's metadata. Virtual environment, dependencies in `requirements.txt` (`anthropic`, `pydantic`, `pyyaml`, `pytest`).
 - `ANTHROPIC_API_KEY` from the environment only; never written to files or logs.
 - Model name comes from config, never hard-coded.
-- Prompts live in text files under `prompts/`, never inline in code.
+- Prompts live in text files, never inline in code: an experiment's under `experiments/<name>/prompts/`, the toy experiment's under `tests/fixtures/toy_sum/prompts/`.
 - Prefer small plain functions; use classes only for things that hold state (Agent, Harness, Logger, Sandbox).
 - Readability over cleverness: Sean must be able to explain every line.
 

@@ -252,9 +252,14 @@ Done when: an Ising config loads, validates, and runs one agent end to end.
 
 - [ ] **SEAN, blocking:** `experiments/ising/` — design, prompts, config,
       submission model, sanity checks, analysis
-- [ ] **SEAN, blocking:** the package list for the sandbox image (now numpy
+- [x] **SEAN, blocking:** the package list for the sandbox image (now numpy
       and scipy). Changing the image is an experimental change, so this is
-      fixed before the first Ising run
+      fixed before the first Ising run. Decided 2026-11-11: **numpy and scipy
+      only, no numba.** Without compiled loops, fast methods must be
+      vectorized (e.g. Swendsen–Wang with scipy's connected components),
+      which is itself behaviour worth observing. Adding numba later is a new
+      image and a deliberate experimental variable (and needs
+      `NUMBA_CACHE_DIR` on a writable path: the root filesystem is read-only)
 - [ ] I check only that the harness can run it; I do not edit anything in
       `experiments/`
 
@@ -286,6 +291,13 @@ Checkpoint: `m5-ising-ready`
      (e.g. AWS Secrets Manager at launch), never in a setup script.
   4. Run commits made on EC2 must get back to the repo (push with a deploy
      key, or copy the commits back).
+- **Prompt caching** (idea 2026-11-11). Every API call resends the whole
+  conversation, so tokens grow roughly with the square of the number of
+  turns; long Ising runs pay mostly for resent history. Caching bills that
+  history at a fraction of the price. The model sees the same input, but
+  token accounting changes (`cache_read_input_tokens` already counts toward
+  `max_total_tokens`), so plan it: decide how cached tokens count against the
+  budget, log it, and say so in the index.
 - Idea (2026-11-10): in `hierarchical`, let the supervisor allocate token
   budgets to workers within a hard total from the config. The harness
   enforces both the total and each allocation; the allocations are logged,

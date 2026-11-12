@@ -103,7 +103,7 @@ Experiment code is named in the config as `module.path:name`, for example
 
 | Tool | Input | Returns |
 |------|-------|---------|
-| `run_python` | `code`, `timeout_s` (default `DEFAULT_TIMEOUT_S` in `harness/tools.py`, capped by `limits.max_timeout_s`) | JSON with exactly `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Error flag set if exit code ≠ 0 or timed out |
+| `run_python` | `code`, `timeout_s` (default `limits.default_timeout_s`, capped by `limits.max_timeout_s`) | JSON with exactly `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Error flag set if exit code ≠ 0 or timed out |
 | `submit_result` | The fields of the submission model | `"Submission accepted."`, or the specific problems and the submissions remaining |
 | `send_message` | Later (hierarchical topology) | |
 

@@ -11,7 +11,6 @@ from pydantic import ValidationError
 from harness.agent import Agent
 from harness.config import RunConfig, fill_prompt, prompt_values
 from harness.run import check_config_files
-from harness.tools import DEFAULT_TIMEOUT_S
 from tests.conftest import TOY_CONFIG, FakeClient, entries_of, tool_call
 
 GOOD_SUBMISSION = {"total": 1555, "method_notes": "Summed with Python."}
@@ -31,7 +30,7 @@ def test_every_allowed_placeholder_is_filled_from_config(toy_config):
     limits, sandbox = toy_config.limits, toy_config.sandbox
     assert filled.split() == [
         str(limits.max_turns), str(limits.max_submissions), str(limits.max_timeout_s),
-        str(DEFAULT_TIMEOUT_S), "1", str(sandbox.memory_mb),
+        str(limits.default_timeout_s), "1", str(sandbox.memory_mb),
         str(sandbox.work_mb), str(sandbox.tmp_mb), str(sandbox.shm_mb),
     ]
 
@@ -82,8 +81,15 @@ def test_filled_prompt_is_logged_and_sent(tmp_path, make_harness):
     assert all(call["system"] == expected for call in client.calls)
 
 
-def test_max_timeout_below_default_rejected():
+def test_default_timeout_above_max_rejected():
     raw = yaml.safe_load(TOY_CONFIG.read_text())
-    raw["limits"]["max_timeout_s"] = DEFAULT_TIMEOUT_S - 1
-    with pytest.raises(ValidationError, match="default timeout"):
+    raw["limits"]["default_timeout_s"] = raw["limits"]["max_timeout_s"] + 1
+    with pytest.raises(ValidationError, match="must not exceed"):
+        RunConfig.model_validate(raw)
+
+
+def test_default_timeout_is_required():
+    raw = yaml.safe_load(TOY_CONFIG.read_text())
+    del raw["limits"]["default_timeout_s"]
+    with pytest.raises(ValidationError, match="default_timeout_s"):
         RunConfig.model_validate(raw)

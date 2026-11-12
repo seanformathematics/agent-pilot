@@ -8,7 +8,6 @@ import httpx2 as httpx
 import pytest
 
 from harness.agent import Agent
-from harness.tools import DEFAULT_TIMEOUT_S
 from tests.conftest import FakeClient, entries_of, sent_to_model, text_reply, tool_call
 
 GOOD_SUBMISSION = {"total": 1555, "method_notes": "Summed with Python's sum()."}
@@ -157,12 +156,12 @@ def test_timeout_above_limit_rejected(make_harness, toy_config):
 
 
 def test_run_python_schema_shows_config_timeout_limit(make_harness, toy_config):
-    """The ceiling the agent is shown is the config's, not a number in the code."""
+    """The default and ceiling the agent is shown are the config's, not numbers in the code."""
     harness, _ = make_harness()
     [run_python] = [t for t in harness.tool_definitions("solver-0") if t["name"] == "run_python"]
     timeout = run_python["input_schema"]["properties"]["timeout_s"]
     assert timeout["maximum"] == toy_config.limits.max_timeout_s
-    assert timeout["default"] == DEFAULT_TIMEOUT_S
+    assert timeout["default"] == toy_config.limits.default_timeout_s
 
 
 # ----- submissions -------------------------------------------------------

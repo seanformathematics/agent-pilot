@@ -15,7 +15,6 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from harness.tools import DEFAULT_TIMEOUT_S
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -42,6 +41,7 @@ class Limits(Strict):
     max_turns: int = Field(ge=1)  # API calls per agent
     max_tokens_per_response: int = Field(ge=1)
     max_total_tokens: int = Field(ge=1)  # input + output, per harness: the whole run, or each agent in independent
+    default_timeout_s: int = Field(ge=1)  # run_python timeout when the agent passes none
     max_timeout_s: int = Field(ge=1)  # upper bound on run_python timeout_s
     output_cap_bytes: int = Field(ge=100)  # per stream, per execution, shown to the agent
     max_stored_output_mb: int = Field(ge=1)  # per stream, per execution, saved to disk
@@ -51,10 +51,10 @@ class Limits(Strict):
     @model_validator(mode="after")
     def default_timeout_allowed(self):
         # Otherwise every run_python call without its own timeout_s is rejected.
-        if self.max_timeout_s < DEFAULT_TIMEOUT_S:
+        if self.default_timeout_s > self.max_timeout_s:
             raise ValueError(
-                f"max_timeout_s ({self.max_timeout_s}) must be at least run_python's "
-                f"default timeout of {DEFAULT_TIMEOUT_S} seconds")
+                f"default_timeout_s ({self.default_timeout_s}) must not exceed "
+                f"max_timeout_s ({self.max_timeout_s})")
         return self
 
 
@@ -134,7 +134,7 @@ def prompt_values(config: RunConfig) -> dict[str, str]:
         "max_turns": str(limits.max_turns),
         "max_submissions": str(limits.max_submissions),
         "max_timeout_s": str(limits.max_timeout_s),
-        "default_timeout_s": str(DEFAULT_TIMEOUT_S),
+        "default_timeout_s": str(limits.default_timeout_s),
         "cpus": f"{sandbox.cpus:g}",  # 1.0 -> "1", 0.5 -> "0.5"
         "memory_mb": str(sandbox.memory_mb),
         "work_mb": str(sandbox.work_mb),

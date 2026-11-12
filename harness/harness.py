@@ -54,7 +54,8 @@ class Harness:
         # deliberately NOT loaded here: it is only imported after the run.
         self.submission_model = load_object(config.submission_model)
         self.sanity_checks = load_object(config.sanity_checks) if config.sanity_checks else None
-        self.run_python_model = tools.run_python_model(config.limits.max_timeout_s)
+        self.run_python_model = tools.run_python_model(
+            config.limits.default_timeout_s, config.limits.max_timeout_s)
 
         # System prompts, read and filled in once, so the logged text is
         # exactly the sent text: what the agent saw, with the numbers in.

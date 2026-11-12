@@ -33,6 +33,7 @@ limits:
   max_turns: 20                # API calls per agent
   max_tokens_per_response: 16000
   max_total_tokens: 200000     # input + output, per agent (each has its own harness)
+  default_timeout_s: 60        # run_python timeout when the agent passes none
   max_timeout_s: 120           # upper bound on run_python timeout_s
   output_cap_bytes: 10000      # per stream, per execution, shown to the agent
   max_stored_output_mb: 100    # per stream, per execution, saved to disk
