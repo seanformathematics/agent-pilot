@@ -1,0 +1,257 @@
+{
+  "N": 16,
+  "method": "Single-cluster Wolff updates on an L=16 periodic square lattice (H = -J sum s_i s_j, J = k_B = 1, bond probability 1 - exp(-2/T)). Equilibration: cold (all +1) and hot (random) starts evolved in parallel until cold |m| <= hot |m| at step t*, then 4t* further clusters. Measurement: |m| recorded after every cluster flip; runs start at 1000 clusters per T and are doubled as needed until the jackknife error on U is below 0.0005 at 40, 50 and 60 blocks. U = 1 - <m^4>/(3<m^2>^2), errors by blocked jackknife over 50 contiguous blocks. Seeds are triples: [137,int(10*T),0] (cold start), [137,int(10*T),1] (hot start).",
+  "script": "experiments/ising/compute_reference.py",
+  "computed_at": "2026-11-13T10:11:22.290513+00:00",
+  "seeds": {
+    "base": 137,
+    "rule": "np.random.default_rng([base, int(10*T), 0]) for the cold start, [base, int(10*T), 1] for the hot start."
+  },
+  "points": [
+    {
+      "T": 1.5,
+      "U": 0.666438523217112,
+      "U_err": 1.379384572467513e-05,
+      "seeds": {
+        "cold": [
+          137,
+          15,
+          0
+        ],
+        "hot": [
+          137,
+          15,
+          1
+        ]
+      }
+    },
+    {
+      "T": 1.6,
+      "U": 0.666293850718874,
+      "U_err": 3.055885229095093e-05,
+      "seeds": {
+        "cold": [
+          137,
+          16,
+          0
+        ],
+        "hot": [
+          137,
+          16,
+          1
+        ]
+      }
+    },
+    {
+      "T": 1.7,
+      "U": 0.6661116278176725,
+      "U_err": 4.9736211504037306e-05,
+      "seeds": {
+        "cold": [
+          137,
+          17,
+          0
+        ],
+        "hot": [
+          137,
+          17,
+          1
+        ]
+      }
+    },
+    {
+      "T": 1.8,
+      "U": 0.6656002249396735,
+      "U_err": 8.238833629093474e-05,
+      "seeds": {
+        "cold": [
+          137,
+          18,
+          0
+        ],
+        "hot": [
+          137,
+          18,
+          1
+        ]
+      }
+    },
+    {
+      "T": 1.9,
+      "U": 0.6645949046169104,
+      "U_err": 0.0002080867811861927,
+      "seeds": {
+        "cold": [
+          137,
+          19,
+          0
+        ],
+        "hot": [
+          137,
+          19,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.0,
+      "U": 0.6624126112813657,
+      "U_err": 0.0003272336974580473,
+      "seeds": {
+        "cold": [
+          137,
+          20,
+          0
+        ],
+        "hot": [
+          137,
+          20,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.1,
+      "U": 0.6559708424306867,
+      "U_err": 0.0004236836077455258,
+      "seeds": {
+        "cold": [
+          137,
+          21,
+          0
+        ],
+        "hot": [
+          137,
+          21,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.2,
+      "U": 0.6393892665573102,
+      "U_err": 0.00038154339335321375,
+      "seeds": {
+        "cold": [
+          137,
+          22,
+          0
+        ],
+        "hot": [
+          137,
+          22,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.3,
+      "U": 0.5920734013064124,
+      "U_err": 0.0003166744928080795,
+      "seeds": {
+        "cold": [
+          137,
+          23,
+          0
+        ],
+        "hot": [
+          137,
+          23,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.4,
+      "U": 0.5015102095531964,
+      "U_err": 0.0002983422215529472,
+      "seeds": {
+        "cold": [
+          137,
+          24,
+          0
+        ],
+        "hot": [
+          137,
+          24,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.5,
+      "U": 0.38205790495970926,
+      "U_err": 0.0003946927497900755,
+      "seeds": {
+        "cold": [
+          137,
+          25,
+          0
+        ],
+        "hot": [
+          137,
+          25,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.6,
+      "U": 0.27629849892975245,
+      "U_err": 0.00040937995958553036,
+      "seeds": {
+        "cold": [
+          137,
+          26,
+          0
+        ],
+        "hot": [
+          137,
+          26,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.7,
+      "U": 0.19875668515998257,
+      "U_err": 0.00034908792225110056,
+      "seeds": {
+        "cold": [
+          137,
+          27,
+          0
+        ],
+        "hot": [
+          137,
+          27,
+          1
+        ]
+      }
+    },
+    {
+      "T": 2.8,
+      "U": 0.14635598691378537,
+      "U_err": 0.0004244451882624753,
+      "seeds": {
+        "cold": [
+          137,
+          28,
+          0
+        ],
+        "hot": [
+          137,
+          28,
+          1
+        ]
+      }
+    }
+  ],
+  "status": "final",
+  "commit": "d6dc0c5461390416df64960641fbe324d9018ec7",
+  "versions": {
+    "python": "3.14.5",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1"
+  }
+}
