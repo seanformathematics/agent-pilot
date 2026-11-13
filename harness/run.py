@@ -39,6 +39,7 @@ records what happened during the run, and grading can be redone later
 without contradicting it.
 """
 
+import argparse
 import functools
 import json
 import os
@@ -54,6 +55,7 @@ from pathlib import Path
 
 import anthropic
 import pydantic
+import yaml
 
 from harness.config import REPO_ROOT, load_config, load_object, load_prompt, repo_path
 from harness.harness import Harness
@@ -578,15 +580,30 @@ def check_api_access(client, model: str, environ=os.environ) -> str | None:
     return None
 
 
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    """Read the command line. argparse supplies --help and a clear error for
+    a missing or extra argument (it exits with status 2 in those cases)."""
+    parser = argparse.ArgumentParser(
+        prog="python -m harness.run",
+        description="Run one experiment config end to end, and record it in runs/.")
+    parser.add_argument("config", type=Path, help="path to the experiment's config.yaml")
+    return parser.parse_args(argv[1:])
+
+
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        print("usage: python -m harness.run <path/to/config.yaml>", file=sys.stderr)
+    config_path = parse_args(argv).config
+    # Check the config before anything touches the API, so a typo in the path
+    # gives a one-line message instead of a traceback.
+    try:
+        config = load_config(config_path)
+    except (OSError, ValueError, ImportError, yaml.YAMLError) as error:
+        print(f"not started (no run folder created): bad config {config_path}: {error}", file=sys.stderr)
         return 2
     from harness.agent import make_client
     from harness.logger import Logger
 
     client = make_client()
-    problem = check_api_access(client, load_config(Path(argv[1])).model)
+    problem = check_api_access(client, config.model)
     if problem:
         print(f"not started (no run folder created): {problem}", file=sys.stderr)
         return 2

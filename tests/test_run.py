@@ -433,3 +433,34 @@ def test_failed_api_check_creates_no_run_folder(tmp_path, monkeypatch, capsys):
     assert run_module.main(["harness.run", str(TOY_CONFIG)]) == 2
     assert started == [] and not (tmp_path / "runs").exists()
     assert "no run folder created" in capsys.readouterr().err
+
+
+# ---- command line ----------------------------------------------------------
+
+def test_help_prints_usage_and_starts_nothing(monkeypatch, capsys):
+    started = []
+    monkeypatch.setattr(run_module, "run_experiment", lambda *a, **k: started.append(a))
+    with pytest.raises(SystemExit) as exit_info:
+        run_module.main(["harness.run", "--help"])
+    assert exit_info.value.code == 0
+    assert "config" in capsys.readouterr().out
+    assert started == []
+
+
+@pytest.mark.parametrize("argv", [["harness.run"], ["harness.run", "a.yaml", "b.yaml"]])
+def test_wrong_number_of_arguments_is_a_usage_error(argv, capsys):
+    with pytest.raises(SystemExit) as exit_info:
+        run_module.main(argv)
+    assert exit_info.value.code == 2
+    assert "usage:" in capsys.readouterr().err
+
+
+def test_missing_config_file_gives_a_message_not_a_traceback(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(run_module, "RUNS_DIR", tmp_path / "runs")
+    clients = []
+    monkeypatch.setattr("harness.agent.make_client", lambda: clients.append(1))
+    assert run_module.main(["harness.run", str(tmp_path / "no_such_config.yaml")]) == 2
+    err = capsys.readouterr().err
+    assert "no run folder created" in err and "no_such_config.yaml" in err
+    assert clients == []  # the API client is never created for a bad config
+    assert not (tmp_path / "runs").exists()
