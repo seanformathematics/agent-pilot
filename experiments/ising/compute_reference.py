@@ -4,6 +4,8 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime,timezone
 import subprocess, platform
+import logging
+
 
 SEED = 137
 N = 16
@@ -11,6 +13,15 @@ N = 16
 def git(*args):
     return subprocess.run(["git", *args], capture_output=True, text=True,
                           check=True, cwd=Path(__file__).parent).stdout.strip()
+
+
+# set up logging
+log = logging.getLogger("compute_reference")
+def setupLogging(path):
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(message)s",
+                        datefmt="%Y-%m-%d %H:%M:%S",
+                        handlers=[logging.StreamHandler(),
+                                    logging.FileHandler(path, mode="w", encoding="utf-8")])
 
 class IsingModel( object ):
     def __init__( self , size , seed ):
@@ -36,10 +47,10 @@ class IsingModel( object ):
 
     ## ------- informational tools -------- ##
 
-    def getMagentization( self ):
+    def getMagnetization( self ):
         return abs( self.lattice.sum() / self.lattice.size )
 
-    def getMagentizationPowers( self , n ):
+    def getMagnetizationPowers( self , n ):
         return (self.lattice.sum() / self.lattice.size) ** n
 
     ## ------- basic tools -------- ##
@@ -121,7 +132,7 @@ class Simulation( object ):
         
         row = {}
         row["round"] = self.round
-        row["m"]  = self.lattice.getMagentization()
+        row["m"]  = self.lattice.getMagnetization()
         
         self.records.append(row)
 
@@ -136,8 +147,8 @@ class Simulation( object ):
         
         while diff > 0:
             count += 1
-            hot = hotLattice.getMagentization()
-            cold = coldLattice.getMagentization()
+            hot = hotLattice.getMagnetization()
+            cold = coldLattice.getMagnetization()
             diff = cold - hot
             records.append({ "round" : count , "hot" : hot , "cold" : cold , "diff" : diff } )
         
@@ -145,7 +156,7 @@ class Simulation( object ):
             coldLattice.wolff( self.T )
 
         self.burnTime = count
-        self.burnRecords = records
+        self.burnRecords = {"record":"magnetization during burn in", "temperature" : self.T , "data": records , "burn_in_clusters" : 5*count }
         self.lattice = coldLattice
         self.otherLattice = hotLattice
 
@@ -178,21 +189,22 @@ class Simulation( object ):
         
         return pd.Series({"numberOfBlocks":numberOfBlocks,"U":U, "U_err": err})
 
-    def jackknifeBinderStable( self , numberOfBlocks , err_limit = 0.0005 , overUnder = 10 ):
+    def jackknifeBinderStable( self , numberOfBlocks , errorLimit = 0.0005 , blockRange = 10 ):
         
         main = self.jackknifeBinder( numberOfBlocks )
-        above = self.jackknifeBinder( numberOfBlocks + overUnder )
-        below = self.jackknifeBinder( numberOfBlocks - overUnder )
-
-        belowTest = (below["U_err"] < err_limit)
-        mainTest = (main["U_err"] < err_limit)
-        aboveTest = (above["U_err"] < err_limit)
+        above = self.jackknifeBinder( numberOfBlocks + blockRange )
+        below = self.jackknifeBinder( numberOfBlocks - blockRange )
         
         tests = {}
-        tests["below"] = (below["U_err"] < err_limit)
-        tests["main"] = (main["U_err"] < err_limit)
-        tests["above"] = (above["U_err"] < err_limit)
+        tests["below"] = bool(below["U_err"] < errorLimit)
+        tests["main"] = bool(main["U_err"] < errorLimit)
+        tests["above"] = bool(above["U_err"] < errorLimit)
         tests["all"] = len(set(tests.values())) == 1
+
+
+        tests["u_err"] = [{"blocks": numberOfBlocks - blockRange , "U": float(below["U"]) , "U_err" : float(below["U_err"])},
+                          {"blocks": numberOfBlocks              , "U": float(main["U"])  , "U_err" : float(main["U_err"])},
+                          {"blocks": numberOfBlocks + blockRange , "U": float(above["U"]) , "U_err" : float(above["U_err"])}]
         return tests
         
     
@@ -206,16 +218,29 @@ class Simulation( object ):
         
 class WolffRuns( object ):
     
-    def __init__( self , temperatures , startingRounds , blockCount ):
+    def __init__( self , temperatures , startingRounds , blockCount , errorLimit = 0.0005 , blockRange = 10 ):
         self.temperatures = temperatures
         self.rounds = startingRounds
         self.blocks = blockCount
+        self.errorResolution = errorLimit
+        self.blockRange = blockRange
+
+        log.info("=== START OF WOLFF CLUSTER RUN ===")
+        log.info("\n")
+        log.info(f"running for T in {temperatures}, jackknife block count = {blockCount} with block range (+/- {blockRange}), starting with {startingRounds} clusters")
         self.run()
+        log.info("\n")
+        log.info("=== END OF WOLFF CLUSTER RUN ===")
 
     def run( self ):
         records = []
+        
         for t in self.temperatures:
+            log.info(f"--- Start of run for T={t} ---")
             S = Simulation( t )
+
+            log.info(f"burn-in: t*={S.burnTime}, then {4 * S.burnTime} more clusters")
+
             S.run(self.rounds)
 
             data = {}
@@ -223,29 +248,54 @@ class WolffRuns( object ):
             data["rounds"] = self.rounds
             data["seeds"] = {"cold": S.lattice.seed , "hot":S.otherLattice.seed}
     
+            log.info(f"cold start seed: {S.lattice.seed}, hot start seed {S.otherLattice.seed}")
+
+            data["jackknife_tests"] = []
             U = S.jackknifeBinder(self.blocks)
-            test = S.jackknifeBinderStable(self.blocks)
-    
+            test = S.jackknifeBinderStable( self.blocks , errorLimit = self.errorResolution , blockRange = self.blockRange )
+            data["jackknife_tests"].append({"clusters": data["rounds"], **test})
+            
             data["U"] = U
             data["test"] = test
+            
+            log.info(f"binder cumulant: {U[["U","U_err"]].to_json()}.")
+
+            errs = ", ".join(f"{r['blocks']}: {r['U_err']:.5f}" for r in test["u_err"])
+            log.info(f"U_err by blocks: {errs}   all below limit: {test['main'] and test['all']}")
+
 
             check = test["main"] and test["all"]
 
             while not check:
                 
                 extra = data["rounds"]
+                log.info(f"Running {extra} clusters.")
                 S.run(extra)
                 data["rounds"] += extra
 
                 U = S.jackknifeBinder(self.blocks)
-                test = S.jackknifeBinderStable(self.blocks)
-            
+                test = S.jackknifeBinderStable( self.blocks , errorLimit = self.errorResolution , blockRange = self.blockRange )
+                data["jackknife_tests"].append({"clusters": data["rounds"], **test})
+
                 data["U"] = U
                 data["test"] = test
                 check = test["main"] and test["all"]
+                log.info(f"binder cumulant: {U[["U","U_err"]].to_json()}.")
+
+                # append jackknife test data to records.
+                log.info(test)
+
+            log.info(f"clusters: {data["rounds"]}\n")
             
+            ## append the burn in records for clarity
+            data["burn_records"] = S.burnRecords
+
+            ## record total cluster count (rounds) for the actual simulation (exclusive of burn in)
+            data["total_clusters"] = data["rounds"]
+            ## record all records for this simulation run
             records.append(data)
             self.records = records
+            log.info(f"--- End of run for T={t} ---")
 
     def report( self , commit ):
 
@@ -254,7 +304,12 @@ class WolffRuns( object ):
         u = data["U"].apply(lambda x : x["U"])
         uerr = data["U"].apply(lambda x : x["U_err"])
         seeds = data["seeds"]
-        points = pd.DataFrame({"T":t,"U":u,"U_err":uerr, "seeds":seeds}).apply(dict,axis=1).to_list()
+        burn = data["burn_records"]
+        total = data["total_clusters"]    
+        jackknife_tests = data["jackknife_tests"]
+    
+        points = pd.DataFrame({"T":t,"U":u,"U_err":uerr, "seeds":seeds,"burn_in": burn, "total_clusters":total, "jackknife_check":jackknife_tests}).apply(dict,axis=1).to_list()
+        
 
         output = {}
         output["N"] = N
@@ -263,11 +318,11 @@ class WolffRuns( object ):
             "(H = -J sum s_i s_j, J = k_B = 1, bond probability 1 - exp(-2/T)). "
             "Equilibration: cold (all +1) and hot (random) starts evolved in parallel "
             "until cold |m| <= hot |m| at step t*, then 4t* further clusters. "
-            "Measurement: |m| recorded after every cluster flip; runs start at 1000 "
+            f"Measurement: |m| recorded after every cluster flip; runs start at {self.rounds} "
             "clusters per T and are doubled as needed until the "
-            "jackknife error on U is below 0.0005 at 40, 50 and 60 blocks. "
-            "U = 1 - <m^4>/(3<m^2>^2), errors by blocked jackknife over 50 contiguous "
-            "blocks. Seeds are triples: [137,int(10*T),0] (cold start), [137,int(10*T),1] (hot start)."
+            f"jackknife error on U is below {self.errorResolution} at {self.blocks-self.blockRange}, {self.blocks} and {self.blocks+self.blockRange} blocks. "
+            f"U = 1 - <m^4>/(3<m^2>^2), errors by blocked jackknife over {self.blocks} contiguous "
+            f"blocks. Seeds are triples: [{SEED},int(10*T),0] (cold start), [{SEED},int(10*T),1] (hot start)."
         )     
         output["script"] = "experiments/ising/compute_reference.py"
         output["computed_at"] = datetime.now(timezone.utc).isoformat()
@@ -283,7 +338,6 @@ class WolffRuns( object ):
         return output
 
 if __name__ == "__main__":
-
     # record which version of the code we ran
     here = Path(__file__).resolve()
     if git("status", "--porcelain", "--", str(here)):
@@ -292,10 +346,23 @@ if __name__ == "__main__":
 
     rounds = 1000
     blockCount = 50
+    errorLimit = 0.0005
     temperatures = [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8]
 
-    W = WolffRuns( temperatures, rounds , blockCount )
-    text = json.dumps(W.report(commit), indent=2)
-    (here.parent / "N16.json").write_text(text, encoding="utf-8")
+    # set up logging
+    setupLogging(here.parent/"N16.log")
+    log.info(f"commit {commit}; python {platform.python_version()}, numpy {np.__version__}, pandas {pd.__version__}")
+    log.info(f"start {rounds} clusters, {blockCount} blocks, error limit {errorLimit}, T = {temperatures}")
+
+    
+    try:
+        W = WolffRuns( temperatures, rounds , blockCount , errorLimit=errorLimit)
+        text = json.dumps(W.report(commit = commit), indent=2)
+        (here.parent / "N16.json").write_text(text, encoding="utf-8")
+        log.info("Output written to N16.json.")
+    except Exception:
+        log.exception("run failed")
+        raise
+    
         
 
