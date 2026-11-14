@@ -1,7 +1,7 @@
 # Prototype of First Science Run: Single Agent Ising Modeler.
-experiment: ising_via_sonnet_solo
+experiment: ising_sonnet_independent
 design: experiments/ising/design.md
-topology: single
+topology: independent
 model: claude-sonnet-5-5
 effort: medium                    # optional; omit to use the model's own default
 
@@ -20,6 +20,34 @@ agents:
     role: solver
     task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
     # task is read by checks.py parser looking for N and T values.
+  - id: ising-02
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-03
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-04
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-05
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-06
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-07
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-08
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-09
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+  - id: ising-10
+    role: solver
+    task: "For a lattice of size N=16 and each temperature T in [1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8], estimate the Binder cumulant U and its one-sigma statistical error U_err. The target is U_err <= 0.005 for each value of T."
+
 
 limits:
   max_turns: 40                # API calls per agent
