@@ -23,6 +23,7 @@ harness/          Reusable machinery shared by all experiments
   logger.py       HAND-WRITTEN — hash-chained append-only log
   verify.py       HAND-WRITTEN — checks the hash chain and the output files' hashes
   topologies.py   One function per topology (see below)
+  report.py       Read-only HTML report of a run folder, written to reports/ (git-ignored)
   tools.py        Tool definitions and their Pydantic input models
 experiments/      SEAN'S — the science. Do not create or edit anything here.
   ising/          (designs, prompts, configs, submission schema, analysis)
