@@ -23,6 +23,14 @@ every wait is logged. The client must be made with ``max_retries=0`` (use
 problems, rate limits, overload, server errors) are retried up to
 ``limits.api_retries`` times; anything else ends the agent at once.
 
+Every request asks for a readable summary of the model's reasoning
+(``THINKING``). Without it the API returns thinking blocks with empty text, so
+the record would show what the agent did but not why. The setting changes only
+what is returned and logged: the model thinks, and is billed, the same either
+way. It is a harness property, not an experimental variable, so it is fixed
+here rather than set by config. The summaries reach the log inside each
+``api_response`` and go back to the model unchanged, like every thinking block.
+
 No automatic model fallback is configured. A fallback would silently switch
 the model partway through a run, which would confound the experiment. A
 refusal is logged and ends the agent.
@@ -33,6 +41,10 @@ import time
 import anthropic
 
 MAX_RETRY_WAIT_S = 60
+
+# Adaptive thinking (the model decides how much to think), with a readable
+# summary returned instead of empty thinking text. See the module docstring.
+THINKING = {"type": "adaptive", "display": "summarized"}
 
 STATUS_SUBMITTED = "submitted"
 STATUS_TURN_LIMIT = "turn_limit"
@@ -155,6 +167,7 @@ class Agent:
             "system": self.system_prompt,
             "tools": self.tools,
             "messages": self.messages,
+            "thinking": THINKING,
         }
         if self.effort:
             request["output_config"] = {"effort": self.effort}

@@ -90,6 +90,31 @@ def test_thinking_blocks_passed_back_unchanged(make_harness):
     assert assistant_turn["content"][0]["type"] == "thinking"
 
 
+def test_every_request_asks_for_thinking_summaries(make_harness):
+    _, _, _, client = run_agent(make_harness, [
+        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert len(client.calls) == 2
+    assert all(call["thinking"] == {"type": "adaptive", "display": "summarized"} for call in client.calls)
+
+
+def test_thinking_summary_is_logged_and_passed_back_unchanged(make_harness):
+    from tests.conftest import make_message
+    summary = "Plan: time one sweep first, then size the production run."
+    first = make_message([
+        {"type": "thinking", "thinking": summary, "signature": "sig-summary"},
+        {"type": "tool_use", "id": "toolu_s", "name": "run_python", "input": {"code": "print(1)"}},
+    ], "tool_use")
+    _, _, logger, client = run_agent(make_harness, [first, tool_call("submit_result", GOOD_SUBMISSION)])
+    # In the log: the first api_response carries the summary text verbatim.
+    responses = entries_of(logger, "api_response")
+    assert responses[0]["data"]["response"]["content"][0] == {
+        "type": "thinking", "thinking": summary, "signature": "sig-summary"}
+    # Back to the model: the next request contains the same block, unchanged.
+    assert client.calls[1]["messages"][1]["content"][0]["thinking"] == summary
+
+
 def test_parallel_tool_calls_answered_in_one_message(make_harness):
     from tests.conftest import make_message
     two_calls = make_message([
