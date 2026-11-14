@@ -2,7 +2,7 @@
 experiment: ising_prototype
 design: experiments/ising/design.md
 topology: single
-model: claude-opus-5-5
+model: claude-sonnet-5-5
 effort: medium                    # optional; omit to use the model's own default
 
 # Experiment code, referenced as "module.path:attribute".
