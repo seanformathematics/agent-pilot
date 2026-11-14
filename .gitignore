@@ -3,7 +3,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-experiments/ising/archive/
 
 # Editors
 *.swp
@@ -16,3 +15,6 @@ experiments/ising/archive/
 # Sean's personal notes
 harness/TODO.md
 experiments/TODO.md
+
+# Run reports: derived views, regenerated on demand by harness/report.py
+reports/
