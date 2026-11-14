@@ -73,7 +73,7 @@ def test_filled_prompt_is_logged_and_sent(tmp_path, make_harness):
     logged = entries_of(logger, "system_prompt")[0]["data"]["text"]
     assert logged == expected
 
-    client = FakeClient([tool_call("run_python", {"code": "print(1)"}),
+    client = FakeClient([tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
                          tool_call("submit_result", GOOD_SUBMISSION)])
     harness.start_agent("solver-0")
     Agent("solver-0", client, harness).run(harness.task_for("solver-0"))

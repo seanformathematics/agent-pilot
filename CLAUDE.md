@@ -77,7 +77,7 @@ To build and test the harness, use a **toy experiment under `tests/fixtures/`** 
 
 All tool inputs are Pydantic models; schemas come from `model_json_schema()`; inputs are validated with `model_validate()` before anything runs.
 
-- `run_python(code: str, timeout_s: int = limits.default_timeout_s)` — runs code in the sandbox. Returns JSON with exactly these keys, always present: `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Set `is_error: true` on the `tool_result` when exit code ≠ 0 or timed out.
+- `run_python(purpose: str, code: str, timeout_s: int = limits.default_timeout_s)` — runs code in the sandbox. `purpose` (required, non-blank, at most 1000 characters) is the agent's own one- or two-sentence statement of why it is making the call; it is logged with the call and its execution. Returns JSON with exactly these keys, always present: `exit_code`, `stdout`, `stderr`, `duration_s`, `timed_out`, `truncated`. Set `is_error: true` on the `tool_result` when exit code ≠ 0 or timed out.
 - `submit_result(...)` — generic mechanism; the schema is the experiment's submission model, named in the config (see Experiment interface). Validate, run experiment sanity checks, return a short acknowledgment or the specific validation error. Allow a small, configured number of resubmissions; log every attempt.
 - `send_message(...)` — hierarchical topology only; enabled per agent by config.
 

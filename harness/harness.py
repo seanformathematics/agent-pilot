@@ -243,6 +243,7 @@ class Harness:
         self.log(agent_id, "execution", {
             "tool_use_id": tool_use_id,
             "exec_id": exec_id,
+            "purpose": call.purpose,  # as validated (whitespace stripped)
             "timeout_s": call.timeout_s,
             "result": result,
             "end_reason": details["end_reason"],

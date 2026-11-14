@@ -27,7 +27,7 @@ def run_agent(make_harness, responses, config=None):
 
 def test_run_then_submit_is_accepted(make_harness):
     outcome, harness, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(sum([1, 2]))"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(sum([1, 2]))"}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     assert outcome == {"agent_id": "solver-0", "status": "submitted", "turns": 2}
@@ -38,7 +38,7 @@ def test_run_then_submit_is_accepted(make_harness):
 
 def test_every_agent_emission_appears_in_log(make_harness):
     responses = [
-        tool_call("run_python", {"code": "print(1)"}, text="Let me compute."),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}, text="Let me compute."),
         tool_call("submit_result", GOOD_SUBMISSION, text="Submitting."),
     ]
     expected_content = [r.to_dict()["content"] for r in responses]
@@ -70,7 +70,7 @@ def test_task_is_logged_and_sent_first(make_harness):
 
 def test_execution_files_archived_and_hashed(make_harness):
     _, harness, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     files = entries_of(logger, "execution")[0]["data"]["files"]
@@ -83,7 +83,7 @@ def test_execution_files_archived_and_hashed(make_harness):
 # ----- the conversation is built correctly ------------------------------
 
 def test_thinking_blocks_passed_back_unchanged(make_harness):
-    first = tool_call("run_python", {"code": "print(1)"})
+    first = tool_call("run_python", {"purpose": "test call", "code": "print(1)"})
     _, _, _, client = run_agent(make_harness, [first, tool_call("submit_result", GOOD_SUBMISSION)])
     assistant_turn = client.calls[1]["messages"][1]
     assert assistant_turn == {"role": "assistant", "content": first.to_dict()["content"]}
@@ -92,7 +92,7 @@ def test_thinking_blocks_passed_back_unchanged(make_harness):
 
 def test_every_request_asks_for_thinking_summaries(make_harness):
     _, _, _, client = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     assert len(client.calls) == 2
@@ -104,7 +104,7 @@ def test_thinking_summary_is_logged_and_passed_back_unchanged(make_harness):
     summary = "Plan: time one sweep first, then size the production run."
     first = make_message([
         {"type": "thinking", "thinking": summary, "signature": "sig-summary"},
-        {"type": "tool_use", "id": "toolu_s", "name": "run_python", "input": {"code": "print(1)"}},
+        {"type": "tool_use", "id": "toolu_s", "name": "run_python", "input": {"purpose": "test call", "code": "print(1)"}},
     ], "tool_use")
     _, _, logger, client = run_agent(make_harness, [first, tool_call("submit_result", GOOD_SUBMISSION)])
     # In the log: the first api_response carries the summary text verbatim.
@@ -118,8 +118,8 @@ def test_thinking_summary_is_logged_and_passed_back_unchanged(make_harness):
 def test_parallel_tool_calls_answered_in_one_message(make_harness):
     from tests.conftest import make_message
     two_calls = make_message([
-        {"type": "tool_use", "id": "toolu_a", "name": "run_python", "input": {"code": "print(1)"}},
-        {"type": "tool_use", "id": "toolu_b", "name": "run_python", "input": {"code": "fail"}},
+        {"type": "tool_use", "id": "toolu_a", "name": "run_python", "input": {"purpose": "test call", "code": "print(1)"}},
+        {"type": "tool_use", "id": "toolu_b", "name": "run_python", "input": {"purpose": "test call", "code": "fail"}},
     ], "tool_use")
     _, _, _, client = run_agent(make_harness, [two_calls, tool_call("submit_result", GOOD_SUBMISSION)])
     results = client.calls[1]["messages"][2]
@@ -129,7 +129,7 @@ def test_parallel_tool_calls_answered_in_one_message(make_harness):
 
 def test_run_python_result_has_exact_keys(make_harness):
     _, _, _, client = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])
@@ -159,6 +159,31 @@ def test_malformed_run_python_rejected_and_logged(make_harness):
     assert entries_of(logger, "execution") == []
 
 
+@pytest.mark.parametrize("bad_input", [
+    {"code": "print(1)"},                                   # no purpose
+    {"purpose": "   ", "code": "print(1)"},                 # blank purpose
+    {"purpose": "x" * 1001, "code": "print(1)"},            # over the limit
+])
+def test_run_python_without_a_real_purpose_is_rejected_and_logged(make_harness, bad_input):
+    _, _, logger, client = run_agent(make_harness, [
+        tool_call("run_python", bad_input),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    rejection = entries_of(logger, "rejection")[0]["data"]
+    assert "Invalid run_python input" in rejection["message"] and "purpose" in rejection["message"]
+    assert client.calls[1]["messages"][2]["content"][0]["is_error"] is True
+    assert entries_of(logger, "execution") == []  # nothing ran
+
+
+def test_purpose_is_recorded_with_its_execution(make_harness):
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "  Time one sweep before sizing the run.  ", "code": "print(1)"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert entries_of(logger, "tool_call")[0]["data"]["input"]["purpose"] == "  Time one sweep before sizing the run.  "
+    assert entries_of(logger, "execution")[0]["data"]["purpose"] == "Time one sweep before sizing the run."
+
+
 def test_unknown_tool_rejected_and_logged(make_harness):
     _, _, logger, client = run_agent(make_harness, [
         tool_call("read_logs", {}),
@@ -172,7 +197,7 @@ def test_unknown_tool_rejected_and_logged(make_harness):
 def test_timeout_above_limit_rejected(make_harness, toy_config):
     limit = toy_config.limits.max_timeout_s
     _, _, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)", "timeout_s": limit + 1}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)", "timeout_s": limit + 1}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     message = entries_of(logger, "rejection")[0]["data"]["message"]
@@ -200,7 +225,7 @@ def test_submission_without_code_execution_is_flagged(make_harness):
 
 def test_submission_after_only_failed_execution_is_flagged(make_harness):
     _, _, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "fail"}),
+        tool_call("run_python", {"purpose": "test call", "code": "fail"}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     assert [f["data"]["reason"] for f in entries_of(logger, "flag")] == ["submit_without_successful_run"]
@@ -208,7 +233,7 @@ def test_submission_after_only_failed_execution_is_flagged(make_harness):
 
 def test_invalid_submission_rejected_then_resubmitted(make_harness):
     outcome, harness, logger, client = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", {"total": "lots"}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
@@ -221,7 +246,7 @@ def test_invalid_submission_rejected_then_resubmitted(make_harness):
 
 def test_sanity_check_rejects_submission(make_harness):
     _, harness, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", {"total": 1555, "method_notes": "   "}),
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
@@ -232,7 +257,7 @@ def test_sanity_check_rejects_submission(make_harness):
 def test_submission_limit_enforced(make_harness):
     bad = {"total": "x"}
     outcome, harness, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", bad),
         tool_call("submit_result", bad),
         tool_call("submit_result", bad),
@@ -265,8 +290,8 @@ def test_stops_on_refusal(make_harness):
 def test_turn_limit(make_harness, toy_config):
     config = toy_config.model_copy(update={"limits": toy_config.limits.model_copy(update={"max_turns": 2})})
     outcome, _, _, client = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
-        tool_call("run_python", {"code": "print(2)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(2)"}),
     ], config=config)
     assert outcome == {"agent_id": "solver-0", "status": "turn_limit", "turns": 2}
     assert len(client.calls) == 2
@@ -275,9 +300,9 @@ def test_turn_limit(make_harness, toy_config):
 def test_token_budget(make_harness, toy_config):
     config = toy_config.model_copy(update={"limits": toy_config.limits.model_copy(update={"max_total_tokens": 200})})
     outcome, harness, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),   # 150 tokens
-        tool_call("run_python", {"code": "print(2)"}),   # 300 tokens: over budget
-        tool_call("run_python", {"code": "print(3)"}),   # never requested
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),   # 150 tokens
+        tool_call("run_python", {"purpose": "test call", "code": "print(2)"}),   # 300 tokens: over budget
+        tool_call("run_python", {"purpose": "test call", "code": "print(3)"}),   # never requested
     ], config=config)
     assert outcome["status"] == "budget_exhausted"
     assert harness.tokens_used == 300
@@ -357,7 +382,7 @@ def test_make_client_has_sdk_retries_off(monkeypatch):
 
 def test_no_log_content_reaches_the_model(make_harness):
     _, harness, logger, client = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("read_logs", {}),
         tool_call("submit_result", {"total": "bad"}),
         tool_call("submit_result", GOOD_SUBMISSION),
@@ -407,7 +432,7 @@ def config_with_submission_model(toy_config, ref):
 def test_non_finite_submission_rejected_and_logged(make_harness, toy_config, bad):
     config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:ValueSubmission")
     outcome, harness, logger, client = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", {"value": bad}),
         tool_call("submit_result", {"value": 2.5}),
     ], config=config)
@@ -423,7 +448,7 @@ def test_non_finite_submission_rejected_and_logged(make_harness, toy_config, bad
 def test_non_finite_inside_a_list_is_named(make_harness, toy_config):
     config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:ValueSubmission")
     _, _, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", {"value": 1.0, "samples": [1.0, "inf"]}),
         text_reply("ok"),
     ], config=config)
@@ -433,7 +458,7 @@ def test_non_finite_inside_a_list_is_named(make_harness, toy_config):
 def test_divergence_reported_through_schema_flag(make_harness, toy_config):
     config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:DivergenceAwareSubmission")
     _, harness, _, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", {"is_finite": False}),
     ], config=config)
     assert harness.accepted_submissions[0]["submission"] == {"is_finite": False, "value": None}
@@ -442,7 +467,7 @@ def test_divergence_reported_through_schema_flag(make_harness, toy_config):
 def test_finite_float_type_rejects_nan_at_validation(make_harness, toy_config):
     config = config_with_submission_model(toy_config, "tests.fixtures.float_schemas:DivergenceAwareSubmission")
     _, _, logger, _ = run_agent(make_harness, [
-        tool_call("run_python", {"code": "print(1)"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
         tool_call("submit_result", {"is_finite": True, "value": "NaN"}),
         text_reply("ok"),
     ], config=config)

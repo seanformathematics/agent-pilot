@@ -29,7 +29,7 @@ GOOD = {"total": 1555, "method_notes": "Summed with Python's sum()."}
 
 def solves():
     """One agent's scripted replies: run code, then submit. 300 tokens in all."""
-    return [tool_call("run_python", {"code": "print(1)"}), tool_call("submit_result", GOOD)]
+    return [tool_call("run_python", {"purpose": "test call", "code": "print(1)"}), tool_call("submit_result", GOOD)]
 
 
 def independent_run(tmp_path, responses, sandbox_factory=FakeSandbox):

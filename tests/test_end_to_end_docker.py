@@ -32,7 +32,7 @@ pytestmark = [
 
 def test_toy_run_end_to_end(tmp_path):
     client = FakeClient([
-        tool_call("run_python", {"code": (
+        tool_call("run_python", {"purpose": "test call", "code": (
             "total = sum([17, -4, 256, 1031, 9, -88, 42, 7, 300, -15])\n"
             "open('/work/answer.txt', 'w').write(str(total))\n"
             "print(total)\n")}),
@@ -65,7 +65,7 @@ def test_toy_run_end_to_end(tmp_path):
 
 def test_tampered_copy_of_a_real_run_fails_verify(tmp_path):
     client = FakeClient([
-        tool_call("run_python", {"code": "print(1555)\n"}),
+        tool_call("run_python", {"purpose": "test call", "code": "print(1555)\n"}),
         tool_call("submit_result", {"total": 1555, "method_notes": "printed it."}),
     ])
     record = run_experiment(TOY_CONFIG, client, Logger, sandbox_factory=Sandbox,
@@ -87,7 +87,7 @@ def test_api_key_appears_nowhere_in_a_run_folder(tmp_path, monkeypatch):
     secret = "sk-ant-test-must-not-leak-0123456789"
     monkeypatch.setenv("ANTHROPIC_API_KEY", secret)
     client = FakeClient([
-        tool_call("run_python", {"code": (
+        tool_call("run_python", {"purpose": "test call", "code": (
             "import os, json\n"
             "print(json.dumps(dict(os.environ)))\n"
             "open('/work/env.txt', 'w').write(json.dumps(dict(os.environ)))\n")}),
@@ -111,13 +111,13 @@ def test_independent_run_end_to_end_agents_cannot_see_each_other(tmp_path):
     look = ("import os\n"
             "print(sorted(os.listdir('/work')), sorted(os.listdir('/tmp')))\n")
     client = FakeClient([
-        tool_call("run_python", {"code": (
+        tool_call("run_python", {"purpose": "test call", "code": (
             "open('/work/left-by-0.txt', 'w').write('hello')\n"
             "open('/tmp/left-by-0.txt', 'w').write('hello')\n" + look)}),
         tool_call("submit_result", {"total": 1555, "method_notes": "0"}),
-        tool_call("run_python", {"code": look}),
+        tool_call("run_python", {"purpose": "test call", "code": look}),
         tool_call("submit_result", {"total": 1555, "method_notes": "1"}),
-        tool_call("run_python", {"code": look}),
+        tool_call("run_python", {"purpose": "test call", "code": look}),
         tool_call("submit_result", {"total": 1555, "method_notes": "2"}),
     ])
     record = run_experiment(repo_path("tests/fixtures/toy_sum/config_independent.yaml"), client, Logger,

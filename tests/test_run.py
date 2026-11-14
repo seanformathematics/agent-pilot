@@ -56,7 +56,7 @@ def config_variant(tmp_path, old: str, new: str):
 # ----- the run folder and index ------------------------------------------
 
 def test_run_folder_contents(tmp_path):
-    record = toy_run(tmp_path, [tool_call("run_python", {"code": "print(1)"}),
+    record = toy_run(tmp_path, [tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
                                 tool_call("submit_result", GOOD_SUBMISSION)])
     run_dir = tmp_path / "runs" / record["run_id"]
     assert sorted(p.name for p in run_dir.iterdir()) == [
@@ -69,7 +69,7 @@ def test_run_folder_contents(tmp_path):
 
 
 def test_index_line(tmp_path):
-    record = toy_run(tmp_path, [tool_call("run_python", {"code": "print(1)"}),
+    record = toy_run(tmp_path, [tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
                                 tool_call("submit_result", GOOD_SUBMISSION)])
     lines = (tmp_path / "runs" / "index.jsonl").read_text().splitlines()
     assert [json.loads(line) for line in lines] == [index_part(record)]

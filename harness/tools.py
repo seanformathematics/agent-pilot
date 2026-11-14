@@ -9,14 +9,23 @@ experiment (see ``experiments/ising/schemas.py``) and wrapped with
 ``tool_definition`` at run time.
 """
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints
 
 RUN_PYTHON_DESCRIPTION = (
     "Run Python code in an isolated sandbox. Returns exit code, stdout, stderr, "
     "duration, and whether the run timed out or output was truncated."
 )
+
+# Why the agent is making a run_python call, in its own words. Required, so the
+# record states the intent of every execution next to its code, whatever the
+# API does with text written between tool calls (on current models, longer
+# notes come back inside thinking blocks, not as visible text). Whitespace is
+# stripped and an empty purpose is rejected; the upper bound only guards
+# against pasting code into it. The code itself is never stripped.
+PURPOSE_MAX_CHARS = 1000
+Purpose = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=PURPOSE_MAX_CHARS)]
 
 
 def run_python_model(default_timeout_s: int, max_timeout_s: int) -> type[BaseModel]:
@@ -30,6 +39,10 @@ def run_python_model(default_timeout_s: int, max_timeout_s: int) -> type[BaseMod
     class RunPythonInput(BaseModel):
         """Input for ``run_python``."""
 
+        # Declared first, so the schema lists it before the code: the agent
+        # states what it is about to do, then writes it.
+        purpose: Purpose = Field(
+            description="One or two sentences: what this call is for and why you are running it now.")
         code: str = Field(description="Python source to execute in the sandbox.")
         timeout_s: int = Field(
             default=default_timeout_s,
