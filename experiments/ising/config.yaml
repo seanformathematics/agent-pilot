@@ -1,5 +1,5 @@
 # Prototype of First Science Run: Single Agent Ising Modeler.
-experiment: ising_prototype
+experiment: ising_via_sonnet_solo
 design: experiments/ising/design.md
 topology: single
 model: claude-sonnet-5-5
