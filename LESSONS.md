@@ -135,3 +135,54 @@ the items.
 - Should the harness check that the number graded equals the number of
   accepted submissions?
   * A: That's a good catch. For clarity we should. Otherwise we expect a drop out worth investigating.
+
+---
+
+## 5. A 4σ outlier that moved when we looked again
+
+**What happened.** In `2026-11-14_ising_sonnet_independent_independent_001`
+(10 Sonnet agents), `ising-10` reported U = 0.38594 ± 0.00085 at T = 2.5.
+Against the reference (0.38206 ± 0.00039) that is a pull of **4.14σ**. The
+chance that the worst of 140 honest pulls reaches 4.14 is about 0.5%, so it
+looked like an agent understating its error. Re-analysed on 2026-11-15:
+
+- **Against its peers, not the reference**, ising-10 is 2.82σ from the
+  weighted mean of the other nine. The worst of 140 points reaching that
+  happens about half the time (p ≈ 0.49). Nothing unusual.
+- **The rest of the gap belongs to the reference.** The other nine agents'
+  weighted mean at T = 2.5 is 0.38340 ± 0.00029, which is 2.7σ above the
+  reference. All ten together sit 3.3σ above it. Every agent's pull at T = 2.5
+  is shifted by the same amount (mean pull +1.47 across agents).
+- Testing the reference against the agents' consensus at every T gives
+  χ² = 24.0 for 14 degrees of freedom (p = 0.046), almost all of it from
+  T = 2.5.
+
+So "agent ising-10 is 4σ off" turned into "the reference value at T = 2.5
+is about 3σ low, or all ten agents share a bias there, and ising-10 is
+an ordinary 2.8σ fluctuation on top". The surprise was real, but it was in
+the wrong place.
+
+**Why it happened.** A pull, (U − U_ref)/√(U_err² + σ_ref²), mixes two
+sources of noise: the agent's and the reference's. The reference's part is
+the same for every agent, so with many agents it stops averaging out and
+shows up as a shared offset. Treating 140 pulls as 140 independent draws
+hides that. Below T ≈ 2.2 it gets worse: the agents' errors are 0.06–0.55
+times σ_ref there, so their pulls are almost pure reference noise (for
+example, every agent gets about +1.65 at T = 2.1).
+
+**What to do.**
+- With several agents, split the comparison in two: agents against each
+  other at each T (tests the agents; no reference needed), and the agents'
+  consensus against the reference (tests the reference). Report both.
+- Before calling an agent anomalous, ask whether the other agents share the
+  shift at that point.
+- Treat the reference as a measurement with its own error bars, open to
+  being checked. With more agents it will be the least precise number in
+  the comparison at some temperatures.
+
+**Questions to answer:**
+- Is the reference at T = 2.5 really low? An independent recomputation
+  there (new seeds, longer run) would decide it.
+- How should calibration be judged under topologies where agents are not
+  independent (e.g. hierarchical, where a supervisor may propagate one
+  method to every worker), so that "agreeing with peers" means less?
