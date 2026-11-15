@@ -76,7 +76,8 @@ def test_index_line_covers_the_whole_batch(finished, tmp_path):
     assert line["tokens_used"] == 900
     assert line["final_log_hash"] == (run_dir / "final_hash.txt").read_text().strip()
     assert line["verify"] == {"ok": True, "problem_count": 0, "problems": []}
-    assert line["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 3, "graded": AGENTS}
+    assert line["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 3, "graded": AGENTS,
+                                "completion": {"accepted": 3, "agents": 3}}
     assert line["analysis_coverage"] == {"accepted": 3, "graded": 3, "complete": True, "ungraded_agents": []}
     assert set(line["agent_runs"]) == set(AGENTS)
     for agent, info in line["agent_runs"].items():
@@ -124,6 +125,14 @@ def test_an_agent_ending_without_submission_does_not_stop_the_others(tmp_path):
     assert record["agent_statuses"] == {
         "solver-0": "submitted", "solver-1": "ended_turn_without_submission", "solver-2": "submitted"}
     assert record["verify"]["ok"]
+
+
+def test_analysis_grades_only_accepted_submissions_but_sees_every_agent(tmp_path):
+    record = independent_run(tmp_path, solves() + [text_reply("I give up.")] + solves())
+    assert record["analysis"]["completion"] == {"accepted": 2, "agents": 3}
+    assert record["analysis"]["graded"] == ["solver-0", "solver-2"]
+    assert record["analysis"]["passed"] is True       # the roster doesn't change grading
+    assert record["analysis_coverage"]["complete"] is True
 
 
 def test_harness_error_in_one_agent_does_not_stop_the_others(tmp_path):

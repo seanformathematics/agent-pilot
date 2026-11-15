@@ -44,7 +44,8 @@ def test_toy_run_end_to_end(tmp_path):
 
     assert record["status"] == "completed"
     assert record["verify"] == {"ok": True, "problem_count": 0, "problems": []}
-    assert record["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 1, "graded": ["solver-0"]}
+    assert record["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 1, "graded": ["solver-0"],
+                                  "completion": {"accepted": 1, "agents": 1}}
     assert record["analysis_coverage"]["complete"] is True
 
     tool_result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])

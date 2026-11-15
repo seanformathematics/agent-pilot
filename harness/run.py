@@ -205,11 +205,36 @@ def commit_run(run_dir: Path, index_path: Path, status: str, repo: Path = REPO_R
     ).stdout.strip()
 
 
-def run_analysis(config, submissions: list[dict]) -> dict:
-    """Import and call the analysis entry point. Errors are recorded, not raised."""
+NOT_RUN = "not_run"
+
+
+def agent_roster(config, outcomes: list[dict], submissions: list[dict]) -> list[dict]:
+    """Every agent the config names, in config order, and how each one ended.
+
+    Each item is {"agent_id", "status", "accepted"}. "status" is the agent's
+    own outcome (submitted, turn_limit, ...), or "not_run" when the run ended
+    (error or Ctrl-C) before the agent reported one; the run's status says
+    which. "accepted" is True when the agent has an accepted submission.
+
+    The analysis gets this alongside the accepted submissions, so it can see
+    agents that never submitted (completion) without grading them.
+    """
+    status = {o["agent_id"]: o["status"] for o in outcomes}
+    accepted = {s["agent_id"] for s in submissions}
+    return [{"agent_id": agent.id, "status": status.get(agent.id, NOT_RUN),
+             "accepted": agent.id in accepted}
+            for agent in config.agents]
+
+
+def run_analysis(config, submissions: list[dict], agents: list[dict]) -> dict:
+    """Import and call the analysis entry point. Errors are recorded, not raised.
+
+    ``submissions`` are the accepted submissions only; ``agents`` is every
+    agent in the config (see agent_roster). It is passed by keyword.
+    """
     try:
         analyze = load_object(config.analysis)
-        result = analyze(submissions)
+        result = analyze(submissions, agents=agents)
         if not isinstance(result, dict) or "estimate" not in result or "passed" not in result:
             raise ValueError(f"analysis must return a dict with 'estimate' and 'passed', got {result!r}")
         return {"analysis": result, "analysis_error": None,
@@ -566,7 +591,8 @@ def run_experiment(
         "verify": result["verify"],
         "storage_bytes": result["storage_bytes"],
         **result["extra"],
-        **run_analysis(config, result["submissions"]),
+        **run_analysis(config, result["submissions"],
+                       agent_roster(config, result["outcomes"], result["submissions"])),
     }
     index_path = Path(runs_dir) / "index.jsonl"
     append_index_line(index_path, record)

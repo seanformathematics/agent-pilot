@@ -116,12 +116,12 @@ def analyzeSubmission(submission: dict, reference: dict ) -> dict:
         "rises_with_T": rises_with_T(ok_points),
     }
 
-def analyze( submissions : list[dict] , reference: dict | None = None ) -> dict:
+def analyze( submissions : list[dict] , reference: dict | None = None , agents: list[dict] | None = None) -> dict:
     reference = reference or load_reference()
 
     if not submissions:
         return {"estimate": None, "passed": False, "outcome": "inconclusive",
-            "reason": "no accepted submission", "n_graded": 0, "graded": []}
+            "reason": "no accepted submission", "n_graded": 0, "graded": [], "agents_recruited": agents }
 
     # a submission includes: {"agent_id", "attempt", "submission"},
 
@@ -152,5 +152,6 @@ def analyze( submissions : list[dict] , reference: dict | None = None ) -> dict:
     output["analysis"] = submissions[["agent_id","analysis"]].apply(dict,axis=1).to_list()
     output["passed"] = bool(agentsSubmitting == agentsPassing) # UPDATE THIS TO CHANGE PASSING LOGIC, FOR EXAMPLE, TO BE LESS STRICT
     output["estimate"] = round(pooledRMS, 4) if pooledRMS is not None else None
+    output["agents_recruited"] = agents
 
     return output

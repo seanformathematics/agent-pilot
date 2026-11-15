@@ -75,7 +75,8 @@ def test_index_line(tmp_path):
     assert [json.loads(line) for line in lines] == [index_part(record)]
     assert record["status"] == "completed"
     assert record["agent_statuses"] == {"solver-0": "submitted"}
-    assert record["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 1, "graded": ["solver-0"]}
+    assert record["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 1, "graded": ["solver-0"],
+                                  "completion": {"accepted": 1, "agents": 1}}
     assert record["analysis_error"] is None
     assert record["commit"] == "abc123"
     assert record["tokens_used"] == 300
@@ -158,6 +159,30 @@ def test_analysis_coverage_compares_what_was_graded_with_what_was_accepted(resul
     assert coverage["ungraded_agents"] == ungraded
 
 
+# ----- the analysis also gets the full list of agents ----------------------
+
+def test_analysis_is_told_about_an_agent_that_did_not_submit(tmp_path):
+    record = toy_run(tmp_path, [text_reply("I give up.")])
+    assert record["accepted_submissions"] == 0
+    # The toy analysis counts agents from the roster; grading is unchanged.
+    assert record["analysis"]["completion"] == {"accepted": 0, "agents": 1}
+    assert record["analysis"]["passed"] is False
+    assert record["analysis"]["n_graded"] == 0
+
+
+def test_agent_roster_lists_every_configured_agent_in_config_order():
+    from types import SimpleNamespace
+    from harness.run import agent_roster
+    config = SimpleNamespace(agents=[SimpleNamespace(id=a) for a in ["a", "b", "c"]])
+    outcomes = [{"agent_id": "a", "status": "submitted"}, {"agent_id": "b", "status": "turn_limit"}]
+    submissions = [{"agent_id": "a", "attempt": 1, "submission": {}}]
+    assert agent_roster(config, outcomes, submissions) == [
+        {"agent_id": "a", "status": "submitted", "accepted": True},
+        {"agent_id": "b", "status": "turn_limit", "accepted": False},
+        {"agent_id": "c", "status": "not_run", "accepted": False},   # run ended before c reported
+    ]
+
+
 # ----- failures still produce a closed log and an index line --------------
 
 def test_failing_analysis_is_recorded(tmp_path):
@@ -209,7 +234,8 @@ def test_agent_outcome_other_than_submitted_still_completes_run(tmp_path):
     record = toy_run(tmp_path, [text_reply("I am done.")])
     assert record["status"] == "completed"
     assert record["agent_statuses"] == {"solver-0": "ended_turn_without_submission"}
-    assert record["analysis"] == {"estimate": None, "passed": False, "n_graded": 0, "graded": []}
+    assert record["analysis"] == {"estimate": None, "passed": False, "n_graded": 0, "graded": [],
+                                  "completion": {"accepted": 0, "agents": 1}}
 
 
 # ----- refused before any run folder exists -------------------------------

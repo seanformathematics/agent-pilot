@@ -77,7 +77,7 @@ Who plugs into what. Arrows read "calls".
                 ├──▶ topology(harness, client) ──▶ Agent ──▶ Anthropic API
                 │      (independent: a fresh Harness + log per agent, in turn)
                 ├──▶ verify(log, final hash)                (Sean's, M2; once per log)
-                └──▶ analyze(submissions)                   (Sean's, after run)
+                └──▶ analyze(submissions, agents=...)       (Sean's, after run)
 ```
 
 ### Sean provides: the experiment
@@ -89,7 +89,7 @@ Who plugs into what. Arrows read "calls".
 | Design file | Markdown | Copied into every run folder |
 | `submission_model` | Pydantic `BaseModel` class | Becomes the `submit_result` schema the agent sees |
 | `sanity_checks` (optional) | `check(submission, task) -> list[str]`, empty means accepted | On every submission. **Must not look at the answer.** |
-| `analysis` | `analyze(submissions) -> {"estimate": ..., "passed": ..., "n_graded": ..., "graded": [...], ...}` | After the run only. Gets accepted submissions only: `[{"agent_id", "attempt", "submission"}]`. `estimate` and `passed` are required; `n_graded` and `graded` (agent ids) should be returned so the harness can check coverage |
+| `analysis` | `analyze(submissions, agents) -> {"estimate": ..., "passed": ..., "n_graded": ..., "graded": [...], ...}` | After the run only. `submissions` holds accepted submissions only: `[{"agent_id", "attempt", "submission"}]`. `agents` (passed by keyword) lists every agent in the config, including those that never submitted: `[{"agent_id", "status", "accepted"}]`, status `not_run` if the run ended before the agent reported one. `estimate` and `passed` are required; `n_graded` and `graded` (agent ids) should be returned so the harness can check coverage |
 
 Experiment code is named in the config as `module.path:name`, for example
 `experiments.ising.schemas:IsingSubmission`.
@@ -155,7 +155,8 @@ analysis error, and `analysis_coverage` (`accepted`, `graded`, `complete`, `ungr
 all agents; the final log hash is that of `batch.jsonl`; verify covers
 every log and the cross-checks, each problem naming its `log`; and
 `agent_runs` gives each agent's status, tokens, wall clock and final log
-hash. The analysis gets every agent's accepted submissions in one list.
+hash. The analysis gets every agent's accepted submissions in one list,
+and the full agent list (`agents`) so it can count agents that never submitted.
 
 ### Harness internals
 
