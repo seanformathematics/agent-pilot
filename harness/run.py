@@ -212,9 +212,37 @@ def run_analysis(config, submissions: list[dict]) -> dict:
         result = analyze(submissions)
         if not isinstance(result, dict) or "estimate" not in result or "passed" not in result:
             raise ValueError(f"analysis must return a dict with 'estimate' and 'passed', got {result!r}")
-        return {"analysis": result, "analysis_error": None}
+        return {"analysis": result, "analysis_error": None,
+                "analysis_coverage": analysis_coverage(submissions, result)}
     except Exception as error:
-        return {"analysis": None, "analysis_error": f"{type(error).__name__}: {error}"}
+        return {"analysis": None, "analysis_error": f"{type(error).__name__}: {error}",
+                "analysis_coverage": analysis_coverage(submissions, None)}
+
+
+def analysis_coverage(submissions: list[dict], result: dict | None) -> dict:
+    """Did the analysis grade every accepted submission?
+
+    The analysis reports "n_graded" (and ideally "graded", the agent ids). The
+    harness compares that with what it handed over. A shortfall is recorded,
+    not treated as a failed run: the record is complete either way, but an
+    agent left out of the grading should never go unnoticed (LESSONS.md §4).
+
+    "complete" is True or False when the analysis reported n_graded, and None
+    when it didn't (or failed), with "note" saying why.
+    """
+    accepted = [s["agent_id"] for s in submissions]
+    coverage = {"accepted": len(accepted), "graded": None, "complete": None, "ungraded_agents": None}
+    if result is None:
+        return {**coverage, "note": "analysis failed; see analysis_error"}
+    n_graded = result.get("n_graded")
+    if not isinstance(n_graded, int) or isinstance(n_graded, bool):
+        return {**coverage, "note": "analysis did not report n_graded"}
+    coverage["graded"] = n_graded
+    graded_ids = result.get("graded")
+    if isinstance(graded_ids, list):
+        coverage["ungraded_agents"] = sorted(set(accepted) - set(graded_ids))
+    coverage["complete"] = n_graded == len(accepted) and not coverage["ungraded_agents"]
+    return coverage
 
 
 def directory_bytes(path: Path) -> int:
@@ -613,6 +641,14 @@ def main(argv: list[str]) -> int:
     print(f"tokens:     {record['tokens_used']}   wall clock: {record['wall_clock_s']} s")
     print(f"final hash: {record['final_log_hash']}")
     print(f"folder:     {RUNS_DIR / record['run_id']}")
+    coverage = record["analysis_coverage"]
+    if coverage["complete"] is True:
+        print(f"analysis:   graded {coverage['graded']}/{coverage['accepted']} accepted submissions")
+    elif coverage["complete"] is False:
+        print(f"ANALYSIS INCOMPLETE: graded {coverage['graded']}/{coverage['accepted']}; "
+              f"ungraded agents: {coverage['ungraded_agents']}")
+    else:
+        print(f"analysis coverage unknown: {coverage.get('note')}")
     verification = record["verify"]
     if verification["ok"]:
         print("verify:     ok")

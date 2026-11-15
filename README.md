@@ -48,6 +48,7 @@ something.
 | **Clean git tree required to start, ignoring `runs/`.** | `commit.txt` must identify the exact code, prompts and config. `runs/` holds none of those. | `clean_commit`, tests in `tests/test_run.py` |
 | **Every run is committed to git the moment it ends**, including failed and aborted runs. Only that run's folder and `runs/index.jsonl` are committed; nothing else is staged. Nothing is pushed: **push yourself after each batch.** | The final hash sits beside the log, so until it is committed someone could rewrite both. A commit (and later a push) anchors the run outside its folder. | `test_every_run_is_committed_with_folder_and_index`, `test_commit_run_commits_only_the_run`. If the commit fails, the command says so and exits with an error. |
 | **Run reports are views, never part of the record.** `python -m harness.report runs/<id> ...` writes one self-contained HTML page per run to `reports/` (git-ignored; regenerate any time). It re-verifies the run first and says so at the top, shows every log record (unknown kinds as raw JSON), escapes all agent content, links to the stored files, describes archives without extracting them, and refuses to write inside `runs/`. | `runs/` must stay immutable, and a report can always be rebuilt from the log, so it needs no storing. Agent-written text is untrusted, so it is never rendered as HTML. | `tests/test_report.py` (e.g. `test_a_tampered_log_is_reported_first`, `test_agent_content_is_escaped_never_rendered_as_html`, `test_report_never_writes_into_the_runs_folder`) |
+| **The harness checks that the analysis graded every accepted submission.** The analysis reports `n_graded` and `graded`; the harness compares them with the submissions it handed over and writes `analysis_coverage` to the index line (`complete` True/False, the ungraded agent ids, or a `note` if the analysis didn't say). A shortfall is recorded and printed (`ANALYSIS INCOMPLETE`), never treated as a failed run. | An analysis written for one agent once graded only the last of ten, silently (LESSONS.md §4). | `test_analysis_coverage_compares_what_was_graded_with_what_was_accepted`, `test_agents_left_out_of_the_grading_are_named_in_the_index`, `test_analysis_coverage_is_unknown_when_the_analysis_does_not_report_it` |
 | **Analysis results go in the index only, never in the log.** | The log records what happened. Grading can be redone later without contradicting it. | `test_analysis_result_not_in_log` |
 | **No model fallback.** A refusal is logged and ends the agent. | A fallback would switch to a different LLM mid-run. | `harness/agent.py` sends no `fallbacks` parameter. |
 | **Every `run_python` call states its purpose.** A required `purpose` field, listed before `code` in the schema; a call without one is rejected and logged like any malformed call. | On current models, text written between tool calls often comes back inside (possibly empty) thinking blocks rather than as visible text, so a prompt rule ("say what you are about to do") could not be checked from the record. A required field puts the agent's own statement of intent next to every execution. Runs before this change used the prompt rule instead. | `test_run_python_without_a_real_purpose_is_rejected_and_logged`, `test_purpose_is_recorded_with_its_execution`, `test_run_python_schema_has_required_fields` |
@@ -88,7 +89,7 @@ Who plugs into what. Arrows read "calls".
 | Design file | Markdown | Copied into every run folder |
 | `submission_model` | Pydantic `BaseModel` class | Becomes the `submit_result` schema the agent sees |
 | `sanity_checks` (optional) | `check(submission, task) -> list[str]`, empty means accepted | On every submission. **Must not look at the answer.** |
-| `analysis` | `analyze(submissions) -> {"estimate": ..., "passed": ..., ...}` | After the run only. Gets accepted submissions only: `[{"agent_id", "attempt", "submission"}]` |
+| `analysis` | `analyze(submissions) -> {"estimate": ..., "passed": ..., "n_graded": ..., "graded": [...], ...}` | After the run only. Gets accepted submissions only: `[{"agent_id", "attempt", "submission"}]`. `estimate` and `passed` are required; `n_graded` and `graded` (agent ids) should be returned so the harness can check coverage |
 
 Experiment code is named in the config as `module.path:name`, for example
 `experiments.ising.schemas:IsingSubmission`.
@@ -149,7 +150,8 @@ Each index line has: run id, time, experiment, design, config, commit,
 topology, model, effort, number of agents, run status, each agent's status,
 accepted submissions, tokens, wall clock, final log hash, verify result
 (`ok`, problem count, the first `MAX_PROBLEMS_IN_INDEX` problems), storage sizes, analysis result or
-analysis error. For an independent run: tokens and storage are totals over
+analysis error, and `analysis_coverage` (`accepted`, `graded`, `complete`, `ungraded_agents`, plus a
+`note` when coverage is unknown). For an independent run: tokens and storage are totals over
 all agents; the final log hash is that of `batch.jsonl`; verify covers
 every log and the cross-checks, each problem naming its `log`; and
 `agent_runs` gives each agent's status, tokens, wall clock and final log

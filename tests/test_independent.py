@@ -76,7 +76,8 @@ def test_index_line_covers_the_whole_batch(finished, tmp_path):
     assert line["tokens_used"] == 900
     assert line["final_log_hash"] == (run_dir / "final_hash.txt").read_text().strip()
     assert line["verify"] == {"ok": True, "problem_count": 0, "problems": []}
-    assert line["analysis"] == {"estimate": 1555, "passed": True}
+    assert line["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 3, "graded": AGENTS}
+    assert line["analysis_coverage"] == {"accepted": 3, "graded": 3, "complete": True, "ungraded_agents": []}
     assert set(line["agent_runs"]) == set(AGENTS)
     for agent, info in line["agent_runs"].items():
         assert info["status"] == "completed" and info["tokens_used"] == 300
@@ -222,3 +223,21 @@ def test_edited_batch_log_is_caught(finished, tmp_path):
     copy = tampered_copy(run_dir, tmp_path)
     edit_once(copy / "batch.jsonl", '"status":"completed"', '"status":"error"')
     assert ("edited_entry", "batch.jsonl") in kinds_and_logs(verify_independent(copy, None))
+
+
+# ----- an analysis that leaves agents ungraded is caught --------------------
+
+def test_agents_left_out_of_the_grading_are_named_in_the_index(tmp_path):
+    # LESSONS.md §4: an analysis written for one agent graded only one of many.
+    variant = tmp_path / "first_only.yaml"
+    text = CONFIG.read_text()
+    assert "toy_sum.analysis:analyze\n" in text
+    variant.write_text(text.replace("toy_sum.analysis:analyze\n", "toy_sum.analysis:analyze_first_only\n"))
+    record = run_experiment(
+        variant, FakeClient(solves() * 3), Logger, sandbox_factory=FakeSandbox,
+        runs_dir=tmp_path / "runs", get_commit=lambda: "abc123",
+        commit_result=lambda run_dir, index_path, status: "not-committed-in-tests",
+    )
+    assert record["status"] == "completed"  # a shortfall is recorded, not a failed run
+    assert record["analysis_coverage"] == {
+        "accepted": 3, "graded": 1, "complete": False, "ungraded_agents": ["solver-1", "solver-2"]}

@@ -44,7 +44,8 @@ def test_toy_run_end_to_end(tmp_path):
 
     assert record["status"] == "completed"
     assert record["verify"] == {"ok": True, "problem_count": 0, "problems": []}
-    assert record["analysis"] == {"estimate": 1555, "passed": True}
+    assert record["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 1, "graded": ["solver-0"]}
+    assert record["analysis_coverage"]["complete"] is True
 
     tool_result = json.loads(client.calls[1]["messages"][2]["content"][0]["content"])
     assert tool_result["exit_code"] == 0 and tool_result["stdout"] == "1555\n"
@@ -126,7 +127,8 @@ def test_independent_run_end_to_end_agents_cannot_see_each_other(tmp_path):
 
     assert record["status"] == "completed"
     assert record["verify"] == {"ok": True, "problem_count": 0, "problems": []}
-    assert record["analysis"] == {"estimate": 1555, "passed": True}
+    assert record["analysis"]["passed"] is True and record["analysis"]["n_graded"] == 3
+    assert record["analysis_coverage"] == {"accepted": 3, "graded": 3, "complete": True, "ungraded_agents": []}
 
     run_dir = tmp_path / "runs" / record["run_id"]
     seen = {agent: (run_dir / agent / "outputs" / agent / f"{agent}-0001.out").read_text()

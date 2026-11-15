@@ -75,7 +75,7 @@ def test_index_line(tmp_path):
     assert [json.loads(line) for line in lines] == [index_part(record)]
     assert record["status"] == "completed"
     assert record["agent_statuses"] == {"solver-0": "submitted"}
-    assert record["analysis"] == {"estimate": 1555, "passed": True}
+    assert record["analysis"] == {"estimate": 1555, "passed": True, "n_graded": 1, "graded": ["solver-0"]}
     assert record["analysis_error"] is None
     assert record["commit"] == "abc123"
     assert record["tokens_used"] == 300
@@ -125,6 +125,39 @@ def test_analysis_not_imported_until_run_ends(tmp_path):
     assert record["analysis"]["passed"] is True  # imported afterwards
 
 
+# ----- did the analysis grade every accepted submission? ------------------
+
+def test_analysis_coverage_is_complete_when_every_submission_is_graded(tmp_path):
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)])
+    assert record["analysis_coverage"] == {"accepted": 1, "graded": 1, "complete": True, "ungraded_agents": []}
+    line = json.loads((tmp_path / "runs" / "index.jsonl").read_text().splitlines()[-1])
+    assert line["analysis_coverage"] == record["analysis_coverage"]  # it is in the index line
+
+
+def test_analysis_coverage_is_unknown_when_the_analysis_does_not_report_it(tmp_path):
+    variant = config_variant(tmp_path, "toy_sum.analysis:analyze", "toy_sum.analysis:analyze_without_coverage")
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)], config_path=variant)
+    assert record["analysis_error"] is None
+    assert record["analysis_coverage"]["complete"] is None
+    assert record["analysis_coverage"]["note"] == "analysis did not report n_graded"
+
+
+@pytest.mark.parametrize("result, complete, ungraded", [
+    ({"n_graded": 2, "graded": ["a", "b"]}, True, []),
+    ({"n_graded": 1, "graded": ["a"]}, False, ["b"]),          # one agent left out
+    ({"n_graded": 2, "graded": ["a", "a"]}, False, ["b"]),     # right count, wrong agents
+    ({"n_graded": 2}, True, None),                             # count only: trusted, ids unknown
+    ({"n_graded": True}, None, None),                          # a bool is not a count
+])
+def test_analysis_coverage_compares_what_was_graded_with_what_was_accepted(result, complete, ungraded):
+    from harness.run import analysis_coverage
+    submissions = [{"agent_id": "a"}, {"agent_id": "b"}]
+    coverage = analysis_coverage(submissions, {"estimate": None, "passed": True, **result})
+    assert coverage["accepted"] == 2
+    assert coverage["complete"] is complete
+    assert coverage["ungraded_agents"] == ungraded
+
+
 # ----- failures still produce a closed log and an index line --------------
 
 def test_failing_analysis_is_recorded(tmp_path):
@@ -133,6 +166,8 @@ def test_failing_analysis_is_recorded(tmp_path):
     assert record["status"] == "completed"
     assert record["analysis"] is None
     assert "AttributeError" in record["analysis_error"]
+    assert record["analysis_coverage"]["complete"] is None
+    assert record["analysis_coverage"]["note"] == "analysis failed; see analysis_error"
 
 
 def test_harness_error_recorded_and_tidied(tmp_path):
@@ -174,7 +209,7 @@ def test_agent_outcome_other_than_submitted_still_completes_run(tmp_path):
     record = toy_run(tmp_path, [text_reply("I am done.")])
     assert record["status"] == "completed"
     assert record["agent_statuses"] == {"solver-0": "ended_turn_without_submission"}
-    assert record["analysis"] == {"estimate": None, "passed": False}
+    assert record["analysis"] == {"estimate": None, "passed": False, "n_graded": 0, "graded": []}
 
 
 # ----- refused before any run folder exists -------------------------------

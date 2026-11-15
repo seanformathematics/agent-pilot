@@ -349,6 +349,23 @@ def duplicates_across_agents(per_agent: dict[str, list[dict]]) -> str:
     return "".join(parts)
 
 
+def render_coverage(index_line: dict | None) -> str:
+    """Did the analysis grade every accepted submission? (index field analysis_coverage)"""
+    if not index_line:
+        return ""
+    coverage = index_line.get("analysis_coverage")
+    if coverage is None:
+        return '<p class="muted">Grading coverage not recorded (this run predates the coverage check).</p>'
+    if coverage.get("complete") is True:
+        return (f'<div class="good">Graded {e(coverage.get("graded"))} of {e(coverage.get("accepted"))} '
+                f'accepted submissions.</div>')
+    if coverage.get("complete") is False:
+        return (f'<div class="bad"><b>Grading incomplete:</b> graded {e(coverage.get("graded"))} of '
+                f'{e(coverage.get("accepted"))} accepted submissions. Not graded: '
+                f'{e(", ".join(coverage.get("ungraded_agents") or []) or "unknown")}.</div>')
+    return f'<div class="warn">Grading coverage unknown: {e(coverage.get("note"))}</div>'
+
+
 # ----- the whole page ---------------------------------------------------------
 
 STYLE = """
@@ -419,6 +436,7 @@ def render_report(run_dir: Path, out_dir: Path, index_path: Path | None = None) 
                  'and is not part of the log; no agent ever saw it.</p>')
     if index_line and index_line.get("analysis_error"):
         parts.append(f'<div class="bad">Analysis error: {e(index_line["analysis_error"])}</div>')
+    parts.append(render_coverage(index_line))
     parts.append(show_value(index_line.get("analysis")) if index_line and index_line.get("analysis") is not None
                  else '<p class="muted">No analysis recorded.</p>')
 

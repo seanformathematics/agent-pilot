@@ -127,3 +127,19 @@ def test_command_line_writes_one_report_per_run(single, tmp_path, capsys):
     assert main(["harness.report", str(single), "--out", str(tmp_path / "reports")]) == 0
     written = capsys.readouterr().out.strip()
     assert os.path.basename(written) == f"{single.name}.html"
+
+
+def test_report_shows_grading_coverage(single, tmp_path):
+    assert "Graded 1 of 1 accepted submissions." in report_text(single, tmp_path)
+
+
+@pytest.mark.parametrize("coverage, expected", [
+    (None, "predates the coverage check"),
+    ({"accepted": 3, "graded": 1, "complete": False, "ungraded_agents": ["b", "c"]}, "Not graded: b, c."),
+    ({"accepted": 1, "graded": None, "complete": None, "ungraded_agents": None,
+      "note": "analysis did not report n_graded"}, "Grading coverage unknown: analysis did not report n_graded"),
+])
+def test_coverage_shortfalls_and_unknowns_are_shown(coverage, expected):
+    from harness.report import render_coverage
+    line = {"run_id": "x"} if coverage is None else {"run_id": "x", "analysis_coverage": coverage}
+    assert expected in render_coverage(line)
