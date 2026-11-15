@@ -98,3 +98,40 @@ only becomes informative on harder tasks.
 - How do tokens scale with turns, and with the size of tool results?
 - Would prompt caching (system prompt + tools) change the cost materially?
 - What `max_total_tokens` is right for an Ising run?
+
+---
+
+## 4. Grading code written for one agent silently ignores the rest
+
+**What happened.** `experiments/ising/analysis.py` was written while every
+run had one agent, and grades `submissions[-1]`. The harness passes it every
+accepted submission in the run (each tagged with its `agent_id`). In the
+first independent batch, `2026-11-14_ising_sonnet_independent_independent_001`
+(10 Sonnet agents, all accepted), the index line therefore described only
+`ising-10`: `rms_pull` 1.37 and one pull ≥ 3. Recomputed over all ten
+agents, the pooled rms pull is 1.02 across 140 points. Nothing failed and
+nothing warned: the run "passed", the record was complete, and nine
+agents were simply not graded.
+
+**Why it matters.** The record is only as good as what reads it. Moving
+from one agent to many changed what "the result" of a run means, and code
+built for one agent didn't notice. Any analysis or summary that picks one
+item from a list (the last, the first, the best) is a place where this can
+happen again: more topologies, more agents and resubmissions all multiply
+the items.
+
+**What to do.**
+- Analysis grades every submission it is given, per agent, and reports
+  pooled statistics alongside.
+- When a run's shape changes (topology, number of agents, resubmissions),
+  check the code that reads it, not only the code that writes it.
+- Cheap guard: the analysis states how many submissions it received and how
+  many it graded, so a mismatch is visible in the index line.
+
+**Questions to answer:**
+- What does "passed" mean for a run of n agents: all of them, a majority,
+  the pooled statistics?
+  * A: eport completion, precision and calibration as separate rates with uncertainties. Judge calibration per agent with a χ²-style test over its 14 points, not its single worst pull. Pool pulls only where the reference error is small, and keep 'passed' as an explicitly stated combination of these. Although it's worth noting that unlike our present test, precision could matter for completion in future tests.
+- Should the harness check that the number graded equals the number of
+  accepted submissions?
+  * A: That's a good catch. For clarity we should. Otherwise we expect a drop out worth investigating.
