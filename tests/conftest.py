@@ -73,6 +73,8 @@ class FakeSandbox:
     """Same interface as harness.sandbox.Sandbox; never runs anything.
 
     Code that is exactly "fail" exits 1; anything else exits 0 printing "ok".
+    Code "unresponsive" acts as if the container stopped answering after the
+    call; code "slept" acts as if the host slept for a minute during it.
     """
 
     def __init__(self, image, memory_mb, work_mb, tmp_mb, shm_mb, cpus, pids_limit, output_cap, stored_output_cap):
@@ -111,7 +113,11 @@ class FakeSandbox:
             paths[suffix] = str(path)
         result = {"exit_code": 1 if failed else 0, "stdout": stdout, "stderr": stderr,
                   "duration_s": 0.01, "timed_out": False, "truncated": False}
-        details = {"end_reason": "exited", "script_path": paths[".py"], "stdout_path": paths[".out"],
+        details = {"end_reason": "exited",
+                   "cleanup": "failed" if code == "unresponsive" else "ok",
+                   "wall_duration_s": 60.01 if code == "slept" else 0.01,
+                   "host_slept": code == "slept",
+                   "script_path": paths[".py"], "stdout_path": paths[".out"],
                    "stderr_path": paths[".err"], "stdout_bytes": len(stdout), "stderr_bytes": len(stderr),
                    "stdout_stored_bytes": len(stdout), "stderr_stored_bytes": len(stderr),
                    "storage_truncated": False, "listing_path": paths[".files.jsonl"],

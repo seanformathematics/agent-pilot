@@ -7,7 +7,10 @@ In order:
   1. Validate the config and everything it points to: prompt files, design,
      submission model, sanity checks. A bad config fails here, before any
      run folder exists. The analysis code is NOT imported yet.
-     The logger and verifier get a trial run on a scratch log.
+     The logger and verifier get a trial run on a scratch log. On the
+     command line, the API key and model are checked, and on macOS the
+     computer is kept awake for as long as this process runs (keep_awake);
+     if that fails, the run does not start.
   2. Refuse to start unless the git tree is clean (ignoring runs/), so the
      commit identifies the exact code, prompts, design and config.
   3. Create runs/<date>_<experiment>_<topology>_<nnn>/ holding exact copies
@@ -175,6 +178,97 @@ def create_run_dir(runs_dir: Path, experiment: str, topology: str) -> Path:
             return run_dir
         except FileExistsError:
             number += 1
+
+
+def keep_awake(platform_name: str = sys.platform, pid: int | None = None) -> dict:
+    """Stop the computer from sleeping until this harness process exits.
+
+    On macOS, starts `caffeinate -i -s -w <our pid>`: no idle sleep, and no
+    system sleep while on mains power. caffeinate watches our process and
+    exits by itself when we exit, even after a crash, so nothing is left
+    running. A closed laptop lid still sleeps (unless an external display
+    is attached).
+
+    Returns a record for the run log: {"ok": True/False, "how": ...}.
+    Other platforms get {"ok": None}: nothing was done, nothing was checked.
+    """
+    if platform_name != "darwin":
+        return {"ok": None, "how": f"not macOS ({platform_name}); nothing done"}
+    command = ["caffeinate", "-i", "-s", "-w", str(pid if pid is not None else os.getpid())]
+    try:
+        helper = subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except OSError as error:
+        return {"ok": False, "how": f"could not start caffeinate: {error}"}
+    return {"ok": True, "how": " ".join(command[:-2]), "caffeinate_pid": helper.pid}
+
+
+def printable(text, limit: int = 70) -> str:
+    """Agent-written text made safe for a terminal: one line, no control
+    characters (which could move the cursor or recolour the screen), cut
+    to ``limit`` characters."""
+    text = "".join(c if c.isprintable() else " " for c in str(text))
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+class ProgressLogger:
+    """Wraps a logger and prints one terminal line per milestone.
+
+    Every entry goes to the real logger first; a line is printed only after
+    the entry is safely written, so the terminal never shows anything the
+    log doesn't hold. The lines are a view for whoever is watching, never
+    part of the record, and agents never see them. Used on the command line
+    only (see main); tests use plain loggers.
+    """
+
+    def __init__(self, logger, out=None):
+        self._logger = logger
+        self._out = out if out is not None else sys.stdout
+        self._batch_size = None   # agents in an independent batch, from batch_start
+        self._batch_done = 0
+
+    def append(self, agent: str, kind: str, data: dict) -> str:
+        entry_hash = self._logger.append(agent, kind, data)
+        line = self.describe(agent, kind, data)
+        if line:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] {line}", file=self._out, flush=True)
+        return entry_hash
+
+    def describe(self, agent: str, kind: str, data: dict) -> str | None:
+        """The progress line for one log entry, or None for entries not shown."""
+        who = f"{agent:<10}"
+        if kind == "agent_start":
+            return f"{who} started"
+        if kind == "execution":
+            result = data["result"]
+            timed_out = "  TIMED OUT" if result["timed_out"] else ""
+            return (f"{who} run_python {data['exec_id'].rsplit('-', 1)[-1]}  exit {result['exit_code']}"
+                    f"  {result['duration_s']:.0f} s{timed_out}  \"{printable(data['purpose'])}\"")
+        if kind == "rejection":
+            return f"{who} rejected: {printable(' '.join(data['message'].split()), 110)}"
+        if kind == "submission_accepted":
+            return f"{who} submission accepted (attempt {data['attempt']})"
+        if kind == "flag":
+            return f"{who} flag: {data['reason']}"
+        if kind == "api_error":
+            return f"{who} API error (retries are logged)"
+        if kind == "sandbox_unresponsive":
+            return f"{who} SANDBOX UNRESPONSIVE after {data['exec_id']}; agent ends"
+        if kind == "agent_end":
+            return f"{who} ended: {data['status']} after {data['turns']} turns"
+        if kind == "run_error":
+            return f"{who} RUN ERROR: {printable(data['message'], 100)}"
+        if kind == "batch_start":
+            self._batch_size = len(data["agents"])
+            return f"{'batch':<10} started: {self._batch_size} agents, one after another"
+        if kind == "agent_run_end":
+            self._batch_done += 1
+            return (f"{data['agent_id']:<10} done: {data['status']}, {data['tokens_used'] / 1000:.0f}k tokens,"
+                    f" {data['wall_clock_s'] / 60:.0f} min   ({self._batch_done}/{self._batch_size} agents)")
+        return None
+
+    def close(self) -> str:
+        return self._logger.close()
 
 
 def host_metadata() -> dict:
@@ -534,8 +628,13 @@ def run_experiment(
     get_commit=clean_commit,
     commit_result=commit_run,
     verifier=verify,
+    awake: dict | None = None,
 ) -> dict:
     """Run one config end to end.
+
+    ``awake`` is what keep_awake() returned; the command line always passes
+    it, and it goes into the run's metadata. Tests leave it out, and the
+    metadata then says no keep-awake was requested.
 
     Returns the line written to runs/index.jsonl, plus "git_commit" (the hash
     of the commit holding the run) or "git_commit_error".
@@ -565,6 +664,7 @@ def run_experiment(
         "commit": commit,
         "config_path": config_label,
         "sandbox": sandbox_factory.describe_image(config.sandbox.image),
+        "keep_awake": awake if awake is not None else {"ok": None, "how": "not requested"},
         **host_metadata(),
     }
     shape = run_independent if config.topology == "independent" else run_single_log
@@ -661,7 +761,17 @@ def main(argv: list[str]) -> int:
     if problem:
         print(f"not started (no run folder created): {problem}", file=sys.stderr)
         return 2
-    record = run_experiment(Path(argv[1]), client, Logger)
+    # A sleeping host freezes the sandbox mid-call (2026-11-16: ising-07 of
+    # the Haiku batch was lost that way), so on macOS a run that cannot keep
+    # the computer awake does not start.
+    awake = keep_awake()
+    if awake["ok"] is False:
+        print(f"not started (no run folder created): {awake['how']}", file=sys.stderr)
+        return 2
+    def logger_with_progress(path):
+        return ProgressLogger(Logger(path))
+
+    record = run_experiment(Path(argv[1]), client, logger_with_progress, awake=awake)
     print(f"run:        {record['run_id']}")
     print(f"status:     {record['status']}  agents: {record['agent_statuses']}")
     print(f"tokens:     {record['tokens_used']}   wall clock: {record['wall_clock_s']} s")

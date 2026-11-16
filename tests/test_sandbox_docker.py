@@ -554,3 +554,34 @@ def test_tmp_and_shm_sizes_come_from_settings(make_sandbox):
     )
     result, _ = run(box, code)
     assert result["stdout"] == "/tmp 100\n/dev/shm 50\n"
+
+
+# ----- host problems: an unresponsive container ---------------------------------
+# `docker pause` freezes the container, the closest repeatable stand-in for a
+# host that slept (2026-11-16, ising-07 of the Haiku batch).
+
+from harness.sandbox import SandboxUnresponsive  # noqa: E402
+
+
+def test_ordinary_call_reports_cleanup_ok_and_no_clock_gap(make_sandbox):
+    result, details = run(make_sandbox(), "import time; time.sleep(1)")
+    assert details["cleanup"] == "ok"
+    assert details["host_slept"] is False
+    assert abs(details["wall_duration_s"] - result["duration_s"]) < 1
+
+
+def test_frozen_container_is_reported_not_raised(make_sandbox):
+    box = make_sandbox()
+    subprocess.run(["docker", "pause", box.container_id], check=True, capture_output=True)
+    result, details = run(box, "print('never runs')")
+    assert details["cleanup"] == "failed"
+    assert details["filesystem"] == {"skipped": "container did not respond"}
+    assert os.path.getsize(details["listing_path"]) == 0  # present, so it can be hashed
+    assert result["exit_code"] != 0
+
+
+def test_archiving_a_frozen_container_raises_sandbox_unresponsive(make_sandbox, tmp_path):
+    box = make_sandbox()
+    subprocess.run(["docker", "pause", box.container_id], check=True, capture_output=True)
+    with pytest.raises(SandboxUnresponsive):
+        box.archive_workspace(tmp_path / "work.tar", 1024 * 1024)

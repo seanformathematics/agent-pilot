@@ -21,7 +21,7 @@ from pydantic import ValidationError
 
 from harness import tools
 from harness.config import RunConfig, load_object, load_prompt
-from harness.sandbox import Sandbox, inspect_archive
+from harness.sandbox import Sandbox, SandboxUnresponsive, inspect_archive
 
 NON_FINITE_MESSAGE = (
     "Submission not accepted: these fields are NaN or infinite: {fields}. "
@@ -247,6 +247,8 @@ class Harness:
             "timeout_s": call.timeout_s,
             "result": result,
             "end_reason": details["end_reason"],
+            "cleanup": details["cleanup"],
+            "wall_duration_s": details["wall_duration_s"],
             "stdout_bytes": details["stdout_bytes"],
             "stderr_bytes": details["stderr_bytes"],
             "stdout_stored_bytes": details["stdout_stored_bytes"],
@@ -256,6 +258,16 @@ class Harness:
         })
         if details["storage_truncated"]:
             self.log(agent_id, "flag", {"reason": "stored_output_truncated", "exec_id": exec_id})
+        if details["host_slept"]:
+            self.log(agent_id, "flag", {"reason": "host_clock_gap", "exec_id": exec_id,
+                                        "duration_s": result["duration_s"],
+                                        "wall_duration_s": details["wall_duration_s"]})
+        if details["cleanup"] == "failed":
+            # The execution above is logged, but the container cannot be
+            # trusted to run anything else, so the agent ends here and the
+            # result is never delivered (no tool_result follows).
+            self.log(agent_id, "sandbox_unresponsive", {"exec_id": exec_id})
+            raise SandboxUnresponsive(f"container did not respond after {exec_id}; agent ended")
 
         succeeded = result["exit_code"] == 0 and not result["timed_out"]
         if succeeded:

@@ -37,7 +37,15 @@ Each run_python call:
      and a small rolling buffer keeps its last few kilobytes. Memory use is
      bounded no matter how much the code prints
   4. as a backstop, limits the docker exec call itself on the host, then
-     kills leftover processes again from a separate docker exec
+     kills leftover processes again from a separate docker exec. If the
+     container does not answer that kill within HOST_MARGIN_S (or docker
+     cannot run it at all), it is tried
+     once more; if it still does not answer, the result says so
+     ("cleanup": "failed") and the file listing is skipped. The harness then
+     ends the agent (see Harness._run_python). Each call also measures its
+     duration on the wall clock: on macOS the monotonic clock stops while
+     the computer sleeps and the wall clock does not, so a gap between the
+     two shows the host slept during the call
   5. builds what the agent sees from the saved head and the rolling tail,
      capped at output_cap (head and tail kept, truncation noted)
   6. lists every writable place the agent can keep things (/work, /tmp,
@@ -84,6 +92,11 @@ LISTING_MAX_BYTES = 5 * 1024 * 1024  # raw `find` output read per listing
 LISTING_TIMEOUT_S = 60
 IMAGE_CHECK_TIMEOUT_S = 120  # each `docker run` in describe_image
 TAR_ERRORS_MAX_BYTES = 2000  # tar's stderr kept in the archive record
+CLOCK_GAP_S = 30  # wall clock ahead of the monotonic clock by this much = the host slept
+
+
+class SandboxUnresponsive(subprocess.SubprocessError):
+    """The container did not answer a docker exec in time (e.g. the host slept)."""
 
 # PID 1 inside the container. Ignoring SIGCHLD tells the kernel to reap
 # finished child processes automatically, so killed processes never pile up
@@ -210,6 +223,7 @@ class Sandbox:
         half = self.output_cap // 2
         out_stats, err_stats = {}, {}
         start = time.monotonic()
+        wall_start = time.time()
         with create_new_file(stdout_path) as out, create_new_file(stderr_path) as err:
             process = subprocess.Popen(
                 command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -238,14 +252,27 @@ class Sandbox:
             for reader in readers:
                 reader.join()  # the pipes close once the docker client has exited
         duration_s = round(time.monotonic() - start, 3)
+        wall_duration_s = round(time.time() - wall_start, 3)
 
-        self._kill_leftover_processes()
+        if self._kill_leftover_processes():
+            cleanup = "ok"
+        elif self._kill_leftover_processes():  # one more try: the stall may have passed
+            cleanup = "retried_ok"
+        else:
+            cleanup = "failed"
 
         reason = classify_exit(exit_code, duration_s, timeout_s, host_timeout)
         stdout, stdout_truncated = agent_view(stdout_path, out_stats, self.output_cap)
         stderr, stderr_truncated = agent_view(stderr_path, err_stats, self.output_cap)
         listing_path = output_dir / f"{exec_id}.files.jsonl"
-        filesystem = self.list_scratch_dirs(listing_path)
+        if cleanup == "failed":
+            # An empty listing file keeps the record's shape (every execution
+            # has its four files, all hashed); the summary says why it is empty.
+            with create_new_file(listing_path):
+                pass
+            filesystem = {"skipped": "container did not respond"}
+        else:
+            filesystem = self.list_scratch_dirs(listing_path)
 
         result = {
             "exit_code": exit_code,
@@ -257,6 +284,9 @@ class Sandbox:
         }
         details = {
             "end_reason": reason,
+            "cleanup": cleanup,  # "ok", "retried_ok" or "failed"
+            "wall_duration_s": wall_duration_s,
+            "host_slept": wall_duration_s - duration_s > CLOCK_GAP_S,
             "script_path": str(script_path),
             "stdout_path": str(stdout_path),
             "stderr_path": str(stderr_path),
@@ -313,7 +343,8 @@ class Sandbox:
         """
         if self.container_id is None:
             raise RuntimeError("sandbox not started")
-        self._kill_leftover_processes()
+        if not self._kill_leftover_processes():
+            raise SandboxUnresponsive("container did not respond to the kill before archiving")
 
         archive_path = Path(archive_path)
         errors_path = archive_path.with_name(archive_path.name + ".err")
@@ -360,18 +391,28 @@ class Sandbox:
             "tar_errors": tar_errors,
         }
 
-    def _kill_leftover_processes(self) -> None:
+    def _kill_leftover_processes(self) -> bool:
         """Kill everything the agent user runs, except PID 1 (the reaper).
 
         Runs as the agent user: with all capabilities dropped, root inside
         the container is not allowed to signal another user's processes.
+
+        Returns True if the kill ran. Returns False if the container did not
+        answer within HOST_MARGIN_S (the docker client is then killed), or if
+        docker could not run the command at all (container paused or gone,
+        Docker restarted): the shell line ends in `true`, so any other exit
+        code is docker's own failure.
         """
-        subprocess.run(
-            ["docker", "exec", self.container_id, "sh", "-c", "kill -9 -1 2>/dev/null; true"],
-            capture_output=True,
-            check=False,
-            timeout=HOST_MARGIN_S,
-        )
+        try:
+            completed = subprocess.run(
+                ["docker", "exec", self.container_id, "sh", "-c", "kill -9 -1 2>/dev/null; true"],
+                capture_output=True,
+                check=False,
+                timeout=HOST_MARGIN_S,
+            )
+        except subprocess.TimeoutExpired:
+            return False
+        return completed.returncode == 0
 
 
 def read_command_output(command: list[str], max_bytes: int, timeout_s: float) -> tuple[bytes, bool, int]:

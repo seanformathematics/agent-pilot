@@ -43,6 +43,7 @@ something.
 | **`/work` lives in the container's memory, with a fixed size (`work_mb`). Nothing from the host is mounted.** | An agent can never fill your laptop's disk, and agent-made files never exist on the host. Removing the container discards `/work`. | `test_filling_work_stops_at_quota_not_host_disk`, `test_nothing_from_host_is_mounted`, `test_work_is_private_memory_with_a_quota` |
 | **After every call, list `/work`, `/tmp` and `/dev/shm`**: names, sizes, times, never contents. Nothing is wiped. | All three keep state between calls; only `/work` is archived. The listing makes hidden state visible (LESSONS.md §2). | `test_listing_covers_work_tmp_and_shm_without_contents`, `test_listing_shows_state_persisting_between_calls` |
 | **No processes outlive a `run_python` call.** | A leftover process could hang the harness or act between calls. | `test_background_processes_do_not_survive`, `test_detached_process_holding_stdout_does_not_hang`, `test_killed_processes_do_not_exhaust_process_limit` |
+| **The host stays awake for the whole run (macOS), and a container that stops answering is recorded, not left to hang.** The command line starts `caffeinate -i -s` tied to the harness process and refuses to start if it can't; the result is in the first log entry (`keep_awake`). A cleanup kill the container doesn't answer is retried once; if it still fails, the execution is logged, then `sandbox_unresponsive`, and the agent ends. A call whose wall-clock time runs ahead of its monotonic time (which stops while the Mac sleeps) is flagged `host_clock_gap`. | 2026-11-16: the Mac idle-slept during a Haiku agent's call; the frozen container hung the harness for an hour and the agent ended with no record of why (LESSONS.md). | `test_caffeinate_holds_the_computer_awake_and_exits_with_the_watched_process`, `test_run_refused_when_the_computer_cannot_be_kept_awake`, `test_frozen_container_is_reported_not_raised`, `test_unresponsive_container_ends_the_agent_with_the_execution_logged`, `test_host_sleep_during_a_call_is_flagged_and_the_agent_carries_on` |
 | **Workspace archives are never auto-extracted.** Inspect the listing first. | An archive made in agent space can hold links and `../` paths. | The harness only reads tar headers (`inspect_archive`). |
 | **Nothing that can fail before a run creates a run folder.** | Run folders are permanent, so junk must never be created. | Config, files, imports, topology, logger and verifier trial run and clean tree are all checked first. On the command line, the API key and model are checked too (`check_api_access`, free). Tests in `tests/test_run.py` |
 | **Clean git tree required to start, ignoring `runs/`.** | `commit.txt` must identify the exact code, prompts and config. `runs/` holds none of those. | `clean_commit`, tests in `tests/test_run.py` |
@@ -207,10 +208,10 @@ and the full agent list (`agents`) so it can count agents that never submitted.
 |------|-------|--------------|-------------|
 | 1. Checks | harness | Validate config and referenced files; import submission model and checks; topology implemented; logger and verifier trial run; clean tree. **Fail here = no run folder.** | (none) |
 | 2. Run folder | harness | Create folder; copy config and design; write commit | (none) |
-| 3. Setup | harness, docker | Create Logger and Harness; record image ID, Python versions, packages, SDK. *Independent:* first `batch.jsonl`, then steps 3–9 once per agent in its own subfolder, each with a fresh Logger and Harness | `run_start`, `system_prompt` (*independent:* `batch_start` in `batch.jsonl`) |
+| 3. Setup | harness, docker | Create Logger and Harness; record image ID, Python versions, packages, SDK, keep-awake status. *Independent:* first `batch.jsonl`, then steps 3–9 once per agent in its own subfolder, each with a fresh Logger and Harness | `run_start`, `system_prompt` (*independent:* `batch_start` in `batch.jsonl`) |
 | 4. Start agent | docker | Start this agent's container with an empty `/work` | `agent_start` |
 | 5. Turn | API | Send messages; get a reply | `task` (first turn), `api_response`, `budget` |
-| 6. Tool call | harness, docker | Validate; run code via stdin; stream output to `outputs/`; or check a submission | `tool_call`, `execution` or `rejection` or `submission_accepted`, `tool_result`, `flag` (if any) |
+| 6. Tool call | harness, docker | Validate; run code via stdin; stream output to `outputs/`; or check a submission | `tool_call`, `execution` or `rejection` or `submission_accepted`, `tool_result`, `flag` (if any); `sandbox_unresponsive` instead of `tool_result` if the container stopped answering (the agent then ends with `run_error`) |
 | | | Repeat 5–6 until the agent ends | `api_error` (each failed attempt) |
 | 7. Agent ends | harness | Record how it ended | `agent_end` |
 | 8. Tidy up | docker, harness | Archive `/work`, inspect it, remove the container (which discards `/work`) | `workspace_archive` (or `workspace_archive_failed`), `container_stop` |
@@ -224,7 +225,7 @@ and the full agent list (`agents`) so it can count agents that never submitted.
 |-------|--------|
 | Run | `completed` (topology finished), `error` (harness failure, see `run_error`), `aborted` (Ctrl-C). Independent: `error` if any agent's run had one, `aborted` on Ctrl-C |
 | Agent | `submitted`, `turn_limit`, `budget_exhausted`, `ended_turn_without_submission`, `max_tokens_without_tool_call`, `refusal`, `api_error` |
-| Flags | `submit_without_successful_run`, `stored_output_truncated`, `workspace_archive_incomplete` |
+| Flags | `submit_without_successful_run`, `stored_output_truncated`, `workspace_archive_incomplete`, `host_clock_gap` |
 
 ### The sandbox container
 
@@ -235,7 +236,7 @@ and the full agent list (`agents`) so it can count agents that never submitted.
 | Filesystem | read-only, except three in-memory folders: `/work` (`work_mb`; the agent's, archived at the end), `/tmp` (`tmp_mb`) and `/dev/shm` (`shm_mb`). All three are listed after every call. Nothing from the host is mounted. |
 | Limits | `memory_mb` (no swap; a total budget for processes **and** whatever is stored in `/work`, `/tmp` and `/dev/shm`), CPUs, process count: from config |
 | PID 1 | tiny Python reaper, so killed processes don't pile up as zombies |
-| Per call | `timeout -k <KILL_GRACE_S> <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs |
+| Per call | `timeout -k <KILL_GRACE_S> <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs (from a second `docker exec`, retried once if the container doesn't answer within 10 s) |
 | Launcher | `docker/launcher.py`, read-only in the image. Saves the code as `/tmp/run_python/<exec_id>.py` and runs it as a normal script: tracebacks and warnings show source lines (launcher frames hidden), `__file__` is set, `multiprocessing` works. |
 | Output | stored up to `max_stored_output_mb` per stream; agent sees head and true tail up to `output_cap_bytes` |
 | Image | `docker/Dockerfile`: Python 3.14 slim + numpy, scipy + the launcher. Changing it is an experimental change; each run logs the image ID. |

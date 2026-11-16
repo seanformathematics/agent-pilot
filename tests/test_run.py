@@ -23,7 +23,7 @@ def clean_verifier(log_path, expected_final_hash):
 
 def toy_run(tmp_path, responses, config_path=TOY_CONFIG, logger_factory=DummyLogger,
             sandbox_factory=FakeSandbox, client=None, commit_result=record_commit,
-            verifier=clean_verifier):
+            verifier=clean_verifier, awake=None):
     return run_experiment(
         config_path,
         client or FakeClient(responses),
@@ -33,6 +33,7 @@ def toy_run(tmp_path, responses, config_path=TOY_CONFIG, logger_factory=DummyLog
         get_commit=lambda: "abc123",
         commit_result=commit_result,
         verifier=verifier,
+        awake=awake,
     )
 
 
@@ -525,3 +526,171 @@ def test_missing_config_file_gives_a_message_not_a_traceback(tmp_path, monkeypat
     assert "no run folder created" in err and "no_such_config.yaml" in err
     assert clients == []  # the API client is never created for a bad config
     assert not (tmp_path / "runs").exists()
+
+
+# ----- host problems: sleep, an unresponsive container ------------------------
+# 2026-11-16: the Mac idle-slept during ising-07 of the Haiku batch; the frozen
+# container made the cleanup kill time out, which ended the agent with no record
+# of why. See LESSONS.md.
+
+import os  # noqa: E402
+import time  # noqa: E402
+
+from harness.run import keep_awake  # noqa: E402
+
+
+def test_keep_awake_does_nothing_off_macos():
+    assert keep_awake("linux") == {"ok": None, "how": "not macOS (linux); nothing done"}
+
+
+def test_keep_awake_reports_a_missing_caffeinate(monkeypatch):
+    def no_such_program(*args, **kwargs):
+        raise FileNotFoundError("no caffeinate here")
+    monkeypatch.setattr(subprocess, "Popen", no_such_program)
+    awake = keep_awake("darwin")
+    assert awake["ok"] is False
+    assert "no caffeinate here" in awake["how"]
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="caffeinate is macOS only")
+def test_caffeinate_holds_the_computer_awake_and_exits_with_the_watched_process():
+    watched = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    try:
+        awake = keep_awake("darwin", pid=watched.pid)
+        assert awake["ok"] is True
+        helper = awake["caffeinate_pid"]
+        time.sleep(0.5)
+        assertions = subprocess.run(["pmset", "-g", "assertions"],
+                                    capture_output=True, text=True).stdout
+        assert f"pid {helper}(caffeinate)" in assertions
+    finally:
+        watched.kill()
+        watched.wait()
+    # caffeinate notices the watched process is gone and exits by itself.
+    deadline = time.monotonic() + 10
+    while os.waitpid(helper, os.WNOHANG) == (0, 0):
+        assert time.monotonic() < deadline, "caffeinate outlived the process it watched"
+        time.sleep(0.1)
+
+
+def test_keep_awake_status_is_in_the_first_log_entry(tmp_path):
+    awake = {"ok": True, "how": "caffeinate -i -s", "caffeinate_pid": 4242}
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)], awake=awake)
+    first = read_log(tmp_path / "runs" / record["run_id"])[0]
+    assert first["kind"] == "run_start"
+    assert first["data"]["metadata"]["keep_awake"] == awake
+
+
+def test_keep_awake_not_requested_is_recorded_as_such(tmp_path):
+    record = toy_run(tmp_path, [tool_call("submit_result", GOOD_SUBMISSION)])
+    first = read_log(tmp_path / "runs" / record["run_id"])[0]
+    assert first["data"]["metadata"]["keep_awake"] == {"ok": None, "how": "not requested"}
+
+
+def test_run_refused_when_the_computer_cannot_be_kept_awake(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(run_module, "RUNS_DIR", tmp_path / "runs")
+    monkeypatch.setattr("harness.agent.make_client", lambda: object())
+    monkeypatch.setattr(run_module, "check_api_access", lambda client, model: None)
+    monkeypatch.setattr(run_module, "keep_awake", lambda: {"ok": False, "how": "could not start caffeinate"})
+    started = []
+    monkeypatch.setattr(run_module, "run_experiment", lambda *a, **k: started.append(a))
+    assert run_module.main(["harness.run", str(TOY_CONFIG)]) == 2
+    assert started == [] and not (tmp_path / "runs").exists()
+    err = capsys.readouterr().err
+    assert "no run folder created" in err and "caffeinate" in err
+
+
+def test_command_line_passes_the_keep_awake_status_to_the_run(tmp_path, monkeypatch):
+    monkeypatch.setattr("harness.agent.make_client", lambda: object())
+    monkeypatch.setattr(run_module, "check_api_access", lambda client, model: None)
+    awake = {"ok": True, "how": "caffeinate -i -s", "caffeinate_pid": 1}
+    monkeypatch.setattr(run_module, "keep_awake", lambda: awake)
+    passed = []
+
+    def fake_run(*args, **kwargs):
+        passed.append(kwargs.get("awake"))
+        raise SystemExit(0)  # stop before printing a summary
+    monkeypatch.setattr(run_module, "run_experiment", fake_run)
+    with pytest.raises(SystemExit):
+        run_module.main(["harness.run", str(TOY_CONFIG)])
+    assert passed == [awake]
+
+
+def test_unresponsive_container_ends_the_agent_with_the_execution_logged(tmp_path):
+    record = toy_run(tmp_path, [tool_call("run_python", {"purpose": "test call", "code": "unresponsive"}),
+                                tool_call("submit_result", GOOD_SUBMISSION)])
+    assert record["status"] == "error"
+    entries = read_log(tmp_path / "runs" / record["run_id"])
+    kinds = [e["kind"] for e in entries]
+    execution = next(e for e in entries if e["kind"] == "execution")
+    assert execution["data"]["cleanup"] == "failed"
+    # The execution is recorded, then why the agent ended; the result is never delivered.
+    assert kinds.index("execution") < kinds.index("sandbox_unresponsive") < kinds.index("run_error")
+    assert "tool_result" not in kinds
+    assert "submission_accepted" not in kinds
+    assert "did not respond" in next(e for e in entries if e["kind"] == "run_error")["data"]["message"]
+
+
+# ----- progress lines on the terminal ----------------------------------------
+
+import io  # noqa: E402
+
+from harness.run import ProgressLogger, printable  # noqa: E402
+from tests.conftest import repo_path  # noqa: E402
+
+
+def test_progress_lines_follow_an_independent_batch(tmp_path):
+    out = io.StringIO()
+    record = toy_run(
+        tmp_path,
+        [tool_call("run_python", {"purpose": "add the numbers", "code": "print(1)"}),
+         tool_call("submit_result", GOOD_SUBMISSION)] * 3,
+        config_path=repo_path("tests/fixtures/toy_sum/config_independent.yaml"),
+        logger_factory=lambda path: ProgressLogger(DummyLogger(path), out=out))
+    lines = [line.split("] ", 1)[1] for line in out.getvalue().splitlines()]
+    assert lines[0] == "batch      started: 3 agents, one after another"
+    assert 'solver-0   run_python 0001  exit 0  0 s  "add the numbers"' in lines
+    assert "solver-0   submission accepted (attempt 1)" in lines
+    assert "solver-0   ended: submitted after 2 turns" in lines
+    assert lines[-1].startswith("solver-2   done: completed") and lines[-1].endswith("(3/3 agents)")
+    assert record["status"] == "completed"
+
+
+def test_progress_wrapper_passes_every_entry_through_unchanged():
+    class RecordingLogger:
+        def __init__(self):
+            self.entries, self.closed = [], False
+
+        def append(self, agent, kind, data):
+            self.entries.append((agent, kind, data))
+            return f"hash-{len(self.entries)}"
+
+        def close(self):
+            self.closed = True
+            return "final-hash"
+
+    inner = RecordingLogger()
+    wrapper = ProgressLogger(inner, out=io.StringIO())
+    sent = [("solver-0", "agent_start", {"container_id": "c"}),
+            ("solver-0", "some_kind_not_shown", {"x": 1}),
+            ("solver-0", "agent_end", {"agent_id": "solver-0", "status": "submitted", "turns": 2})]
+    hashes = [wrapper.append(*entry) for entry in sent]
+    assert inner.entries == sent
+    assert hashes == ["hash-1", "hash-2", "hash-3"]
+    assert wrapper.close() == "final-hash" and inner.closed
+
+
+def test_progress_line_printed_only_after_the_entry_is_written():
+    class BrokenLogger:
+        def append(self, agent, kind, data):
+            raise OSError("disk full")
+    out = io.StringIO()
+    with pytest.raises(OSError):
+        ProgressLogger(BrokenLogger(), out=out).append("solver-0", "agent_start", {})
+    assert out.getvalue() == ""
+
+
+def test_agent_text_cannot_control_the_terminal():
+    shown = printable("clear \x1b[2J\x1b[31mred\x07 and\nnew line")
+    assert "\x1b" not in shown and "\x07" not in shown and "\n" not in shown
+    assert printable("x" * 100, limit=10) == "x" * 9 + "…"

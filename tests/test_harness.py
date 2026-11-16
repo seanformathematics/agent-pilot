@@ -488,3 +488,26 @@ def test_submission_counts_only_once_logged(make_harness):
         harness.handle_tool_call("solver-0", "toolu_x", "submit_result", GOOD_SUBMISSION)
     assert harness.accepted_submissions == []
     assert not harness.is_done("solver-0")
+
+
+# ----- host sleep during a call ----------------------------------------------
+
+def test_host_sleep_during_a_call_is_flagged_and_the_agent_carries_on(make_harness):
+    outcome, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "test call", "code": "slept"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert outcome["status"] == "submitted"
+    execution = entries_of(logger, "execution")[0]["data"]
+    assert execution["wall_duration_s"] == 60.01 and execution["cleanup"] == "ok"
+    flags = [e["data"] for e in entries_of(logger, "flag")]
+    assert {"reason": "host_clock_gap", "exec_id": execution["exec_id"],
+            "duration_s": 0.01, "wall_duration_s": 60.01} in flags
+
+
+def test_no_clock_gap_flag_on_an_ordinary_call(make_harness):
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert all(e["data"]["reason"] != "host_clock_gap" for e in entries_of(logger, "flag"))

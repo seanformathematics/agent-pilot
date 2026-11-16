@@ -97,3 +97,35 @@ def test_inspect_reports_truncated_archive(tmp_path):
     summary = inspect_archive(archive)
     assert summary["complete"] is False
     assert summary["members"] >= 1
+
+
+# ----- the cleanup kill: when the container does not answer -------------------
+
+import subprocess  # noqa: E402
+
+from harness import sandbox as sandbox_module  # noqa: E402
+
+
+def box_with_container():
+    box = sandbox_module.Sandbox("image", 1024, 64, 64, 64, 1, 64, 1000, 1000)
+    box.container_id = "some-container"
+    return box
+
+
+def test_cleanup_kill_reports_a_container_that_does_not_answer(monkeypatch):
+    def hangs(*args, **kwargs):
+        raise subprocess.TimeoutExpired(args[0], kwargs["timeout"])
+    monkeypatch.setattr(sandbox_module.subprocess, "run", hangs)
+    assert box_with_container()._kill_leftover_processes() is False
+
+
+def test_cleanup_kill_reports_docker_failing_to_run_it(monkeypatch):
+    monkeypatch.setattr(sandbox_module.subprocess, "run",
+                        lambda *a, **k: subprocess.CompletedProcess(a[0], 1))
+    assert box_with_container()._kill_leftover_processes() is False
+
+
+def test_cleanup_kill_succeeds(monkeypatch):
+    monkeypatch.setattr(sandbox_module.subprocess, "run",
+                        lambda *a, **k: subprocess.CompletedProcess(a[0], 0))
+    assert box_with_container()._kill_leftover_processes() is True
