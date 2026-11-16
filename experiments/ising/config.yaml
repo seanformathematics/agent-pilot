@@ -1,8 +1,8 @@
 # Prototype of First Science Run: Single Agent Ising Modeler.
-experiment: ising_sonnet_independent
+experiment: ising_haiku_at_medium
 design: experiments/ising/design.md
 topology: independent
-model: claude-sonnet-5-5
+model: claude-haiku-5-5
 effort: medium                    # optional; omit to use the model's own default
 
 # Experiment code, referenced as "module.path:attribute".
