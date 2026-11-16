@@ -242,3 +242,126 @@ can't separate agents.
 - Is the 2D Ising model rich enough to keep studying these questions, or
   is it time for a harder problem? (Sean's view, 2026-11-16: there is
   much more to explore with it.)
+
+---
+
+## 7. The host computer is part of the instrument
+
+**What happened.** In `2026-11-16_ising_haiku_at_medium_independent_001`,
+agent `ising-07` started a `run_python` call at 11:26:34 (local time; the
+log says 19:26:34 UTC) with the maximum 600 s timeout. At 11:29:09 the Mac
+went into idle sleep. It was plugged in, but that doesn't prevent idle sleep
+(the power log says "Idle Sleep … Using AC"). From the power log
+(`pmset -g log`) and the agent's log:
+
+| local time | Mac | ising-07 |
+|---|---|---|
+| 11:26:34 | awake | call starts |
+| 11:29:09 | idle sleep | |
+| 11:37:50–11:38:30 | brief dark wake, then sleep | |
+| 11:53:30 | dark wake (background only), about 40 min | |
+| ≈12:00:35 | | the harness's 620 s backstop runs out |
+| 12:00:45 | | cleanup kill times out after 10 s; agent ends; archive fails |
+| 12:33:43 | full wake (user activity) | container finally stops; `run_error` |
+
+The backstop counts on the monotonic clock, which on macOS stops while the
+computer sleeps. Adding up only the awake and dark-wake periods, its 620 s
+ran out at about 12:00:35, ten seconds before the first failure was logged.
+The container never answered, even in dark wake. Apparently Docker
+Desktop's virtual machine stays frozen until the Mac fully wakes, because
+`docker rm` finished in the same second the screen came on.
+
+**What the record shows.** The log goes straight from `tool_call` to
+`workspace_archive_failed`, with no `execution` and no `tool_result`. The run's
+verification reports three files with no log entry
+(`ising-07-0002.py/.out/.err`): the hung call's files, written before the
+harness died. The analysis lists `ising-07` as `not_run`, although it did
+run. Nothing was tampered with and the record is honest about the gap,
+but nothing in it says *why*. That had to be reconstructed from the Mac's
+power log.
+
+**Why it matters.**
+- A lost agent is a lost data point, and it is lost to the host, not to the
+  agent. Counted as an agent failure, it would make Haiku look worse than it
+  is.
+- The harness treated "the container didn't answer" as a programming error
+  (an exception) rather than an event to record. One fragile cleanup call
+  ended the agent.
+- Every timeout in the harness assumed the computer stays awake. Durations
+  in the log quietly leave out time asleep.
+
+**What we did** (commit `f202ed8`).
+- On macOS the harness holds `caffeinate -i -s` for the whole run, refuses to
+  start if it can't, and records that it did (`keep_awake` in the first
+  log entry). The lid must stay open.
+- A cleanup kill the container doesn't answer is retried once. If it still
+  fails, the execution is logged, then `sandbox_unresponsive`, and only then
+  does the agent end.
+- Every execution records its wall-clock duration next to the monotonic
+  one. A gap of more than 30 s is flagged `host_clock_gap`.
+- The terminal shows a progress line for each milestone, so a stalled run
+  is visible while it happens.
+
+**Still open** (pm `cbkqhq`).
+- Agents that ended because of the host should get their own status (e.g.
+  `host_incident`), not the generic `error` or `not_run`, so that analysis
+  can separate them from agent failures.
+- A power cut or crash kills the harness itself, which can't log its own
+  death. It leaves a run folder with no `final_hash.txt` and no index line,
+  and nothing currently notices one. The harness should refuse to start
+  while such a folder exists, and a small command should record it as
+  `interrupted`.
+
+**Questions to answer:**
+- How should a batch that lost an agent to the host be compared with one
+  that didn't: rerun the agent, or report n = 9?
+- What else does the record assume about the host (disk, network, Docker
+  restarts, clock changes), and which of these can it detect for itself?
+
+---
+
+## 8. The weaker model exercised the harness more
+
+**What happened.** The Haiku batch ran on the same design, prompt and
+limits as the 10-agent Sonnet batch. On physics the two look similar (pooled
+rms pull 1.11 vs 1.02; one point beyond 3σ each), but their process
+differed:
+
+| | Haiku (9 agents) | Sonnet (10 agents) |
+|---|---|---|
+| Tokens | 640k | 155k |
+| Turns per agent | 4–13 | 2–4 |
+| `run_python` calls per agent | 2–12 | 1–3 |
+| Calls hitting the 600 s limit | 3 | 0 |
+| Rejected tool calls | 6 | 0 |
+
+The rejections were:
+- three `run_python` calls with no `code` field (ising-05; the content
+  suggests the code ended up inside `purpose`);
+- two submissions missing required fields (`seeds`, `error_method`), each
+  fixed on resubmission;
+- one attempt to submit again after an accepted submission.
+
+The hung call that led to §7 was also Haiku's: 8 worker processes on a
+1-CPU sandbox, sized for hours of work.
+
+**Why it matters.** Rejection logging, resubmission limits and the timeout
+path were built and tested, but Sonnet never used them in a real run.
+Haiku did, and they held. A model that makes more mistakes is a cheap
+stress test of the harness, at about a twentieth of Sonnet's token price.
+A lot of the harness's value lies in paths that capable models rarely
+take.
+
+**What to do.**
+- Before an expensive batch (Opus), consider a Haiku batch on the same
+  config as a dress rehearsal for the harness, not only as a data point.
+- Report tool-use errors (rejections by type, timeouts, resubmissions) per
+  model. They separate models even where the physics measures are
+  saturated (§6).
+
+**Questions to answer:**
+- Does Haiku at a higher effort level make fewer tool-use errors, or just
+  spend more tokens?
+- Do Haiku's error bars hold up per agent under the χ² calibration test,
+  given that several agents rounded low-T values to 5 decimals and
+  reported `U_err = 1e-05` (about 10× the true error there)?
