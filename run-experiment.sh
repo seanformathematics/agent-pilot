@@ -1,5 +1,6 @@
 #!/bin/sh
 # Start a harness run: venv interpreter, Mac kept awake for the whole run.
+# example usage: ./run-experiment.sh experiments/ising/config.yaml
 
 set -e
 cd "$(dirname "$0")"
