@@ -1,0 +1,1 @@
+import subprocess;print(subprocess.run('ps aux | grep sim.py | head; cat /work/sim.log',shell=True,capture_output=True,text=True).stdout)

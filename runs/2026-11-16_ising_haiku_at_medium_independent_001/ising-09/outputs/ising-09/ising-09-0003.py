@@ -1,0 +1,1 @@
+import time;time.sleep(120);print(open('/work/sim.log').read())

@@ -1,0 +1,1 @@
+CompletedProcess(args=['python3', '/work/ising.py', 'test'], returncode=0, stdout='time 100 sweeps R=1000: 0.7386429309844971\nU 0.5965799225053874\n', stderr='')

@@ -1,0 +1,6 @@
+total 4
+drwx------ 2 agent agent   80 Nov 16 18:17 .
+drwxr-xr-x 1 root  root    12 Nov 16 18:17 ..
+-rw-rw-rw- 1 agent agent    0 Nov 16 18:17 prod.log
+-rw-rw-rw- 1 agent agent 1159 Nov 16 18:17 prod.py
+

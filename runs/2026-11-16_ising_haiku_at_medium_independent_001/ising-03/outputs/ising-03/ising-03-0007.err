@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-03-0007.py", line 34, in <module>
+    t=time.time()
+      ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'?
