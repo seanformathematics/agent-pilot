@@ -393,7 +393,7 @@ markup inside a string field:
 
 | | Haiku medium | Haiku high |
 |---|---|---|
-| `submit_result` calls with leaked markup | 3 of 12 | 10 of 19 |
+| `submit_result` calls with leaked markup | 3 of 12 | 10 of 20 |
 | Agents affected | 2 | 5 (3 recovered) |
 | Agents lost to it | 0 | 2 |
 
