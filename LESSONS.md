@@ -365,3 +365,94 @@ take.
 - Do Haiku's error bars hold up per agent under the χ² calibration test,
   given that several agents rounded low-T values to 5 decimals and
   reported `U_err = 1e-05` (about 10× the true error there)?
+
+## 9. The tool-call format is a channel that can corrupt data silently
+
+**What happened.** In the Haiku-high batch (`ising_haiku_at_high`, same
+design and limits as Haiku-medium, `effort: high`), two of ten agents,
+ising-03 and ising-07, ended without an accepted submission. Both had
+finished, well-calibrated results in `/work`. Both lost all three
+submission attempts to the same mistake. The model writes a tool call in a
+markup format that the API turns into JSON. Both agents closed the
+`error_method` parameter with `</error_method>` instead of `</parameter>`.
+The parser read that tag as ordinary text, so the next parameter (opening
+tag and value) ended up inside the `error_method` string:
+
+```
+...far below the 0.005 target.</error_method>\n<parameter name="seeds">[1507, 1607, ...]
+```
+
+Pydantic correctly rejected the call: `seeds` was missing. Its message
+truncates the input it shows (`'C...rom biasing the error.'`), though, so
+neither agent could see where its markup had gone wrong. Each repeated the
+slip, then dropped other fields on the third try, and ran out of attempts.
+Their final messages diagnose the cause correctly, after the fact.
+
+Searching every logged tool input in both Haiku batches for parameter
+markup inside a string field:
+
+| | Haiku medium | Haiku high |
+|---|---|---|
+| `submit_result` calls with leaked markup | 3 of 12 | 10 of 19 |
+| Agents affected | 2 | 5 (3 recovered) |
+| Agents lost to it | 0 | 2 |
+
+This also explains §8's rejections. Medium's three `run_python` calls with
+no `code` were `</purpose>` closing the `purpose` field and swallowing
+`code`, and both of its "missing field" submissions were this slip too.
+
+**The silent case.** When the swallowed parameter is required, validation
+fails and the record shows it. When it is optional with a default, the
+call is *accepted*. Medium's ising-06 has an accepted submission with
+`notes` empty and its real notes, markup included, stuck to the end of
+`report`. Grading reads only `points`, so no score changed, but nothing in
+the run flagged the corrupted field. It was found only by searching the
+logs. Any future schema with an optional field that grading reads would be
+mis-graded silently.
+
+**Why it matters.** We had treated the tool schema as a guarantee about the
+data: if it validates, it is what the agent meant. It isn't. Validation
+checks shape, not intent. The model's own formatting is a step between what
+it means and what we record, and that step fails in a way the schema
+can't always see. Extra thinking didn't help: the leak was more frequent at
+high effort than at medium (on small samples).
+
+The resubmission limit (3) is what turned a formatting slip into a lost
+agent. It is a hyperparameter of the design, and this is the first batch
+where it decided an outcome.
+
+**What to do** (decided 2026-11-16; to apply after the Opus-medium batch, so
+Opus gets the same feedback as Haiku and Sonnet; pm `nwzcfb`):
+- **Feedback is part of the instrument.** A rejection should name the
+  fields received and the fields expected, without truncation, using only
+  the schema. Changing what agents are told is an experimental change and
+  goes in design.md.
+- **Flag, don't reject.** The harness logs a `tool_input_markup` flag
+  whenever any tool call has a string field containing tool-call syntax.
+  The agent never sees it. Legitimate code can contain such text, so it is
+  a flag, not a rejection.
+- **Check old runs as analysis.** The logs hold every raw input, so the
+  same check runs over finished runs without touching `runs/`.
+- **Strict tool use (`strict: true`) is an arm, not a fix.** It would
+  likely prevent missing-field rejections, so it would remove a failure
+  mode we are measuring. If used, it is a deliberate design setting.
+- **Report per model:** leaked-markup calls, and agents lost to the
+  resubmission limit.
+
+**Answers to §8's questions:**
+- Higher effort did not reduce tool-use errors. Haiku-high had 12
+  rejected submit attempts against medium's 3, and used 29% more tokens
+  (827k vs 640k) with fewer `run_python` calls (53 vs 60) and timeouts
+  (1 vs 3).
+- The 5-decimal rounding did not recur at high effort. Agents reported
+  full precision (`U_err` down to about 4e-7), and calibration was a
+  little tighter: pooled rms pull 1.05 (n = 112, none beyond 3σ) against
+  1.11.
+
+**Questions to answer:**
+- Does Opus leak markup at all? (The same log check over the 10-agent
+  Sonnet batch finds none in 27 tool calls.)
+- Does the leak rate depend on the field's content, for example long free
+  text with angle brackets (`<m^4>`)? Almost every submission contained
+  such text, so these batches can't say.
+- With complete rejection feedback, do agents recover on the next try?
