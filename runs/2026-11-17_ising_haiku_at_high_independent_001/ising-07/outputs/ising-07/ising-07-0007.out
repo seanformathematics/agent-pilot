@@ -1,0 +1,14 @@
+T=1.50 U=0.66645 timeBlockJK_err=0.00000
+T=1.60 U=0.66630 timeBlockJK_err=0.00000
+T=1.70 U=0.66604 timeBlockJK_err=0.00000
+T=1.80 U=0.66556 timeBlockJK_err=0.00000
+T=1.90 U=0.66460 timeBlockJK_err=0.00000
+T=2.00 U=0.66246 timeBlockJK_err=0.00001
+T=2.10 U=0.65661 timeBlockJK_err=0.00003
+T=2.20 U=0.63934 timeBlockJK_err=0.00007
+T=2.30 U=0.59287 timeBlockJK_err=0.00019
+T=2.40 U=0.50065 timeBlockJK_err=0.00024
+T=2.50 U=0.38266 timeBlockJK_err=0.00037
+T=2.60 U=0.27578 timeBlockJK_err=0.00034
+T=2.70 U=0.19861 timeBlockJK_err=0.00051
+T=2.80 U=0.14581 timeBlockJK_err=0.00049

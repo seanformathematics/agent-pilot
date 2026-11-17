@@ -1,0 +1,4 @@
+numba missing No module named 'numba'
+numpy 2.5.4
+scipy 1.18.1
+1000 ops time 0.055977821350097656
