@@ -22,7 +22,7 @@ This stage tests the experiment through the Binder cumulant computations. It is 
 - Purpose statement: every run_python call requires a purpose field. (replaced the 'say what you'll do' prompt line, 2026-11-14)
 - Limits and sandbox: as in config.yaml:
   - turns: 40
-  - tokens: 2500000
+  - tokens: 2500000 ( max 64_000 per response)
   - max_timeout_s: 600
   - CPUs: 1
   - memory: 2048 MB
