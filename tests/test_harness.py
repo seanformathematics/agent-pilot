@@ -378,6 +378,57 @@ def test_make_client_has_sdk_retries_off(monkeypatch):
     assert make_client().max_retries == 0
 
 
+def test_every_request_is_streamed(make_harness):
+    # Non-streamed requests that think for over a minute were cut by the
+    # network (2026-11-17); the agent must only ever stream.
+    _, _, _, client = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert client.streamed == len(client.calls) == 2
+
+
+SSE_REPLY = [
+    ("message_start", {"type": "message_start", "message": {
+        "id": "msg_test", "type": "message", "role": "assistant", "model": "claude-test",
+        "content": [], "stop_reason": None, "stop_sequence": None,
+        "usage": {"input_tokens": 10, "output_tokens": 1}}}),
+    ("content_block_start", {"type": "content_block_start", "index": 0,
+                             "content_block": {"type": "text", "text": ""}}),
+    ("content_block_delta", {"type": "content_block_delta", "index": 0,
+                             "delta": {"type": "text_delta", "text": "Nothing to do."}}),
+    ("content_block_stop", {"type": "content_block_stop", "index": 0}),
+    ("message_delta", {"type": "message_delta", "delta": {"stop_reason": "end_turn", "stop_sequence": None},
+                       "usage": {"output_tokens": 5}}),
+    ("message_stop", {"type": "message_stop"}),
+]
+
+
+def test_streamed_reply_from_the_real_sdk_is_logged_whole(make_harness):
+    # The real SDK client, fed a canned server-sent-event stream: no network.
+    sent = []
+
+    def serve(request):
+        sent.append(json.loads(request.content))
+        body = "".join(f"event: {name}\ndata: {json.dumps(data)}\n\n" for name, data in SSE_REPLY)
+        return httpx.Response(200, headers={"content-type": "text/event-stream"}, text=body)
+
+    client = anthropic.Anthropic(api_key="test-key-not-real", max_retries=0,
+                                 http_client=httpx.Client(transport=httpx.MockTransport(serve)))
+    harness, logger = make_harness()
+    agent = Agent("solver-0", client, harness)
+    harness.start_agent("solver-0")
+    outcome = agent.run(harness.task_for("solver-0"))
+
+    assert sent[0]["stream"] is True
+    assert outcome["status"] == "ended_turn_without_submission"
+    logged = entries_of(logger, "api_response")[0]["data"]
+    response = logged.get("response", logged)
+    assert [(block["type"], block["text"]) for block in response["content"]] == [("text", "Nothing to do.")]
+    assert response["stop_reason"] == "end_turn"
+    assert response["usage"]["output_tokens"] == 5
+
+
 # ----- isolation of the record from the agent --------------------------
 
 def test_no_log_content_reaches_the_model(make_harness):
