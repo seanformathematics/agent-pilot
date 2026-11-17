@@ -235,6 +235,7 @@ and the full agent list (`agents`) so it can count agents that never submitted.
 | Privileges | all Linux capabilities dropped; no privilege escalation; runs as user `agent` |
 | Filesystem | read-only, except three in-memory folders: `/work` (`work_mb`; the agent's, archived at the end), `/tmp` (`tmp_mb`) and `/dev/shm` (`shm_mb`). All three are listed after every call. Nothing from the host is mounted. |
 | Limits | `memory_mb` (no swap; a total budget for processes **and** whatever is stored in `/work`, `/tmp` and `/dev/shm`), CPUs, process count: from config |
+| CPU count | `cpus` is a time quota; the container is also pinned to the first ceil(`cpus`) cores with `PYTHON_CPU_COUNT` set to match, so Python, `nproc` and default pool sizes report the cores the agent really has. Only `/proc/cpuinfo` still lists the Docker VM's cores. Tests: `test_code_sees_only_its_cores`, `test_fractional_cpus_round_up_to_whole_cores` |
 | PID 1 | tiny Python reaper, so killed processes don't pile up as zombies |
 | Per call | `timeout -k <KILL_GRACE_S> <T> python /opt/harness/launcher.py <exec_id>` with code on stdin, then kill everything else the agent runs (from a second `docker exec`, retried once if the container doesn't answer within 10 s) |
 | Launcher | `docker/launcher.py`, read-only in the image. Saves the code as `/tmp/run_python/<exec_id>.py` and runs it as a normal script: tracebacks and warnings show source lines (launcher frames hidden), `__file__` is set, `multiprocessing` works. |

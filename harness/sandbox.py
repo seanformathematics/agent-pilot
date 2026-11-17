@@ -14,6 +14,14 @@ Removing the container discards /work.
 Container settings:
   * no network
   * memory, CPU and process-count limits from config (swap disabled)
+  * pinned to the first ceil(cpus) cores, with PYTHON_CPU_COUNT set to the
+    same number. A CPU quota (--cpus) alone limits time, not cores, so
+    Python would report all of the Docker VM's cores and Pool() would start
+    that many workers. Pinning makes os.process_cpu_count(), nproc, Pool()
+    and ProcessPoolExecutor() see ceil(cpus) cores, and PYTHON_CPU_COUNT
+    does the same for os.cpu_count() and multiprocessing.cpu_count(). Only
+    the kernel's own /proc/cpuinfo still lists the VM's cores. Agents run
+    one after another, so every container can use the same cores
   * all Linux capabilities dropped, no privilege escalation
   * read-only root filesystem; only /work, /tmp and /dev/shm are writable
   * /work, /tmp and /dev/shm sizes from config; all three live in memory
@@ -68,6 +76,7 @@ KILL_GRACE_S more seconds, or because it hit the memory limit.
 """
 
 import json
+import math
 import os
 import re
 import stat
@@ -109,6 +118,11 @@ REAPER = (
 )
 
 
+def cores_for(cpus: float) -> int:
+    """Whole cores a container is pinned to: cpus rounded up (0.5 -> 1, 2 -> 2)."""
+    return math.ceil(cpus)
+
+
 class Sandbox:
     """A single agent's Docker container and working directory."""
 
@@ -134,6 +148,7 @@ class Sandbox:
         self.tmp_mb = tmp_mb
         self.shm_mb = shm_mb
         self.cpus = cpus
+        self.cores = cores_for(cpus)
         self.pids_limit = pids_limit
         self.output_cap = output_cap
         self.stored_output_cap = stored_output_cap
@@ -166,6 +181,8 @@ class Sandbox:
             "--memory", f"{self.memory_mb}m",
             "--memory-swap", f"{self.memory_mb}m",  # same value = no swap
             "--cpus", str(self.cpus),
+            "--cpuset-cpus", f"0-{self.cores - 1}",
+            "--env", f"PYTHON_CPU_COUNT={self.cores}",
             "--pids-limit", str(self.pids_limit),
             "--cap-drop", "ALL",
             "--security-opt", "no-new-privileges",

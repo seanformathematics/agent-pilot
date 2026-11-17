@@ -129,3 +129,11 @@ def test_cleanup_kill_succeeds(monkeypatch):
     monkeypatch.setattr(sandbox_module.subprocess, "run",
                         lambda *a, **k: subprocess.CompletedProcess(a[0], 0))
     assert box_with_container()._kill_leftover_processes() is True
+
+
+def test_cores_round_cpus_up():
+    from harness.sandbox import cores_for
+    assert cores_for(1.0) == 1
+    assert cores_for(0.5) == 1
+    assert cores_for(2) == 2
+    assert cores_for(1.5) == 2

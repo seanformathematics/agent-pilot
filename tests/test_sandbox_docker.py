@@ -143,6 +143,34 @@ def test_multiprocessing_pool_works(make_sandbox):
     assert result["stdout"] == "[0, 1, 4, 9, 16]\n"
 
 
+CPU_COUNTS = (
+    "import os, subprocess, multiprocessing as mp\n"
+    "from concurrent.futures import ProcessPoolExecutor\n"
+    "if __name__ == '__main__':\n"
+    "    with mp.Pool() as pool:\n"
+    "        pool_size = pool._processes\n"
+    "    counts = [os.cpu_count(), os.process_cpu_count(), mp.cpu_count(),\n"
+    "              len(os.sched_getaffinity(0)), pool_size,\n"
+    "              ProcessPoolExecutor()._max_workers,\n"
+    "              int(subprocess.run(['nproc'], capture_output=True, text=True).stdout)]\n"
+    "    print(counts)\n"
+)
+
+
+def test_code_sees_only_its_cores(make_sandbox):
+    # A CPU quota alone left every count at the VM's cores (8), and agents
+    # started Pool(8) on 1 CPU. Pinning plus PYTHON_CPU_COUNT fixes all of these.
+    result, _ = run(make_sandbox(cpus=1.0), CPU_COUNTS)
+    assert result["exit_code"] == 0, result["stderr"]
+    assert result["stdout"] == "[1, 1, 1, 1, 1, 1, 1]\n"
+
+
+def test_fractional_cpus_round_up_to_whole_cores(make_sandbox):
+    result, _ = run(make_sandbox(cpus=1.5), CPU_COUNTS)
+    assert result["exit_code"] == 0, result["stderr"]
+    assert result["stdout"] == "[2, 2, 2, 2, 2, 2, 2]\n"
+
+
 def test_script_basics(make_sandbox):
     code = ("import sys\n"
             "print(__name__, __file__, sys.argv[0])\n"
