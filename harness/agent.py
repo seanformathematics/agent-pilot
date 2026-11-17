@@ -7,7 +7,7 @@ the harness.
 Each turn:
   1. stop if the agent has an accepted submission, hit its turn limit, or the
      run's token budget is spent;
-  2. call ``client.messages.create`` and log the full response;
+  2. call the API (streamed; see below) and log the full response;
   3. append the response content to the history exactly as returned (thinking
      blocks must go back unchanged);
   4. run every requested tool through the harness and send all the
@@ -22,6 +22,15 @@ every wait is logged. The client must be made with ``max_retries=0`` (use
 ``make_client``). Errors that might succeed on a second try (network
 problems, rate limits, overload, server errors) are retried up to
 ``limits.api_retries`` times; anything else ends the agent at once.
+
+Every request is streamed: the response arrives as a flow of small pieces
+and ``get_final_message()`` assembles them into the same Message that
+``messages.create`` would return, so the log and the history are unchanged.
+Streaming changes only how the response travels, not what the model sees or
+writes. A non-streamed request sends nothing back until the whole response is
+ready, and a network can cut a connection that stays silent that long: on
+2026-11-17, at effort max, every non-streamed request still thinking after
+60 s was dropped (APIConnectionError), and a streamed one ran for 109 s.
 
 Every request asks for a readable summary of the model's reasoning
 (``THINKING``). Without it the API returns thinking blocks with empty text, so
@@ -133,7 +142,8 @@ class Agent:
         while True:
             attempt += 1
             try:
-                return self._client.messages.create(**self._request())
+                with self._client.messages.stream(**self._request()) as stream:
+                    return stream.get_final_message()
             except anthropic.APIError as error:
                 retryable = is_retryable(error)
                 will_retry = retryable and attempt <= self.api_retries

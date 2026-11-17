@@ -55,7 +55,7 @@ class FakeClient:
     def __init__(self, responses: list) -> None:
         self._responses = list(responses)
         self.calls: list[dict] = []
-        self.messages = self  # so ``client.messages.create`` resolves here
+        self.messages = self  # so ``client.messages.stream`` resolves here
 
     def create(self, **kwargs):
         self.calls.append(copy.deepcopy(kwargs))  # the agent keeps mutating its history
@@ -65,6 +65,27 @@ class FakeClient:
         if isinstance(response, BaseException):  # includes KeyboardInterrupt
             raise response
         return response
+
+    def stream(self, **kwargs):
+        """Like ``client.messages.stream``: a context manager whose
+        ``get_final_message()`` gives the reply. Goes through ``create`` so
+        subclasses that override it still see every request."""
+        self.streamed = getattr(self, "streamed", 0) + 1
+        return FakeStream(lambda: self.create(**kwargs))
+
+
+class FakeStream:
+    def __init__(self, reply) -> None:
+        self._reply = reply
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc) -> bool:
+        return False
+
+    def get_final_message(self):
+        return self._reply()
 
 
 # ----- sandbox without Docker ------------------------------------------
