@@ -1,0 +1,2 @@
+T=2.5: 20 seeds x 64 reps x 3000 sweeps: mean U=0.38313, std across seeds=0.00127, mean jackknife err=0.00149, ratio std/jk=0.852, elapsed=74s
+T=2.8: 20 seeds x 64 reps x 3000 sweeps: mean U=0.14527, std across seeds=0.00253, mean jackknife err=0.00236, ratio std/jk=1.070, elapsed=146s
