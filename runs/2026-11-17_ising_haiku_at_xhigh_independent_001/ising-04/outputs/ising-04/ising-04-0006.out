@@ -1,0 +1,14 @@
+T=1.50 U=0.66645 err=0.000000 | halves 0.66645 0.66645 | first300sweeps 0.66645 | e=-1.95113 onsager_e=-1.95112
+T=1.60 U=0.66630 err=0.000001 | halves 0.66630 0.66630 | first300sweeps 0.66630 | e=-1.92821 onsager_e=-1.92824
+T=1.70 U=0.66604 err=0.000001 | halves 0.66604 0.66604 | first300sweeps 0.66604 | e=-1.89818 onsager_e=-1.89817
+T=1.80 U=0.66556 err=0.000003 | halves 0.66556 0.66556 | first300sweeps 0.66556 | e=-1.85929 onsager_e=-1.85930
+T=1.90 U=0.66460 err=0.000008 | halves 0.66461 0.66459 | first300sweeps 0.66462 | e=-1.80935 onsager_e=-1.80949
+T=2.00 U=0.66242 err=0.000023 | halves 0.66245 0.66240 | first300sweeps 0.66244 | e=-1.74561 onsager_e=-1.74556
+T=2.10 U=0.65669 err=0.000064 | halves 0.65671 0.65666 | first300sweeps 0.65647 | e=-1.66197 onsager_e=-1.66208
+T=2.20 U=0.63945 err=0.000165 | halves 0.63962 0.63928 | first300sweeps 0.63954 | e=-1.55046 onsager_e=-1.54649
+T=2.30 U=0.59292 err=0.000338 | halves 0.59306 0.59279 | first300sweeps 0.59167 | e=-1.40627 onsager_e=-1.34287
+T=2.40 U=0.50053 err=0.000588 | halves 0.50095 0.50011 | first300sweeps 0.50012 | e=-1.25475 onsager_e=-1.20397
+T=2.50 U=0.38332 err=0.000778 | halves 0.38195 0.38469 | first300sweeps 0.38120 | e=-1.13113 onsager_e=-1.10608
+T=2.60 U=0.27519 err=0.000837 | halves 0.27654 0.27383 | first300sweeps 0.28117 | e=-1.03898 onsager_e=-1.02829
+T=2.70 U=0.19797 err=0.000890 | halves 0.19835 0.19760 | first300sweeps 0.20000 | e=-0.96795 onsager_e=-0.96353
+T=2.80 U=0.14542 err=0.000916 | halves 0.14627 0.14457 | first300sweeps 0.14473 | e=-0.90992 onsager_e=-0.90814

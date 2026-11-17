@@ -1,0 +1,6 @@
+Metropolis T=2.5: U=0.38288 +- 0.00098  <m^2>=0.20213  <m^4>=0.075643  time 4.8s
+Metropolis T=2.8: U=0.14419 +- 0.00132  <m^2>=0.06930  <m^4>=0.012330  time 5.1s
+Wolff pilot T=2.0: <m^2>=0.83332 <m^4>=0.703182 kurt=1.0126 U=0.66246 <|m|>=0.9112 mean m=+0.00008 parity-even M: True
+Wolff pilot T=2.5: <m^2>=0.20236 <m^4>=0.075790 kurt=1.8509 U=0.38304 <|m|>=0.3892 mean m=+0.00013 parity-even M: True
+Wolff pilot T=2.8: <m^2>=0.06961 <m^4>=0.012402 kurt=2.5595 U=0.14684 <|m|>=0.2151 mean m=+0.00045 parity-even M: True
+total time 10.026495218276978

@@ -1,0 +1,4 @@
+T=1.5 repeat U=0.66645+-0.000000  production U=0.66645+-0.000000  diff=-0.000001  diff/sqrt(err^2+err^2)=-2.47
+T=2.3 repeat U=0.59247+-0.000106  production U=0.59249+-0.000076  diff=-0.000019  diff/sqrt(err^2+err^2)=-0.15
+T=2.6 repeat U=0.27680+-0.000412  production U=0.27558+-0.000295  diff=+0.001216  diff/sqrt(err^2+err^2)=+2.40
+T=2.8 repeat U=0.14574+-0.000649  production U=0.14619+-0.000459  diff=-0.000453  diff/sqrt(err^2+err^2)=-0.57

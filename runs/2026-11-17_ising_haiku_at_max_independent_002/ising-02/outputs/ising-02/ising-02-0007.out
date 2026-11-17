@@ -1,0 +1,9 @@
+T=2.00  Onsager=-0.872782  integral=-0.872782
+T=2.20  Onsager=-0.773245  integral=-0.773244
+T=2.30  Onsager=-0.671433  integral=-0.671434
+T=2.50  Onsager=-0.553040  integral=-0.553040
+T=2.80  Onsager=-0.454071  integral=-0.454071
+4x4 T=2.00 exact E/bond=-0.87769  SW E/bond=-0.87752
+4x4 T=2.50 exact E/bond=-0.68956  SW E/bond=-0.68930
+4x4 T=2.80 exact E/bond=-0.57414  SW E/bond=-0.57333
+energy check naive: [np.int64(8), np.int64(-8), np.int64(-28)]  code: [  8.  -8. -28.]

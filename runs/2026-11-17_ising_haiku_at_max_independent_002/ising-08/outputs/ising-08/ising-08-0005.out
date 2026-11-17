@@ -1,0 +1,13 @@
+T=1.70 U=0.666038 jk_err=0.0000015 time=54.2s
+T=1.60 U=0.666302 jk_err=0.0000008 time=54.2s
+T=1.50 U=0.666453 jk_err=0.0000005 time=53.8s
+production remaining done, elapsed 162.2
+batch2 T=2.80 U=0.144654 jk_err=0.0014519 time=5.2s
+batch2 T=2.70 U=0.198094 jk_err=0.0011827 time=6.8s
+batch2 T=2.60 U=0.275650 jk_err=0.0009648 time=9.5s
+batch2 T=2.50 U=0.382721 jk_err=0.0007030 time=14.1s
+batch2 T=2.40 U=0.501233 jk_err=0.0004533 time=21.9s
+batch2 done, elapsed 219.7
+4x4 T=3.0: exact=0.480541 Wolff(4e6 flips)=0.480393 jk_err=0.000186 diff/err=-0.80 time=7.6s
+total elapsed 227.2
+['__pycache__', 'ising_wolff.py', 'res2_2.40.npz', 'res2_2.50.npz', 'res2_2.60.npz', 'res2_2.70.npz', 'res2_2.80.npz', 'res_1.50.npz', 'res_1.60.npz', 'res_1.70.npz', 'res_1.80.npz', 'res_1.90.npz', 'res_2.00.npz', 'res_2.10.npz', 'res_2.20.npz', 'res_2.30.npz', 'res_2.40.npz', 'res_2.50.npz', 'res_2.60.npz', 'res_2.70.npz', 'res_2.80.npz']

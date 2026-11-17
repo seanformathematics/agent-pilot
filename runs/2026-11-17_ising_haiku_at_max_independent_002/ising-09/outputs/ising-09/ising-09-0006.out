@@ -1,0 +1,4 @@
+N=4 T=2.8: exact U=0.52293, Wolff U=0.52286 +- 0.00016, pull=-0.44
+Metropolis N=16 T=2.8: U=0.14506 +- 0.00092, tau_int(m2)=2.71, <m2>=0.0696, time=12s
+Metropolis N=16 T=2.0: U=0.66246 +- 0.00003, tau_int(m2)=2.56, <m2>=0.8336, time=12s
+total 25.91434597969055

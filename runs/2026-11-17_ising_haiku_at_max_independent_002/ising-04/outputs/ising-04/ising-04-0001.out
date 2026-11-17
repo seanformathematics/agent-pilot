@@ -1,0 +1,13 @@
+python 3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+platform Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+cpu count 8
+numpy 2.5.4
+scipy 1.18.1
+numba missing No module named 'numba'
+gcc None
+cc None
+clang None
+tcc None
+gcc run failed [Errno 2] No such file or directory: 'gcc'
+MemTotal:        8196284 kB
+cwd /work []

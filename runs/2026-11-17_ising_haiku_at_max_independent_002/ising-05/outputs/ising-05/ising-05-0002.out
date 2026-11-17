@@ -1,0 +1,20 @@
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+make None
+numba False
+cython False
+cffi False
+scipy True
+numpy True
+jax False
+torch False
+pythran False
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+pip download rc 1  meResolutionError("HTTPSConnection(host='pypi.org', port=443): Failed to resolve 'pypi.org' ([Errno -3] Temporary failure in name resolution)")': /simple/numba/
+ERROR: Could not find a version that satisfies the requirement numba (from versions: none)
+ERROR: No matching distribution found for numba
+
+8

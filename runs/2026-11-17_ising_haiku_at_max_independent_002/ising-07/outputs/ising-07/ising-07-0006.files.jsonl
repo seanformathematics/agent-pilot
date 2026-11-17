@@ -1,0 +1,17 @@
+{"dir": "/work", "path": "/work/__pycache__", "type": "d", "bytes": 60, "mtime": 1794901130.9527752}
+{"dir": "/work", "path": "/work/__pycache__/wolff_prod.cpython-314.pyc", "type": "f", "bytes": 11520, "mtime": 1794901130.9527752}
+{"dir": "/work", "path": "/work/wolff_prod.py", "type": "f", "bytes": 4424, "mtime": 1794901130.9502826}
+{"dir": "/work", "path": "/work/prod", "type": "d", "bytes": 120, "mtime": 1794901708.326513}
+{"dir": "/work", "path": "/work/prod/blocks_02.npz", "type": "f", "bytes": 20388902, "mtime": 1794901708.3395128}
+{"dir": "/work", "path": "/work/prod/log.jsonl", "type": "f", "bytes": 243, "mtime": 1794901708.340513}
+{"dir": "/work", "path": "/work/prod/state.npz", "type": "f", "bytes": 918274, "mtime": 1794901708.340513}
+{"dir": "/work", "path": "/work/prod/blocks_01.npz", "type": "f", "bytes": 14109150, "mtime": 1794901401.2502284}
+{"dir": "/work", "path": "/work/pilot_state.npy", "type": "f", "bytes": 229504, "mtime": 1794900860.191556}
+{"dir": "/work", "path": "/work/pilot_L16.npz", "type": "f", "bytes": 72806214, "mtime": 1794900860.1905172}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 160, "mtime": 1794901738.007439}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0006.py", "type": "f", "bytes": 1651, "mtime": 1794901738.008844}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0005.py", "type": "f", "bytes": 467, "mtime": 1794901409.5262046}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0004.py", "type": "f", "bytes": 5094, "mtime": 1794901130.945794}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0003.py", "type": "f", "bytes": 2285, "mtime": 1794901074.80967}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0002.py", "type": "f", "bytes": 5047, "mtime": 1794900706.9908733}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0001.py", "type": "f", "bytes": 657, "mtime": 1794900572.38828}

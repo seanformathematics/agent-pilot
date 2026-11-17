@@ -1,0 +1,12 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+numpy 2.5.4 scipy 1.18.1
+no numba: ModuleNotFoundError("No module named 'numba'")
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+cpu_count 8
+work: []
+gcc run failed: FileNotFoundError(2, 'No such file or directory')

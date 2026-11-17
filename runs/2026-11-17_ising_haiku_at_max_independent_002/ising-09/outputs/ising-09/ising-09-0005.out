@@ -1,0 +1,15 @@
+  T=2.8 seed=9000: U=0.14495 err_rep=0.00163 time=7.7s
+  T=2.8 seed=9010: U=0.14414 err_rep=0.00160 time=7.7s
+  T=2.8 seed=9020: U=0.14499 err_rep=0.00163 time=7.7s
+  T=2.8 seed=9030: U=0.14289 err_rep=0.00160 time=8.0s
+  T=2.8 seed=9040: U=0.14337 err_rep=0.00166 time=7.7s
+  T=2.8 seed=9050: U=0.14626 err_rep=0.00157 time=8.0s
+T=2.8: mean U over seeds=0.14443, scatter sd=0.00123 (+-0.00039), mean jackknife err=0.00162
+  T=2.3 seed=9001: U=0.59209 err_rep=0.00027 time=10.3s
+  T=2.3 seed=9011: U=0.59282 err_rep=0.00025 time=10.7s
+  T=2.3 seed=9021: U=0.59280 err_rep=0.00026 time=10.3s
+  T=2.3 seed=9031: U=0.59294 err_rep=0.00026 time=10.6s
+  T=2.3 seed=9041: U=0.59254 err_rep=0.00027 time=10.3s
+  T=2.3 seed=9051: U=0.59254 err_rep=0.00027 time=10.6s
+T=2.3: mean U over seeds=0.59262, scatter sd=0.00030 (+-0.00010), mean jackknife err=0.00026
+total 125.70173907279968

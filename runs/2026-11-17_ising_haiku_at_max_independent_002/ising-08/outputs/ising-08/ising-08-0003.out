@@ -1,0 +1,13 @@
+T=2.80 U=0.147803 jk_err=0.001391 chain U=[0.14753 0.14735 0.14823 0.14812] chain-scatter/sqrt(K)=0.000216 time=5.2s
+T=2.70 U=0.199342 jk_err=0.001192 chain U=[0.19969 0.19708 0.19832 0.20226] chain-scatter/sqrt(K)=0.001110 time=6.7s
+T=2.60 U=0.277478 jk_err=0.000947 chain U=[0.27734 0.27483 0.27924 0.27849] chain-scatter/sqrt(K)=0.000966 time=9.3s
+T=2.50 U=0.383458 jk_err=0.000704 chain U=[0.38408 0.38202 0.38186 0.38588] chain-scatter/sqrt(K)=0.000952 time=14.0s
+T=2.40 U=0.502074 jk_err=0.000456 chain U=[0.50135 0.50246 0.50304 0.50146] chain-scatter/sqrt(K)=0.000406 time=22.0s
+T=2.30 U=0.592846 jk_err=0.000238 chain U=[0.593   0.59294 0.59231 0.59313] chain-scatter/sqrt(K)=0.000183 time=32.4s
+T=2.20 U=0.639320 jk_err=0.000102 chain U=[0.63935 0.63933 0.63934 0.63927] chain-scatter/sqrt(K)=0.000017 time=42.0s
+T=2.10 U=0.656745 jk_err=0.000039 chain U=[0.65686 0.65669 0.65675 0.65668] chain-scatter/sqrt(K)=0.000042 time=48.0s
+T=2.00 U=0.662439 jk_err=0.000015 chain U=[0.66243 0.66244 0.66246 0.66242] chain-scatter/sqrt(K)=0.000010 time=51.3s
+T=1.90 U=0.664603 jk_err=0.000006 chain U=[0.66461 0.6646  0.66459 0.66461] chain-scatter/sqrt(K)=0.000005 time=53.2s
+T=1.80 U=0.665556 jk_err=0.000003 chain U=[0.66556 0.66555 0.66556 0.66555] chain-scatter/sqrt(K)=0.000002 time=54.1s
+done this call: [2.8, 2.7, 2.6, 2.5, 2.4, 2.3, 2.2, 2.1, 2.0, 1.9, 1.8] elapsed 338.3
+existing: ['res_1.80.npz', 'res_1.90.npz', 'res_2.00.npz', 'res_2.10.npz', 'res_2.20.npz', 'res_2.30.npz', 'res_2.40.npz', 'res_2.50.npz', 'res_2.60.npz', 'res_2.70.npz', 'res_2.80.npz']

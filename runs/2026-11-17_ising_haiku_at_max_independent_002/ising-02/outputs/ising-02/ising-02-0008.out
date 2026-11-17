@@ -1,0 +1,6 @@
+Metropolis 16x16 T=2.50: E/bond=-0.56580 +- 0.00013 (naive) ; Onsager=-0.55304
+Metropolis 16x16 T=2.80: E/bond=-0.45522 +- 0.00010 (naive) ; Onsager=-0.45407
+metropolis time 8.2 s
+SW 16x16 fresh T=2.50: E/bond=-0.56609 +- 0.00034 ; Onsager=-0.55304
+SW 16x16 fresh T=2.80: E/bond=-0.45531 +- 0.00022 ; Onsager=-0.45407
+total 18.0 s

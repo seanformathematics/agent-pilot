@@ -1,9 +1,9 @@
 # Prototype of First Science Run: Single Agent Ising Modeler.
-experiment: ising_haiku_at_high
+experiment: ising_haiku_at_xhigh
 design: experiments/ising/design.md
 topology: independent
 model: claude-haiku-5-5
-effort: high                    # optional; omit to use the model's own default
+effort: xhigh                  # optional; omit to use the model's own default
 
 # Experiment code, referenced as "module.path:attribute".
 submission_model: experiments.ising.schemas:IsingSubmission
@@ -51,7 +51,7 @@ agents:
 
 limits:
   max_turns: 40                # API calls per agent
-  max_tokens_per_response: 16000
+  max_tokens_per_response: 64_000
   max_total_tokens: 2_500_000    # input + output, whole run
   max_timeout_s: 600           # upper bound on run_python timeout_s
   default_timeout_s: 60        # default setting for run_python timeout in seconds

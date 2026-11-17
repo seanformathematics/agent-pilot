@@ -1,0 +1,14 @@
+T 1.5 U 0.66645 err 0.0 tau_m2 0.59 tau_m4 0.59 time 7.8 meanm2 0.9734
+T 1.6 U 0.6663 err 0.0 tau_m2 0.63 tau_m4 0.62 time 7.9 meanm2 0.95988
+T 1.7 U 0.66604 err 0.0 tau_m2 0.68 tau_m4 0.68 time 7.9 meanm2 0.9415
+T 1.8 U 0.66556 err 1e-05 tau_m2 0.74 tau_m4 0.74 time 7.8 meanm2 0.91625
+T 1.9 U 0.66462 err 1e-05 tau_m2 0.86 tau_m4 0.85 time 7.7 meanm2 0.88205
+T 2.0 U 0.66245 err 4e-05 tau_m2 1.02 tau_m4 1.0 time 7.5 meanm2 0.83334
+T 2.1 U 0.6567 err 8e-05 tau_m2 1.32 tau_m4 1.28 time 7.0 meanm2 0.76291
+T 2.2 U 0.63897 err 0.00023 tau_m2 1.83 tau_m4 1.73 time 6.2 meanm2 0.6503
+T 2.3 U 0.59368 err 0.0006 tau_m2 2.33 tau_m4 2.19 time 4.8 meanm2 0.49423
+T 2.4 U 0.50005 err 0.00114 tau_m2 2.57 tau_m4 2.41 time 3.1 meanm2 0.32252
+T 2.5 U 0.38671 err 0.00166 tau_m2 2.45 tau_m4 2.28 time 2.0 meanm2 0.20402
+T 2.6 U 0.27577 err 0.00225 tau_m2 2.28 tau_m4 2.06 time 1.4 meanm2 0.13141
+T 2.7 U 0.19468 err 0.00276 tau_m2 2.23 tau_m4 1.97 time 1.0 meanm2 0.09222
+T 2.8 U 0.14446 err 0.00361 tau_m2 2.39 tau_m4 2.07 time 0.7 meanm2 0.06933

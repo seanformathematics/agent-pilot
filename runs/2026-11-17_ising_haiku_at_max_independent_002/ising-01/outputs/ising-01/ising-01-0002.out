@@ -1,0 +1,8 @@
+Validation N=4 (exact vs Wolff):
+T=1.5: exact U=0.66396, m2=0.97530, m4=0.95894 | wolff U=0.66400 +- 0.00002, m2=0.97560, m4=0.95941, z=1.97
+T=2.0: exact U=0.64481, m2=0.86892, m4=0.80453 | wolff U=0.64483 +- 0.00009, m2=0.86884, m4=0.80435, z=0.17
+T=2.269: exact U=0.61722, m2=0.76144, m4=0.66579 | wolff U=0.61687 +- 0.00017, m2=0.76038, m4=0.66455, z=-2.10
+T=3.0: exact U=0.48054, m2=0.45099, m4=0.31696 | wolff U=0.48079 +- 0.00042, m2=0.45138, m4=0.31736, z=0.58
+time for validation 5.068443536758423
+N=16 R=256: 50 steps took 0.207s -> 4.14 ms/step, 61904 cluster updates/s
+N=16 R=1024: 50 steps took 0.822s -> 16.44 ms/step, 62284 cluster updates/s

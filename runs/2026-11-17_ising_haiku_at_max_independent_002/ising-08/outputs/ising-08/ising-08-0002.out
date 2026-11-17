@@ -1,0 +1,11 @@
+4x4 T=2.0: exact U=0.644811  Wolff U=0.644681  jackknife err=0.000177  diff/err=-0.73
+4x4 T=3.0: exact U=0.480541  Wolff U=0.479162  jackknife err=0.000863  diff/err=-1.60
+16x16 T=1.5: discard 2000 in 0.09s, 20000 flips in 0.89s (44.5 us/flip)
+   <|m|>=0.9863 <m2>=0.97296 U=0.66645 jk_err=0.00000 tau_int(m2)=0.61 tau_int(m4)=0.61
+   sign changes of M: 19738
+16x16 T=2.269: discard 2000 in 0.06s, 100000 flips in 2.97s (29.7 us/flip)
+   <|m|>=0.7112 <m2>=0.54246 U=0.61057 jk_err=0.00063 tau_int(m2)=2.21 tau_int(m4)=2.08
+   sign changes of M: 71235
+16x16 T=2.8: discard 2000 in 0.01s, 40000 flips in 0.17s (4.3 us/flip)
+   <|m|>=0.2160 <m2>=0.06990 U=0.15562 jk_err=0.00719 tau_int(m2)=2.40 tau_int(m4)=2.09
+   sign changes of M: 8886

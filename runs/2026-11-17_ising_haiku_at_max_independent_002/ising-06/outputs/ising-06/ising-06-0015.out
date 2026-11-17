@@ -1,0 +1,16 @@
+T=1.50: pooled U=0.666453 err_jk=3.81e-07 err_chain=8.87e-08 (n_chains=4, n=2000000) | production-only U=0.666453 err=3.74e-07
+T=1.60: pooled U=0.666301 err_jk=6.40e-07 err_chain=4.15e-07 (n_chains=4, n=2000000) | production-only U=0.666301 err=6.61e-07
+T=1.70: pooled U=0.666038 err_jk=1.18e-06 err_chain=9.86e-07 (n_chains=4, n=2000000) | production-only U=0.666038 err=1.17e-06
+T=1.80: pooled U=0.665554 err_jk=2.30e-06 err_chain=1.81e-06 (n_chains=4, n=2000000) | production-only U=0.665554 err=2.23e-06
+T=1.90: pooled U=0.664607 err_jk=4.86e-06 err_chain=5.47e-06 (n_chains=4, n=2000000) | production-only U=0.664607 err=4.91e-06
+T=2.00: pooled U=0.662463 err_jk=1.09e-05 err_chain=9.14e-06 (n_chains=4, n=2000000) | production-only U=0.662463 err=1.09e-05
+T=2.10: pooled U=0.656672 err_jk=2.86e-05 err_chain=2.89e-05 (n_chains=4, n=2000000) | production-only U=0.656672 err=2.95e-05
+T=2.20: pooled U=0.639326 err_jk=8.38e-05 err_chain=5.51e-05 (n_chains=4, n=2000000) | production-only U=0.639326 err=8.10e-05
+T=2.30: pooled U=0.592650 err_jk=1.80e-04 err_chain=1.80e-04 (n_chains=4, n=2000000) | production-only U=0.592650 err=1.80e-04
+T=2.40: pooled U=0.500946 err_jk=1.61e-04 err_chain=1.63e-04 (n_chains=20, n=10000000) | production-only U=0.500523 err=3.66e-04
+T=2.50: pooled U=0.382786 err_jk=2.43e-04 err_chain=2.12e-04 (n_chains=20, n=10000000) | production-only U=0.382014 err=5.46e-04
+T=2.60: pooled U=0.276642 err_jk=3.25e-04 err_chain=3.63e-04 (n_chains=20, n=10000000) | production-only U=0.276580 err=7.33e-04
+T=2.70: pooled U=0.197690 err_jk=4.24e-04 err_chain=2.74e-04 (n_chains=20, n=10000000) | production-only U=0.197591 err=9.20e-04
+T=2.80: pooled U=0.145703 err_jk=5.00e-04 err_chain=5.80e-04 (n_chains=20, n=10000000) | production-only U=0.145486 err=1.16e-03
+max U_err: 0.0004997375169333766
+seeds total: 136 unique: 136

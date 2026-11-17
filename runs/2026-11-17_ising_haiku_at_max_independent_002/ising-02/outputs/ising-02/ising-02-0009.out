@@ -1,0 +1,3 @@
+T=2.80  n_runs=14  mean U=0.14579  scatter sd=0.00100  median jackknife err (R=512)=0.00099  mean jackknife err=0.00100
+T=2.50  n_runs=6  mean U=0.38318  scatter sd=0.00029  median jackknife err (R=512)=0.00064  mean jackknife err=0.00064
+elapsed 344.1 s

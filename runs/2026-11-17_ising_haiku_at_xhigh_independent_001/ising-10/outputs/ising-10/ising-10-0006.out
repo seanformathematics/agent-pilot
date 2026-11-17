@@ -1,0 +1,14 @@
+T=1.50 init=cold seed=40000 U=0.66645 err=0.00000 | prod U=0.66645 err=0.00000 | z=-0.08 t=12.3s
+T=1.60 init=random seed=40001 U=0.66630 err=0.00000 | prod U=0.66630 err=0.00000 | z=-2.20 t=24.6s
+T=1.70 init=cold seed=40002 U=0.66604 err=0.00000 | prod U=0.66604 err=0.00000 | z=-0.31 t=36.4s
+T=1.80 init=random seed=40003 U=0.66556 err=0.00000 | prod U=0.66556 err=0.00000 | z=-0.42 t=47.9s
+T=1.90 init=cold seed=40004 U=0.66460 err=0.00001 | prod U=0.66461 err=0.00001 | z=-0.77 t=59.6s
+T=2.00 init=random seed=40005 U=0.66248 err=0.00003 | prod U=0.66244 err=0.00002 | z=+0.98 t=71.2s
+T=2.10 init=cold seed=40006 U=0.65663 err=0.00009 | prod U=0.65672 err=0.00005 | z=-0.85 t=83.0s
+T=2.20 init=random seed=40007 U=0.63969 err=0.00023 | prod U=0.63933 err=0.00014 | z=+1.35 t=95.0s
+T=2.30 init=cold seed=40008 U=0.59217 err=0.00048 | prod U=0.59242 err=0.00030 | z=-0.45 t=107.2s
+T=2.40 init=random seed=40009 U=0.50247 err=0.00083 | prod U=0.50155 err=0.00051 | z=+0.95 t=119.7s
+T=2.50 init=cold seed=40010 U=0.38267 err=0.00111 | prod U=0.38367 err=0.00067 | z=-0.77 t=132.5s
+T=2.60 init=random seed=40011 U=0.27664 err=0.00119 | prod U=0.27452 err=0.00076 | z=+1.50 t=145.4s
+T=2.70 init=cold seed=40012 U=0.19938 err=0.00128 | prod U=0.19731 err=0.00077 | z=+1.39 t=158.5s
+T=2.80 init=random seed=40013 U=0.14511 err=0.00128 | prod U=0.14590 err=0.00078 | z=-0.53 t=171.7s

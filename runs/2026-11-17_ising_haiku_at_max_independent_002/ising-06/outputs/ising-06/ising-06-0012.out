@@ -1,0 +1,4 @@
+T=2.6: 20 chains x 5e5: mean U=0.275408; chain std=0.001238 -> 4-chain pool error from scatter=0.000619; mean per-chain jackknife err=0.001494 -> 4-chain pool=0.000747; time 66.3s
+  chain U: [0.27808, 0.2749, 0.27699, 0.27458, 0.27404, 0.27432, 0.27474, 0.27673, 0.27499, 0.27458, 0.27339, 0.27497, 0.27548, 0.27502, 0.27404, 0.27679, 0.27695, 0.27516, 0.27673, 0.27566]
+T=2.4: 12 chains x 5e5: mean U=0.500985; chain std=0.000993 -> 4-chain pool error from scatter=0.000497; mean per-chain jackknife err=0.000709 -> 4-chain pool=0.000355; time 93.2s
+  chain U: [0.50276, 0.50137, 0.50041, 0.50163, 0.49964, 0.50197, 0.50151, 0.49918, 0.50047, 0.50109, 0.5006, 0.50119]

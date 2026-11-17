@@ -1,0 +1,6 @@
+4x4 T=1.5: exact U=0.663959  wolff U=0.663964 +- 0.000021 (jk-corr 0.663964), time 1.0s
+4x4 T=2.3: exact U=0.613054  wolff U=0.613043 +- 0.000244 (jk-corr 0.613043), time 0.9s
+4x4 T=3.0: exact U=0.480541  wolff U=0.480111 +- 0.000577 (jk-corr 0.480111), time 0.6s
+16x16 T=1.5: 39.1 us per update; <|m|>=0.9866
+16x16 T=2.269: 25.3 us per update; <|m|>=0.7136
+16x16 T=2.8: 4.0 us per update; <|m|>=0.2119

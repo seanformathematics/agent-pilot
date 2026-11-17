@@ -1,0 +1,23 @@
+N=4 T=2.269: dof 17 chi2 21.22
+M=-16 exact=0.24179 wolff=0.24185
+M=-14 exact=0.11385 wolff=0.11347
+M=-12 exact=0.05749 wolff=0.05769
+M=-10 exact=0.03058 wolff=0.03052
+M= -8 exact=0.01941 wolff=0.01955
+M= -6 exact=0.01314 wolff=0.01323
+M= -4 exact=0.01030 wolff=0.01037
+M= -2 exact=0.00895 wolff=0.00897
+M=  0 exact=0.00900 wolff=0.00887
+M=  2 exact=0.00895 wolff=0.00885
+M=  4 exact=0.01030 wolff=0.01015
+M=  6 exact=0.01314 wolff=0.01306
+M=  8 exact=0.01941 wolff=0.01930
+M= 10 exact=0.03058 wolff=0.03048
+M= 12 exact=0.05749 wolff=0.05753
+M= 14 exact=0.11385 wolff=0.11403
+M= 16 exact=0.24179 wolff=0.24209
+U_wolff 0.6173366492910782 U_exact 0.6172236388895551
+time N=4 check 2.04
+T=1.5: U=0.66645 +- 0.00000 (R=256, steps=2800); tau_int(m2)=0.59, tau_int(|m|)=0.59; early m2 means per 25 steps: [0.7549 0.9736 0.9734 0.9727 0.9734 0.9736 0.9731 0.9733] time 7.7s
+T=2.269: U=0.61165 +- 0.00024 (R=256, steps=2800); tau_int(m2)=2.20, tau_int(|m|)=2.20; early m2 means per 25 steps: [0.16   0.5235 0.5546 0.5357 0.5493 0.5514 0.551  0.55  ] time 14.3s
+T=2.8: U=0.14294 +- 0.00191 (R=256, steps=2800); tau_int(m2)=2.25, tau_int(|m|)=2.25; early m2 means per 25 steps: [0.0231 0.0537 0.0693 0.0717 0.0708 0.0659 0.0675 0.0676] time 10.9s

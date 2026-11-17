@@ -1,0 +1,16 @@
+T=1.50  U=0.6664533  U_err=5.407e-07  groupcheck=3.690e-07  n=2048000  seed=1000  ok=True
+T=1.60  U=0.6663006  U_err=9.833e-07  groupcheck=5.530e-07  n=2048000  seed=1001  ok=True
+T=1.70  U=0.6660385  U_err=1.751e-06  groupcheck=2.159e-06  n=2048000  seed=1002  ok=True
+T=1.80  U=0.6655561  U_err=3.366e-06  groupcheck=3.600e-06  n=2048000  seed=1003  ok=True
+T=1.90  U=0.6646077  U_err=6.790e-06  groupcheck=4.011e-06  n=2048000  seed=1004  ok=True
+T=2.00  U=0.6624376  U_err=1.547e-05  groupcheck=1.277e-05  n=2048000  seed=1005  ok=True
+T=2.10  U=0.6566635  U_err=3.789e-05  groupcheck=1.743e-05  n=2048000  seed=1006  ok=True
+T=2.20  U=0.6394300  U_err=9.251e-05  groupcheck=1.197e-04  n=2048000  seed=1007  ok=True
+T=2.30  U=0.5927426  U_err=1.986e-04  groupcheck=2.735e-04  n=2048000  seed=1008  ok=True
+T=2.40  U=0.5011574  U_err=3.371e-04  groupcheck=3.442e-04  n=2048000  seed=1009  ok=True
+T=2.50  U=0.3817528  U_err=4.623e-04  groupcheck=5.040e-04  n=2048000  seed=1010  ok=True
+T=2.60  U=0.2757797  U_err=5.603e-04  groupcheck=4.985e-04  n=2048000  seed=1011  ok=True
+T=2.70  U=0.1971690  U_err=6.162e-04  groupcheck=4.224e-04  n=2048000  seed=1012  ok=True
+T=2.80  U=0.1452984  U_err=7.334e-04  groupcheck=8.869e-04  n=2048000  seed=1013  ok=True
+all ok: True
+max U_err: 7.334e-04

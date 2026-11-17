@@ -1,0 +1,5 @@
+T=1.5: U=0.66645 err=0.00000  tau(m2)~1.72  elapsed 2.6s
+T=2.0: U=0.66239 err=0.00006  tau(m2)~2.20  elapsed 2.6s
+T=2.27: U=0.61065 err=0.00070  tau(m2)~3.13  elapsed 2.7s
+T=2.6: U=0.27501 err=0.00251  tau(m2)~1.39  elapsed 2.6s
+T=2.8: U=0.14668 err=0.00251  tau(m2)~0.87  elapsed 2.5s

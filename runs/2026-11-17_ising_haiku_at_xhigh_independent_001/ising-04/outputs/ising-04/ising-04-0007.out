@@ -1,0 +1,19 @@
+N=4 T=1.5: exact U=0.66396  MC U=0.66379
+N=4 T=2.0: exact U=0.64481  MC U=0.64447
+N=4 T=2.269: exact U=0.61722  MC U=0.61683
+N=4 T=2.8: exact U=0.52293  MC U=0.52251
+N=16 split-half check (interleaved blocks, 4 chunks):
+T=1.5: U=0.66645 jk_err=0.000000  quarter-U std=0.000000 expected~0.000001 ratio=0.58
+T=1.6: U=0.66630 jk_err=0.000001  quarter-U std=0.000001 expected~0.000002 ratio=0.65
+T=1.7: U=0.66604 jk_err=0.000001  quarter-U std=0.000003 expected~0.000003 ratio=0.99
+T=1.8: U=0.66556 jk_err=0.000003  quarter-U std=0.000007 expected~0.000006 ratio=1.04
+T=1.9: U=0.66460 jk_err=0.000008  quarter-U std=0.000014 expected~0.000017 ratio=0.83
+T=2.0: U=0.66242 jk_err=0.000023  quarter-U std=0.000049 expected~0.000046 ratio=1.05
+T=2.1: U=0.65669 jk_err=0.000064  quarter-U std=0.000167 expected~0.000129 ratio=1.30
+T=2.2: U=0.63945 jk_err=0.000165  quarter-U std=0.000201 expected~0.000330 ratio=0.61
+T=2.3: U=0.59292 jk_err=0.000338  quarter-U std=0.000986 expected~0.000676 ratio=1.46
+T=2.4: U=0.50053 jk_err=0.000588  quarter-U std=0.001047 expected~0.001175 ratio=0.89
+T=2.5: U=0.38332 jk_err=0.000778  quarter-U std=0.001807 expected~0.001556 ratio=1.16
+T=2.6: U=0.27519 jk_err=0.000837  quarter-U std=0.002336 expected~0.001675 ratio=1.39
+T=2.7: U=0.19797 jk_err=0.000890  quarter-U std=0.001982 expected~0.001779 ratio=1.11
+T=2.8: U=0.14542 jk_err=0.000916  quarter-U std=0.001692 expected~0.001832 ratio=0.92

@@ -1,0 +1,14 @@
+T=1.50 U=0.66645 jackknife_err=0.00000 replica_err=0.00000 <|m|>=0.9865
+T=1.60 U=0.66630 jackknife_err=0.00000 replica_err=0.00000 <|m|>=0.9796
+T=1.70 U=0.66604 jackknife_err=0.00000 replica_err=0.00000 <|m|>=0.9701
+T=1.80 U=0.66555 jackknife_err=0.00000 replica_err=0.00000 <|m|>=0.9569
+T=1.90 U=0.66461 jackknife_err=0.00001 replica_err=0.00001 <|m|>=0.9383
+T=2.00 U=0.66244 jackknife_err=0.00003 replica_err=0.00003 <|m|>=0.9112
+T=2.10 U=0.65654 jackknife_err=0.00008 replica_err=0.00010 <|m|>=0.8684
+T=2.20 U=0.63931 jackknife_err=0.00022 replica_err=0.00023 <|m|>=0.7940
+T=2.30 U=0.59359 jackknife_err=0.00050 replica_err=0.00048 <|m|>=0.6714
+T=2.40 U=0.50066 jackknife_err=0.00088 replica_err=0.00084 <|m|>=0.5160
+T=2.50 U=0.38428 jackknife_err=0.00093 replica_err=0.00104 <|m|>=0.3895
+T=2.60 U=0.27511 jackknife_err=0.00123 replica_err=0.00112 <|m|>=0.3037
+T=2.70 U=0.19844 jackknife_err=0.00114 replica_err=0.00128 <|m|>=0.2507
+T=2.80 U=0.14531 jackknife_err=0.00129 replica_err=0.00133 <|m|>=0.2145

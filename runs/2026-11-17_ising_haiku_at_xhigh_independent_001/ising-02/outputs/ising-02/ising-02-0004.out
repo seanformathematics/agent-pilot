@@ -1,0 +1,29 @@
+pilot T=1.5 first-quarter<m2>=0.9731 last-quarter=0.9732
+pilot T=1.6 first-quarter<m2>=0.9596 last-quarter=0.9598
+pilot T=1.7 first-quarter<m2>=0.9421 last-quarter=0.9420
+pilot T=1.8 first-quarter<m2>=0.9171 last-quarter=0.9158
+pilot T=1.9 first-quarter<m2>=0.8821 last-quarter=0.8817
+pilot T=2.0 first-quarter<m2>=0.8330 last-quarter=0.8315
+pilot T=2.1 first-quarter<m2>=0.7625 last-quarter=0.7634
+pilot T=2.2 first-quarter<m2>=0.6544 last-quarter=0.6451
+pilot T=2.3 first-quarter<m2>=0.4928 last-quarter=0.4911
+pilot T=2.4 first-quarter<m2>=0.3240 last-quarter=0.3216
+pilot T=2.5 first-quarter<m2>=0.2022 last-quarter=0.2028
+pilot T=2.6 first-quarter<m2>=0.1329 last-quarter=0.1320
+pilot T=2.7 first-quarter<m2>=0.0912 last-quarter=0.0922
+pilot T=2.8 first-quarter<m2>=0.0694 last-quarter=0.0700
+n meas 4000 time 181.23596239089966
+1.5 0.66645 0.0
+1.6 0.6663 0.0
+1.7 0.66604 0.0
+1.8 0.66556 1e-05
+1.9 0.66462 1e-05
+2.0 0.66244 3e-05
+2.1 0.65661 7e-05
+2.2 0.63957 0.00018
+2.3 0.59265 0.00036
+2.4 0.50157 0.00057
+2.5 0.38307 0.00088
+2.6 0.27562 0.001
+2.7 0.19866 0.00106
+2.8 0.14735 0.00129

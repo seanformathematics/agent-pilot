@@ -1,0 +1,12 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+8
+which gcc cc clang tcc ->  
+gcc --version | head -1 ->  /bin/sh: 1: gcc: not found
+python -c 'import numba; print(numba.__version__)' ->  Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import numba; print(numba.__version__)
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numba'
+python -c 'import numpy; print(numpy.__version__)' -> 2.5.4 
+nproc -> 8 
+free -m ->  /bin/sh: 1: free: not found

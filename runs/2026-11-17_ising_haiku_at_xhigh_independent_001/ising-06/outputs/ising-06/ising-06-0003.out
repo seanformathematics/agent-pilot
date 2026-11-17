@@ -1,0 +1,18 @@
+T 2.27 time 3.297231674194336
+ block start 0  <U> over replicas: 0.6111  <|m|> 0.7151
+ block start 250  <U> over replicas: 0.609  <|m|> 0.7113
+ block start 500  <U> over replicas: 0.6112  <|m|> 0.7152
+ block start 1000  <U> over replicas: 0.6099  <|m|> 0.7118
+ block start 2000  <U> over replicas: 0.6113  <|m|> 0.7136
+ block start 3000  <U> over replicas: 0.6059  <|m|> 0.706
+ tau_int m2 mean 9.0  m4 7.0
+ sign flips (post-burn) total: 3763
+T 2.0 time 3.1942429542541504
+ block start 0  <U> over replicas: 0.6624  <|m|> 0.9112
+ block start 250  <U> over replicas: 0.6623  <|m|> 0.911
+ block start 500  <U> over replicas: 0.6624  <|m|> 0.9114
+ block start 1000  <U> over replicas: 0.6623  <|m|> 0.911
+ block start 2000  <U> over replicas: 0.6624  <|m|> 0.911
+ block start 3000  <U> over replicas: 0.6624  <|m|> 0.911
+ tau_int m2 mean 2.6  m4 2.3
+ sign flips (post-burn) total: 26

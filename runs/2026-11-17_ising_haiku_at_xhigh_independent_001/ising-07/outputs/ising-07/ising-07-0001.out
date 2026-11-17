@@ -1,0 +1,5 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+8
+no numba No module named 'numba'
+2.5.4
+loop 1e7 0.6661741733551025

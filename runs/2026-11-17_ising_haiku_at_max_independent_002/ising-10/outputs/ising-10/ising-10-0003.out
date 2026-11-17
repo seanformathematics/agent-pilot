@@ -1,0 +1,4 @@
+N=4 T=1.8: exact U=0.65629, SW U=0.65616, std over replicas/sqrt(R)=0.00009, time 2.1s
+N=4 T=2.27: exact U=0.61709, SW U=0.61652, std over replicas/sqrt(R)=0.00025, time 2.4s
+N=4 T=3.0: exact U=0.48054, SW U=0.47915, std over replicas/sqrt(R)=0.00056, time 2.2s
+N=16 timing: 60 steps x 512 replicas in 6.08 s -> 101.34 ms per step
