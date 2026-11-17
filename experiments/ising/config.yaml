@@ -1,9 +1,9 @@
 # Prototype of First Science Run: Single Agent Ising Modeler.
-experiment: ising_haiku_at_max
+experiment: ising_haiku_at_xhigh
 design: experiments/ising/design.md
 topology: independent
 model: claude-haiku-5-5
-effort: max                  # optional; omit to use the model's own default
+effort: xhigh                  # optional; omit to use the model's own default
 
 # Experiment code, referenced as "module.path:attribute".
 submission_model: experiments.ising.schemas:IsingSubmission
