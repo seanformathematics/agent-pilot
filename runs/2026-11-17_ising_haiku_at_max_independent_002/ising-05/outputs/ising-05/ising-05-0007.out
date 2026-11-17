@@ -1,0 +1,4 @@
+T=2.8: Metropolis U=0.14633 +- 0.00076 (512 reps x 4000 sweeps, seed 31337) | Wolff U=0.14507 | diff=+0.00126 (+1.7 sigma_metro) time 11.1s
+T=2.5: Metropolis U=0.38283 +- 0.00080 (512 reps x 4000 sweeps, seed 4242) | Wolff U=0.38255 | diff=+0.00029 (+0.4 sigma_metro) time 11.6s
+T=2.3: Metropolis U=0.59261 +- 0.00032 (512 reps x 4000 sweeps, seed 8080) | Wolff U=0.59257 | diff=+0.00004 (+0.1 sigma_metro) time 10.4s
+total 33.1

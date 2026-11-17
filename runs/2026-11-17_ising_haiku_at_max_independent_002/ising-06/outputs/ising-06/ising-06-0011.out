@@ -1,0 +1,16 @@
+T=1.50  U=0.66645306  err_jk=3.736e-07  err_chain=8.867e-08  n=2000000  seeds=[5000000, 5000001, 5000002, 5000003]  bound_ok=True
+T=1.60  U=0.66630061  err_jk=6.609e-07  err_chain=4.147e-07  n=2000000  seeds=[5000100, 5000101, 5000102, 5000103]  bound_ok=True
+T=1.70  U=0.66603782  err_jk=1.167e-06  err_chain=9.857e-07  n=2000000  seeds=[5000200, 5000201, 5000202, 5000203]  bound_ok=True
+T=1.80  U=0.66555407  err_jk=2.231e-06  err_chain=1.807e-06  n=2000000  seeds=[5000300, 5000301, 5000302, 5000303]  bound_ok=True
+T=1.90  U=0.66460719  err_jk=4.909e-06  err_chain=5.465e-06  n=2000000  seeds=[5000400, 5000401, 5000402, 5000403]  bound_ok=True
+T=2.00  U=0.66246329  err_jk=1.092e-05  err_chain=9.138e-06  n=2000000  seeds=[5000500, 5000501, 5000502, 5000503]  bound_ok=True
+T=2.10  U=0.65667160  err_jk=2.950e-05  err_chain=2.894e-05  n=2000000  seeds=[5000600, 5000601, 5000602, 5000603]  bound_ok=True
+T=2.20  U=0.63932620  err_jk=8.096e-05  err_chain=5.513e-05  n=2000000  seeds=[5000700, 5000701, 5000702, 5000703]  bound_ok=True
+T=2.30  U=0.59265038  err_jk=1.804e-04  err_chain=1.802e-04  n=2000000  seeds=[5000800, 5000801, 5000802, 5000803]  bound_ok=True
+T=2.40  U=0.50052313  err_jk=3.658e-04  err_chain=2.227e-04  n=2000000  seeds=[5000900, 5000901, 5000902, 5000903]  bound_ok=True
+T=2.50  U=0.38201427  err_jk=5.455e-04  err_chain=3.180e-04  n=2000000  seeds=[5001000, 5001001, 5001002, 5001003]  bound_ok=True
+T=2.60  U=0.27658001  err_jk=7.333e-04  err_chain=9.934e-04  n=2000000  seeds=[5001100, 5001101, 5001102, 5001103]  bound_ok=True
+T=2.70  U=0.19759112  err_jk=9.198e-04  err_chain=9.719e-04  n=2000000  seeds=[5001200, 5001201, 5001202, 5001203]  bound_ok=True
+T=2.80  U=0.14548648  err_jk=1.159e-03  err_chain=2.407e-03  n=2000000  seeds=[5001300, 5001301, 5001302, 5001303]  bound_ok=True
+num seeds: 56 unique: 56
+all checks pass: True

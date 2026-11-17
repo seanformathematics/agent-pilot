@@ -1,0 +1,6 @@
+Metropolis T=2.8: sweeps/replica=17000, replicas=2000, time=150.2s
+   U=0.146158  jackknife err=0.000272  replica-scatter err=0.000289  tau_int(m2, sweeps)=2.57
+Metropolis T=2.4: sweeps/replica=24500, replicas=2000, time=200.7s
+   U=0.501099  jackknife err=0.000140  replica-scatter err=0.000146  tau_int(m2, sweeps)=8.82
+T=2.8: Wolff pooled U=0.146231 +- 0.001005 (n_flips=2400000);  Metropolis U=0.146158 +- 0.000272;  diff=-0.000074, sigma_diff=0.001042
+T=2.4: Wolff pooled U=0.501654 +- 0.000322 (n_flips=2400000);  Metropolis U=0.501099 +- 0.000140;  diff=-0.000555, sigma_diff=0.000351

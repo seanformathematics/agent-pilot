@@ -1,0 +1,7 @@
+T=1.5: U=0.66645 jk_err=0.00000  sign_flips=1973241  time=91.0s
+T=1.6: U=0.66630 jk_err=0.00000  sign_flips=1959197  time=91.7s
+T=1.7: U=0.66604 jk_err=0.00000  sign_flips=1940109  time=91.8s
+T=1.8: U=0.66556 jk_err=0.00000  sign_flips=1913350  time=91.3s
+T=1.9: U=0.66461 jk_err=0.00000  sign_flips=1876759  time=89.6s
+budget reached before T= 2.0
+total elapsed 455.4

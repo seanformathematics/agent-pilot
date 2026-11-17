@@ -1,0 +1,11 @@
+T=1.50  simulated E/bond=-0.97555  Onsager E/bond=-0.97556  diff=0.00001
+T=2.00  simulated E/bond=-0.87262  Onsager E/bond=-0.87278  diff=0.00016
+T=2.20  simulated E/bond=-0.77510  Onsager E/bond=-0.77324  diff=-0.00185
+T=2.30  simulated E/bond=-0.70317  Onsager E/bond=-0.67143  diff=-0.03173
+T=2.50  simulated E/bond=-0.56538  Onsager E/bond=-0.55304  diff=-0.01234
+T=2.80  simulated E/bond=-0.45507  Onsager E/bond=-0.45407  diff=-0.00100
+T=2.80: run U values: [0.14529 0.14691 0.14472 0.14628 0.14704 0.14406 0.14778 0.1474 ]
+   mean U over runs=0.14619, scatter sd=0.00135 (SE of mean=0.00048), median jackknife err per run=0.00100
+T=2.30: run U values: [0.59238 0.59263 0.59284 0.59243 0.59234 0.59218]
+   mean U over runs=0.59247, scatter sd=0.00023 (SE of mean=0.00009), median jackknife err per run=0.00028
+elapsed 246.4 s

@@ -1,0 +1,4 @@
+Metropolis T=2.3: U=0.59238 +- 0.00022 (n=5120000), time 34.4s
+   Wolff (production, 2e6 samples) U=0.59265
+Metropolis T=2.8: U=0.14508 +- 0.00066 (n=5120000), time 38.8s
+   Wolff (production, 2e6 samples) U=0.14549

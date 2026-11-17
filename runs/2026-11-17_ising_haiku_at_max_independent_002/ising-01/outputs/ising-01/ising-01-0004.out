@@ -1,0 +1,8 @@
+Metropolis N=16 T=2.269: U=0.61067 +- 0.00059 (R=128, sweeps=5000), time so far 5.0s
+Wolff     N=16 T=2.269: U=0.61123 +- 0.00025; diff=-0.00057 (-0.89 sigma)
+Metropolis N=16 T=2.8: U=0.14342 +- 0.00194 (R=128, sweeps=5000), time so far 24.5s
+Wolff     N=16 T=2.8: U=0.14729 +- 0.00193; diff=-0.00387 (-1.41 sigma)
+burn trace T=1.5 m2 block means(50 steps): [0.8662 0.9729 0.9734 0.9731 0.9735 0.9729 0.9735 0.9734]
+burn trace T=2.269 m2 block means(50 steps): [0.3424 0.5485 0.5444 0.5425 0.545  0.5432 0.5462 0.5367]
+burn trace T=2.8 m2 block means(50 steps): [0.0368 0.0656 0.069  0.0683 0.0712 0.0718 0.0667 0.072 ]
+total time 39.5

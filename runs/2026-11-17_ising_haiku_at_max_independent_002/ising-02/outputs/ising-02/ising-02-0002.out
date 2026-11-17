@@ -1,0 +1,6 @@
+T=1.50 exact U=0.66396 M2avg=249.6774 M4avg=62845.257 | SW U=0.66395 M2avg=249.6678 M4avg=62841.919 Eavg=-31.2087
+T=2.00 exact U=0.64481 M2avg=222.4440 M4avg=52725.683 | SW U=0.64473 M2avg=222.3649 M4avg=52700.221 Eavg=-28.0767
+T=2.50 exact U=0.58153 M2avg=167.6354 M4avg=35279.259 | SW U=0.58121 M2avg=167.4241 M4avg=35217.195 Eavg=-22.0425
+T=3.00 exact U=0.48054 M2avg=115.4530 M4avg=20772.224 | SW U=0.48072 M2avg=115.5463 M4avg=20798.750 Eavg=-16.2887
+16x16 R=1024: 15.9 ms per SW sweep, 15.50 us per replica-sweep
+16x16 R=4096: 65.3 ms per SW sweep, 15.95 us per replica-sweep
