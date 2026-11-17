@@ -1,0 +1,26 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+8
+CMD: which gcc cc clang tcc 
+OUT:  
+ERR: 
+CMD: gcc --version 
+OUT:  
+ERR: /bin/sh: 1: gcc: not found
+
+CMD: python3 -c 'import numba; print(numba.__version__)' 
+OUT:  
+ERR: Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import numba; print(numba.__version__)
+    ^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'numba'
+
+CMD: pip list 2>/dev/null | head -100 
+OUT: Package Version
+------- -------
+numpy   2.5.4
+pip     26.2.2
+scipy   1.18.1
+ 
+ERR: 

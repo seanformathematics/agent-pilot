@@ -1,0 +1,4 @@
+T=1.5: time 0.48s for 600 sweeps x 200 chains; E=-1.9509 (Onsager inf -1.9511); |m|=0.9864 (Onsager 0.9865)
+T=2.0: time 0.49s for 600 sweeps x 200 chains; E=-1.7453 (Onsager inf -1.7456); |m|=0.9115 (Onsager 0.9113)
+T=2.269: time 0.50s for 600 sweeps x 200 chains; E=-1.4521 (Onsager inf -1.4151); |m|=0.7120 (Onsager 0.3769)
+T=2.8: time 0.55s for 600 sweeps x 200 chains; E=-0.9106 (Onsager inf -0.9081); |m|=0.2155 (Onsager 0.0000)

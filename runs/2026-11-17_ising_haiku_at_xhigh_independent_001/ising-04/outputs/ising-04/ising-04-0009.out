@@ -1,0 +1,2 @@
+N=4 T=2.0: MC U=0.64445 ± 0.00018 (jackknife); exact=0.64481; diff/err=-2.03; time=30.4
+N=4 T=2.8: MC U=0.52287 ± 0.00012 (jackknife); exact=0.52293; diff/err=-0.45; time=60.4

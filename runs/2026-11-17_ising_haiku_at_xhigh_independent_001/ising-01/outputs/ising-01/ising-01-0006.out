@@ -1,0 +1,6 @@
+T=2.3 seed=3000 U_check=0.59242 time=44.1
+T=2.6 seed=3001 U_check=0.27615 time=90.4
+T=2.8 seed=3002 U_check=0.14576 time=138.0
+T=2.3 original U=0.59234
+T=2.6 original U=0.27571
+T=2.8 original U=0.14652

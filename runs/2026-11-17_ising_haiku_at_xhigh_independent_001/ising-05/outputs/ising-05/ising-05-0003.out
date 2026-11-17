@@ -1,0 +1,7 @@
+time per 20000 clusters: 0.5840003490447998
+U: 0.6101621999148348 mean|m| 0.71090625
+nbins 10 blocklen 2000 U std over bins/sqrt(nb) 0.001655472574944791
+nbins 20 blocklen 1000 U std over bins/sqrt(nb) 0.0014506212930209543
+nbins 50 blocklen 400 U std over bins/sqrt(nb) 0.0012908473731256583
+nbins 100 blocklen 200 U std over bins/sqrt(nb) 0.0013678456398581933
+nbins 200 blocklen 100 U std over bins/sqrt(nb) 0.001493947715350809

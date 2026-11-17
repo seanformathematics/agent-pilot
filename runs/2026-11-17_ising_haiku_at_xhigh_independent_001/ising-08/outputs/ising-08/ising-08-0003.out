@@ -1,0 +1,6 @@
+T 2.269 time 5.751176595687866
+ U pooled 0.6102562180121621  std of per-replica avg-based U 0.016160656279454653 mean |m| 0.71142215625
+ trace means over blocks [np.float64(0.7101), np.float64(0.7065), np.float64(0.7105), np.float64(0.7156), np.float64(0.7113), np.float64(0.7175), np.float64(0.7102), np.float64(0.7118), np.float64(0.716), np.float64(0.7047)]
+T 1.5 time 11.00637698173523
+ U pooled 0.6664536335102764  std of per-replica avg-based U 1.9170841311905377e-05 mean |m| 0.9865157812500001
+ trace means over blocks [np.float64(0.9864), np.float64(0.9865), np.float64(0.9865), np.float64(0.9865), np.float64(0.9866), np.float64(0.9866), np.float64(0.9865), np.float64(0.9865), np.float64(0.9865), np.float64(0.9865)]
