@@ -1,9 +1,9 @@
 # Prototype of First Science Run: Single Agent Ising Modeler.
-experiment: ising_opus_at_medium_pinned
+experiment: ising_sonnet_at_low_pinned
 design: experiments/ising/design.md
 topology: independent
-model: claude-opus-5-5
-effort: medium                  # optional; omit to use the model's own default
+model: claude-sonnet-5-5
+effort: low                  # optional; omit to use the model's own default
 
 # Experiment code, referenced as "module.path:attribute".
 submission_model: experiments.ising.schemas:IsingSubmission
