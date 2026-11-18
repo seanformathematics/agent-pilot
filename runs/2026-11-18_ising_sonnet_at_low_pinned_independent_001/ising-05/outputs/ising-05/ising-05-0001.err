@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-05-0001.py", line 3, in <module>
+    from numba import njit
+ModuleNotFoundError: No module named 'numba'
