@@ -1,0 +1,13 @@
+{"dir": "/work", "path": "/work/prod1.npz", "type": "f", "bytes": 26667288, "mtime": 1794970059.8524904}
+{"dir": "/work", "path": "/work/val4.npz", "type": "f", "bytes": 62310112, "mtime": 1794969574.795172}
+{"dir": "/work", "path": "/work/pilot.npz", "type": "f", "bytes": 4464408, "mtime": 1794969532.6270657}
+{"dir": "/work", "path": "/work/__pycache__", "type": "d", "bytes": 60, "mtime": 1794969549.667185}
+{"dir": "/work", "path": "/work/__pycache__/sim.cpython-314.pyc", "type": "f", "bytes": 4388, "mtime": 1794969549.667185}
+{"dir": "/work", "path": "/work/sim.py", "type": "f", "bytes": 2030, "mtime": 1794969549.6661625}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 160, "mtime": 1794970064.536503}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0006.py", "type": "f", "bytes": 1228, "mtime": 1794970064.537046}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0005.py", "type": "f", "bytes": 292, "mtime": 1794969579.7678635}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0004.py", "type": "f", "bytes": 1513, "mtime": 1794969549.6577163}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0003.py", "type": "f", "bytes": 1247, "mtime": 1794969540.1917076}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0002.py", "type": "f", "bytes": 2527, "mtime": 1794969492.5670679}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0001.py", "type": "f", "bytes": 324, "mtime": 1794969462.4527934}

@@ -1,0 +1,7 @@
+exact 4x4 U at T 1.5 0.66396
+exact 4x4 U at T 2.27 0.61709
+exact 4x4 U at T 3.0 0.48054
+SW 4x4 T 1.5 0.66398
+SW 4x4 T 2.27 0.61704
+SW 4x4 T 3.0 0.48039
+time per sweep R=512 N=16: 0.00823223114013672

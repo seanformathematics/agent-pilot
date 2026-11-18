@@ -1,0 +1,14 @@
+T=1.5 U=0.6664546 jk=6.183e-07 boot=6.104e-07 blockjk=4.697e-07 reported=6.183e-07 nsamp=2048000
+T=1.6 U=0.6663015 jk=9.792e-07 boot=1.008e-06 blockjk=9.965e-07 reported=1.008e-06 nsamp=2048000
+T=1.7 U=0.6660342 jk=1.747e-06 boot=1.835e-06 blockjk=1.695e-06 reported=1.835e-06 nsamp=2048000
+T=1.8 U=0.6655546 jk=3.320e-06 boot=3.414e-06 blockjk=4.020e-06 reported=4.020e-06 nsamp=2048000
+T=1.9 U=0.6646050 jk=7.025e-06 boot=7.133e-06 blockjk=7.282e-06 reported=7.282e-06 nsamp=2048000
+T=2.0 U=0.6624386 jk=1.525e-05 boot=1.481e-05 blockjk=1.354e-05 reported=1.525e-05 nsamp=2048000
+T=2.1 U=0.6566386 jk=3.847e-05 boot=3.826e-05 blockjk=3.753e-05 reported=3.847e-05 nsamp=2048000
+T=2.2 U=0.6392994 jk=9.162e-05 boot=9.294e-05 blockjk=8.607e-05 reported=9.294e-05 nsamp=2048000
+T=2.3 U=0.5925327 jk=2.021e-04 boot=2.017e-04 blockjk=1.990e-04 reported=2.021e-04 nsamp=2048000
+T=2.4 U=0.5009930 jk=3.294e-04 boot=3.187e-04 blockjk=2.929e-04 reported=3.294e-04 nsamp=2048000
+T=2.5 U=0.3830845 jk=4.620e-04 boot=4.497e-04 blockjk=4.441e-04 reported=4.620e-04 nsamp=2048000
+T=2.6 U=0.2760469 jk=5.484e-04 boot=5.554e-04 blockjk=6.053e-04 reported=6.053e-04 nsamp=2048000
+T=2.7 U=0.1973447 jk=6.059e-04 boot=5.945e-04 blockjk=5.923e-04 reported=6.059e-04 nsamp=2048000
+T=2.8 U=0.1456641 jk=7.092e-04 boot=7.179e-04 blockjk=8.343e-04 reported=8.343e-04 nsamp=2048000

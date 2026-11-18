@@ -1,0 +1,8 @@
+T=1.0: MC U=0.66655 +- 0.00000   exact U=0.66655  diff/err=-0.52
+T=1.5: MC U=0.66396 +- 0.00001   exact U=0.66396  diff/err=-0.44
+T=2.0: MC U=0.64479 +- 0.00003   exact U=0.64481  diff/err=-0.80
+T=2.27: MC U=0.61714 +- 0.00007   exact U=0.61709  diff/err=0.69
+T=2.6: MC U=0.56329 +- 0.00010   exact U=0.56317  diff/err=1.32
+T=3.0: MC U=0.48054 +- 0.00012   exact U=0.48054  diff/err=-0.04
+T=4.0: MC U=0.30292 +- 0.00019   exact U=0.30298  diff/err=-0.31
+sweeps 116413

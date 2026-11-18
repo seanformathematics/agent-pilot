@@ -1,0 +1,14 @@
+T=1.5 U=0.66645 jk=0.00000 boot=0.00000 blockjk=0.00000 | halfsplit diff=+0.00000
+T=1.6 U=0.66630 jk=0.00000 boot=0.00000 blockjk=0.00000 | halfsplit diff=+0.00000
+T=1.7 U=0.66603 jk=0.00000 boot=0.00000 blockjk=0.00000 | halfsplit diff=-0.00000
+T=1.8 U=0.66555 jk=0.00000 boot=0.00000 blockjk=0.00000 | halfsplit diff=+0.00001
+T=1.9 U=0.66461 jk=0.00001 boot=0.00001 blockjk=0.00001 | halfsplit diff=+0.00001
+T=2.0 U=0.66244 jk=0.00002 boot=0.00001 blockjk=0.00001 | halfsplit diff=+0.00002
+T=2.1 U=0.65664 jk=0.00004 boot=0.00004 blockjk=0.00004 | halfsplit diff=+0.00006
+T=2.2 U=0.63930 jk=0.00009 boot=0.00009 blockjk=0.00009 | halfsplit diff=-0.00004
+T=2.3 U=0.59253 jk=0.00020 boot=0.00020 blockjk=0.00020 | halfsplit diff=+0.00057
+T=2.4 U=0.50099 jk=0.00033 boot=0.00032 blockjk=0.00029 | halfsplit diff=-0.00029
+T=2.5 U=0.38308 jk=0.00046 boot=0.00045 blockjk=0.00044 | halfsplit diff=+0.00112
+T=2.6 U=0.27605 jk=0.00055 boot=0.00056 blockjk=0.00061 | halfsplit diff=+0.00107
+T=2.7 U=0.19734 jk=0.00061 boot=0.00059 blockjk=0.00059 | halfsplit diff=-0.00003
+T=2.8 U=0.14566 jk=0.00071 boot=0.00072 blockjk=0.00083 | halfsplit diff=+0.00323

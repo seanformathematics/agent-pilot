@@ -1,0 +1,7 @@
+T=1.5 cold-start U=0.66645 err=0.00000 min_rep<|m|>=0.986 frac(<|m|><0.5)=0.0000 time=12.0s
+T=2.0 cold-start U=0.66241 err=0.00003 min_rep<|m|>=0.898 frac(<|m|><0.5)=0.0000 time=12.3s
+T=2.2 cold-start U=0.63938 err=0.00019 min_rep<|m|>=0.764 frac(<|m|><0.5)=0.0000 time=12.6s
+T=2.3 cold-start U=0.59329 err=0.00042 min_rep<|m|>=0.613 frac(<|m|><0.5)=0.0000 time=12.9s
+T=2.4 cold-start U=0.50121 err=0.00068 min_rep<|m|>=0.470 frac(<|m|><0.5)=0.1543 time=13.3s
+T=2.6 cold-start U=0.27605 err=0.00104 min_rep<|m|>=0.272 frac(<|m|><0.5)=1.0000 time=13.8s
+T=2.8 cold-start U=0.14736 err=0.00112 min_rep<|m|>=0.199 frac(<|m|><0.5)=1.0000 time=14.2s

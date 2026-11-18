@@ -1,0 +1,6 @@
+T 2.269 time 8.2 U 0.6112878969102233
+  tau_int(m2) ~ 2.2  window 14
+   bs 500 nb 590 U 0.61129 jk err 0.00038
+   bs 2000 nb 147 U 0.61129 jk err 0.00039
+   bs 10000 nb 29 U 0.61127 jk err 0.00037
+   bs 50000 nb 5 U 0.61124 jk err 0.00043

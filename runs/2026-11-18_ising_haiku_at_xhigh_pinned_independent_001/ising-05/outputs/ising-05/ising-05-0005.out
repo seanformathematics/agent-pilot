@@ -1,0 +1,7 @@
+time 5.740132570266724
+T=2.3 R=1000 nsweep=1000: U=0.59292 err=0.00061 jackmean=0.59292
+R=125: mean subset err 0.00174
+R=250: mean subset err 0.00123
+R=500: mean subset err 0.00087
+nsweep=250, R=1000 err 0.00128
+nsweep=500, R=1000 err 0.00088
