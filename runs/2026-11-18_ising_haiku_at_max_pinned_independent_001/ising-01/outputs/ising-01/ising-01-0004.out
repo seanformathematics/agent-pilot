@@ -1,0 +1,4 @@
+L=4 T=1.5: exact U=0.66396  SW U=0.66398 +- 0.00002  (jk 0.66398)  z=0.92  time=1.7s  avg iters/step=7.5
+L=4 T=2.0: exact U=0.64481  SW U=0.64477 +- 0.00011  (jk 0.64477)  z=-0.39  time=1.9s  avg iters/step=8.8
+L=4 T=2.27: exact U=0.61709  SW U=0.61694 +- 0.00020  (jk 0.61694)  z=-0.78  time=2.0s  avg iters/step=9.1
+L=4 T=3.0: exact U=0.48054  SW U=0.48005 +- 0.00043  (jk 0.48005)  z=-1.15  time=2.0s  avg iters/step=9.1

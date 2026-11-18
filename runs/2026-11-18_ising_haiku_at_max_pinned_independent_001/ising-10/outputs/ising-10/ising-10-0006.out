@@ -1,0 +1,5 @@
+T=1.90 seed=50019 U=0.664616 err=0.000006 nn_corr=0.90479 (+-0.00007) onsager_nn=0.90474 elapsed=49.3
+T=2.00 seed=50020 U=0.662449 err=0.000014 nn_corr=0.87279 (+-0.00008) onsager_nn=0.87278 elapsed=98.8
+T=2.10 seed=50021 U=0.656687 err=0.000036 nn_corr=0.83093 (+-0.00011) onsager_nn=0.83104 elapsed=147.5
+T=2.20 seed=50022 U=0.639379 err=0.000086 nn_corr=0.77495 (+-0.00013) onsager_nn=0.77324 elapsed=196.3
+onsager check T=1.5: 0.97556  T=2.8: 0.45407

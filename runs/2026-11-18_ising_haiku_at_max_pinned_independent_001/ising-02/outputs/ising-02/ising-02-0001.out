@@ -1,0 +1,14 @@
+python 3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+platform Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+numpy 2.5.4
+scipy 1.18.1
+numba not available: No module named 'numba'
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+cpu count 1
+CPU architecture: 8
+work writable True
+10M python loop s: 0.656

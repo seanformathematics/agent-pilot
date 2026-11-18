@@ -1,0 +1,6 @@
+METRO T=2.30 U=0.59172 +- 0.00062 | SW pooled nn=0.70326, Metro nn=0.70276 +- 0.00033 | elapsed=5.6
+METRO T=2.50 U=0.38243 +- 0.00130 | SW pooled nn=0.56546, Metro nn=0.56559 +- 0.00025 | elapsed=11.5
+METRO T=2.80 U=0.14441 +- 0.00160 | SW pooled nn=0.45504, Metro nn=0.45494 +- 0.00014 | elapsed=17.5
+SW pooled U at T=2.30: 0.592772 +- 0.000125
+SW pooled U at T=2.50: 0.382978 +- 0.000299
+SW pooled U at T=2.80: 0.146581 +- 0.000452

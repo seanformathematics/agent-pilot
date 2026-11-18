@@ -1,0 +1,4 @@
+T=1.50 seed=50015 U=0.666454 err=0.000001 nn_corr=0.97556 elapsed=49.2
+T=1.60 seed=50016 U=0.666301 err=0.000001 nn_corr=0.96416 elapsed=98.9
+T=1.70 seed=50017 U=0.666036 err=0.000002 nn_corr=0.94913 elapsed=148.8
+T=1.80 seed=50018 U=0.665560 err=0.000003 nn_corr=0.92964 elapsed=199.0

@@ -1,0 +1,18 @@
+python 3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+platform Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+gcc None
+cc None
+clang None
+tcc None
+no numba: No module named 'numba'
+numpy 2.5.4 scipy 1.18.1
+cpu count 1
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdfhm dit uscat ilrcpc flagm sb dcpodp flagm2 frint
+CPU implementer	: 0x61
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0x000
+CPU revision	: 0
+[]

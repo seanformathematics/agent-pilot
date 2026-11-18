@@ -1,0 +1,9 @@
+seed 5101: U=0.38343 jk_err=0.00037 (52.0s)
+seed 5102: U=0.38267 jk_err=0.00038 (51.1s)
+seed 5103: U=0.38299 jk_err=0.00037 (51.1s)
+seed 5104: U=0.38269 jk_err=0.00037 (51.6s)
+seed 5105: U=0.38324 jk_err=0.00037 (52.2s)
+seed 5106: U=0.38331 jk_err=0.00038 (52.2s)
+6 new runs R=1000,K=3000: mean U=0.38306 sd=0.00033 mean jk err=0.00037
+all 11 K=3000 runs: mean=0.38311 sd=0.00059; jk ~0.00037; ratio=1.60
+total 310.3

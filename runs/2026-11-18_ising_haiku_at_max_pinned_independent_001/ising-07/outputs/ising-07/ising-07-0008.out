@@ -1,0 +1,8 @@
+T=2.20 seed=30000107 init=ordered time=36.6s U=0.63941 Uerr_jack(B=20)=0.00010 E/N=-1.5502
+T=2.30 seed=30000108 init=ordered time=37.7s U=0.59275 Uerr_jack(B=20)=0.00021 E/N=-1.4060
+T=2.40 seed=30000109 init=ordered time=36.3s U=0.50109 Uerr_jack(B=20)=0.00036 E/N=-1.2549
+T=2.50 seed=30000110 init=ordered time=35.8s U=0.38375 Uerr_jack(B=20)=0.00049 E/N=-1.1319
+T=2.60 seed=30000111 init=ordered time=35.3s U=0.27595 Uerr_jack(B=20)=0.00060 E/N=-1.0390
+T=2.70 seed=30000112 init=ordered time=34.8s U=0.19802 Uerr_jack(B=20)=0.00070 E/N=-0.9680
+T=2.80 seed=30000113 init=ordered time=34.5s U=0.14719 Uerr_jack(B=20)=0.00079 E/N=-0.9099
+total 256.3819191455841

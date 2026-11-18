@@ -1,0 +1,4 @@
+chains finished this call: 112
+timing (T,chain,sec): [(1.5, 0, 4.9), (1.5, 1, 5.0), (1.5, 2, 5.0)] ... [(2.8, 5, 0.5), (2.8, 6, 0.5), (2.8, 7, 0.5)]
+elapsed 367.1
+files now: 112 of 112

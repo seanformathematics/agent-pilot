@@ -1,0 +1,2 @@
+T=2.269 R=1024 steps=250: U=0.61208 err=0.00052 time=17.6s  per replica-step=68.8 us  iters/step=43.4
+mean m2 per site-normalized: 0.5474665609002113

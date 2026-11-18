@@ -1,0 +1,14 @@
+T=1.5  U=0.66645  err(jk,5k blk)=0.00000  err(jk,2.5k blk)=0.00000  err(jk,chain)=0.00000  err(scatter/sqrt8)=0.00000  tau(M2)=0.59 tau(M4)=0.59  <|m|>=0.9865 <m2>=0.9733
+T=1.6  U=0.66630  err(jk,5k blk)=0.00000  err(jk,2.5k blk)=0.00000  err(jk,chain)=0.00000  err(scatter/sqrt8)=0.00000  tau(M2)=0.61 tau(M4)=0.61  <|m|>=0.9796 <m2>=0.9599
+T=1.7  U=0.66604  err(jk,5k blk)=0.00000  err(jk,2.5k blk)=0.00000  err(jk,chain)=0.00000  err(scatter/sqrt8)=0.00000  tau(M2)=0.68 tau(M4)=0.68  <|m|>=0.9701 <m2>=0.9415
+T=1.8  U=0.66555  err(jk,5k blk)=0.00000  err(jk,2.5k blk)=0.00000  err(jk,chain)=0.00000  err(scatter/sqrt8)=0.00000  tau(M2)=0.74 tau(M4)=0.74  <|m|>=0.9568 <m2>=0.9163
+T=1.9  U=0.66461  err(jk,5k blk)=0.00001  err(jk,2.5k blk)=0.00001  err(jk,chain)=0.00001  err(scatter/sqrt8)=0.00001  tau(M2)=0.86 tau(M4)=0.85  <|m|>=0.9383 <m2>=0.8819
+T=2.0  U=0.66246  err(jk,5k blk)=0.00002  err(jk,2.5k blk)=0.00002  err(jk,chain)=0.00001  err(scatter/sqrt8)=0.00001  tau(M2)=1.02 tau(M4)=1.00  <|m|>=0.9112 <m2>=0.8334
+T=2.1  U=0.65666  err(jk,5k blk)=0.00004  err(jk,2.5k blk)=0.00004  err(jk,chain)=0.00003  err(scatter/sqrt8)=0.00003  tau(M2)=1.31 tau(M4)=1.26  <|m|>=0.8686 <m2>=0.7621
+T=2.2  U=0.63941  err(jk,5k blk)=0.00011  err(jk,2.5k blk)=0.00011  err(jk,chain)=0.00015  err(scatter/sqrt8)=0.00015  tau(M2)=1.79 tau(M4)=1.70  <|m|>=0.7944 <m2>=0.6517
+T=2.3  U=0.59263  err(jk,5k blk)=0.00027  err(jk,2.5k blk)=0.00027  err(jk,chain)=0.00028  err(scatter/sqrt8)=0.00028  tau(M2)=2.36 tau(M4)=2.20  <|m|>=0.6696 <m2>=0.4921
+T=2.4  U=0.50128  err(jk,5k blk)=0.00050  err(jk,2.5k blk)=0.00048  err(jk,chain)=0.00045  err(scatter/sqrt8)=0.00045  tau(M2)=2.46 tau(M4)=2.32  <|m|>=0.5167 <m2>=0.3239
+T=2.5  U=0.38257  err(jk,5k blk)=0.00086  err(jk,2.5k blk)=0.00082  err(jk,chain)=0.00054  err(scatter/sqrt8)=0.00054  tau(M2)=2.44 tau(M4)=2.30  <|m|>=0.3890 <m2>=0.2023
+T=2.6  U=0.27434  err(jk,5k blk)=0.00110  err(jk,2.5k blk)=0.00106  err(jk,chain)=0.00119  err(scatter/sqrt8)=0.00120  tau(M2)=2.27 tau(M4)=2.06  <|m|>=0.3041 <m2>=0.1318
+T=2.7  U=0.19895  err(jk,5k blk)=0.00148  err(jk,2.5k blk)=0.00142  err(jk,chain)=0.00146  err(scatter/sqrt8)=0.00146  tau(M2)=2.32 tau(M4)=2.09  <|m|>=0.2506 <m2>=0.0926
+T=2.8  U=0.14597  err(jk,5k blk)=0.00155  err(jk,2.5k blk)=0.00152  err(jk,chain)=0.00196  err(scatter/sqrt8)=0.00196  tau(M2)=2.33 tau(M4)=2.03  <|m|>=0.2147 <m2>=0.0694

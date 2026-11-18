@@ -1,0 +1,6 @@
+T=1.5 done in 43.3s, mean<M>=-0.099, eq_last=63869.0
+T=1.6 done in 46.5s, mean<M>=-0.163, eq_last=62881.0
+T=1.7 done in 50.6s, mean<M>=0.246, eq_last=61594.7
+T=1.8 done in 55.7s, mean<M>=-0.104, eq_last=59885.2
+T=1.9 done in 61.9s, mean<M>=-0.153, eq_last=58033.9
+batch total 258.0388104915619

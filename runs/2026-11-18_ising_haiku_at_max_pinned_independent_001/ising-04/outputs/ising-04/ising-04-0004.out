@@ -1,0 +1,6 @@
+Onsager e/spin at T=2.800: -0.90814
+Onsager e/spin at T=2.269: -1.41511
+Onsager e/spin at T=2.000: -1.74556
+Onsager e/spin at T=1.500: -1.95112
+Wolff T=2.8: mean e/spin = -0.9179, mean m^2 = 0.07419, U(block) = 0.1406
+Metropolis T=2.8: mean e/spin = -0.9124, mean m^2 = 0.07221, <|m|> = 0.2164, time 0.2s

@@ -1,0 +1,12 @@
+--- production T=2.5 (seed 900070): R=1000 K=3000
+U=0.38417  jackknife err=0.00037  time-block err (blocks of 300 steps, 10 blocks)=0.00026
+per-replica U_r: mean=0.38429 sd=0.01171 min=0.3448 max=0.4240 skew=-0.17 exkurt=0.10
+var of replica-mean m2: observed/expected(indep) ratio = 4.250  (a2 sd across replicas=0.00705)
+--- pilot T=2.5 (R=1000,K=1000): R=1000 K=1000
+U=0.38295  jackknife err=0.00067  time-block err (blocks of 100 steps, 10 blocks)=0.00074
+per-replica U_r: mean=0.38322 sd=0.02108 min=0.3008 max=0.4468 skew=-0.24 exkurt=0.25
+var of replica-mean m2: observed/expected(indep) ratio = 4.109  (a2 sd across replicas=0.01195)
+time-block U values (prod): [0.38455 0.38359 0.38415 0.3839  0.38358 0.38294 0.38473 0.38593 0.38447
+ 0.38386]
+time-block U values (pilot): [0.38224 0.3828  0.38529 0.38303 0.38035 0.38089 0.38586 0.38217 0.38012
+ 0.38677]

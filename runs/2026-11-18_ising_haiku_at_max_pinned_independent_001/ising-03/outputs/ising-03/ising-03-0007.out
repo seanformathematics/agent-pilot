@@ -1,0 +1,5 @@
+cross-check T=1.5: Metropolis U=0.66645 (R=64 x 2000 sweeps, correlated)  Wolff(batch1) U=0.66645
+cross-check T=2.0: Metropolis U=0.66242 (R=64 x 2000 sweeps, correlated)  Wolff(batch1) U=0.66246
+cross-check T=2.2: Metropolis U=0.63871 (R=64 x 2000 sweeps, correlated)  Wolff(batch1) U=0.63941
+batch2 chains done this call: 112  total batch2 files: 112 of 112
+elapsed 369.2

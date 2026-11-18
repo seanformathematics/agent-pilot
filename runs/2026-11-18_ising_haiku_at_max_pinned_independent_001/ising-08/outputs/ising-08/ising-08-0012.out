@@ -1,0 +1,17 @@
+T=1.5 U=0.66645363 U_err(LOO jackknife)=2.3263e-07 n=5120000 seed=2000
+T=1.6 U=0.66630161 U_err(LOO jackknife)=4.0837e-07 n=5120000 seed=2001
+T=1.7 U=0.66603829 U_err(LOO jackknife)=7.4602e-07 n=5120000 seed=2002
+T=1.8 U=0.66555596 U_err(LOO jackknife)=1.4498e-06 n=5120000 seed=2003
+T=1.9 U=0.66460995 U_err(LOO jackknife)=3.0116e-06 n=5120000 seed=2004
+T=2.0 U=0.66245123 U_err(LOO jackknife)=6.9847e-06 n=5120000 seed=2005
+T=2.1 U=0.65667005 U_err(LOO jackknife)=1.8817e-05 n=5120000 seed=2006
+T=2.2 U=0.63938686 U_err(LOO jackknife)=4.8910e-05 n=5120000 seed=2007
+T=2.3 U=0.59259083 U_err(LOO jackknife)=1.1839e-04 n=5120000 seed=2008
+T=2.4 U=0.50113604 U_err(LOO jackknife)=2.2495e-04 n=5120000 seed=2009
+T=2.5 U=0.38292325 U_err(LOO jackknife)=3.3068e-04 n=5120000 seed=2010
+T=2.6 U=0.27654637 U_err(LOO jackknife)=4.6622e-04 n=5120000 seed=2011
+T=2.7 U=0.19884090 U_err(LOO jackknife)=5.8600e-04 n=5120000 seed=2012
+T=2.8 U=0.14569147 U_err(LOO jackknife)=7.0164e-04 n=5120000 seed=2013
+Tc = 2.269185 ; spline estimate of U_16(Tc) = 0.61148
+cubic fit (2.1..2.5) estimate at Tc = 0.60945
+finite: True

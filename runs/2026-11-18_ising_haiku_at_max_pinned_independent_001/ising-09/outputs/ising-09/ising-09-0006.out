@@ -1,0 +1,37 @@
+T=2.2 chain=2 time=14.9s U_chain=0.63954
+T=2.2 chain=3 time=15.0s U_chain=0.63927
+T=2.3 chain=2 time=11.5s U_chain=0.59202
+T=2.3 chain=3 time=11.6s U_chain=0.59325
+T=2.4 chain=2 time=7.7s U_chain=0.49974
+T=2.4 chain=3 time=7.8s U_chain=0.50123
+T=2.4 chain=4 time=7.7s U_chain=0.50081
+T=2.4 chain=5 time=7.7s U_chain=0.50101
+T=2.4 chain=6 time=7.8s U_chain=0.50303
+T=2.4 chain=7 time=7.8s U_chain=0.50085
+T=2.5 chain=2 time=4.9s U_chain=0.38462
+T=2.5 chain=3 time=4.9s U_chain=0.38187
+T=2.5 chain=4 time=5.0s U_chain=0.38212
+T=2.5 chain=5 time=5.0s U_chain=0.38417
+T=2.5 chain=6 time=5.0s U_chain=0.38279
+T=2.5 chain=7 time=4.9s U_chain=0.37986
+T=2.6 chain=2 time=3.3s U_chain=0.27529
+T=2.6 chain=3 time=3.3s U_chain=0.27886
+T=2.6 chain=4 time=3.3s U_chain=0.27677
+T=2.6 chain=5 time=3.3s U_chain=0.27521
+T=2.6 chain=6 time=3.3s U_chain=0.27424
+T=2.6 chain=7 time=3.3s U_chain=0.27759
+T=2.7 chain=2 time=2.4s U_chain=0.19564
+T=2.7 chain=3 time=2.4s U_chain=0.20166
+T=2.7 chain=4 time=2.4s U_chain=0.19635
+T=2.7 chain=5 time=2.4s U_chain=0.19530
+T=2.7 chain=6 time=2.4s U_chain=0.19870
+T=2.7 chain=7 time=2.4s U_chain=0.19982
+T=2.8 chain=2 time=1.8s U_chain=0.14235
+T=2.8 chain=3 time=1.8s U_chain=0.14563
+T=2.8 chain=4 time=1.8s U_chain=0.14690
+T=2.8 chain=5 time=1.9s U_chain=0.14701
+T=2.8 chain=6 time=1.8s U_chain=0.14634
+T=2.8 chain=7 time=1.8s U_chain=0.15063
+production elapsed 174.5
+Metropolis check T=2.5: U=0.38368 +- 0.00111 <m^2>=0.20197 time 12.8s
+Metropolis check T=2.8: U=0.14768 +- 0.00133 <m^2>=0.06963 time 13.3s

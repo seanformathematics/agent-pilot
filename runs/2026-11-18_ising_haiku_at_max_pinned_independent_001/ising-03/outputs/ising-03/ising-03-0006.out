@@ -1,0 +1,7 @@
+T=5.0: Metropolis <m2>=0.01123 U=0.0160 <|m|>=0.0847 |  Wolff <m2>=0.01117 U=-0.0014 <|m|>=0.0841   (t=1.1s)
+T=2.8: Metropolis <m2>=0.06915 U=0.1549 <|m|>=0.2149 |  Wolff <m2>=0.07017 U=0.1426 <|m|>=0.2157   (t=1.2s)
+T=2.4: Metropolis <m2>=0.32467 U=0.5030 <|m|>=0.5178 |  Wolff <m2>=0.32387 U=0.5009 <|m|>=0.5169   (t=1.8s)
+T 5.0 mean Wolff cluster size 2.883
+T 2.8 mean Wolff cluster size 17.796
+T 2.4 mean Wolff cluster size 83.112
+T 2.269 mean Wolff cluster size 139.913

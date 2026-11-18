@@ -1,0 +1,15 @@
+calibration c^2 (T=2.2-2.8 excl 2.5): 0.984; including 2.5 with 14 runs: 1.518 => c = 1.232
+T=1.5: U_pooled=0.66645 jk_pooled=0.000000 runs=2 n=6000000 run_U=[0.66645 0.66645]
+T=1.6: U_pooled=0.66630 jk_pooled=0.000001 runs=2 n=6000000 run_U=[0.6663 0.6663]
+T=1.7: U_pooled=0.66604 jk_pooled=0.000001 runs=2 n=6000000 run_U=[0.66604 0.66604]
+T=1.8: U_pooled=0.66556 jk_pooled=0.000002 runs=2 n=6000000 run_U=[0.66556 0.66556]
+T=1.9: U_pooled=0.66461 jk_pooled=0.000004 runs=2 n=6000000 run_U=[0.66461 0.66461]
+T=2.0: U_pooled=0.66245 jk_pooled=0.000009 runs=2 n=6000000 run_U=[0.66245 0.66245]
+T=2.1: U_pooled=0.65667 jk_pooled=0.000021 runs=2 n=6000000 run_U=[0.65667 0.65666]
+T=2.2: U_pooled=0.63936 jk_pooled=0.000038 runs=4 n=12000000 run_U=[0.63945 0.6393  0.63939 0.6393 ]
+T=2.3: U_pooled=0.59267 jk_pooled=0.000082 runs=4 n=12000000 run_U=[0.59281 0.59282 0.59255 0.59251]
+T=2.4: U_pooled=0.50087 jk_pooled=0.000140 runs=4 n=12000000 run_U=[0.50069 0.50101 0.50103 0.50075]
+T=2.5: U_pooled=0.38358 jk_pooled=0.000182 runs=14 n=42000000 run_U=[0.38417 0.38286 0.38364 0.38364] | 14-run mean=0.38317 sd=0.00056 se_emp=0.00015 se_jk_equiv=0.00010
+T=2.6: U_pooled=0.27606 jk_pooled=0.000224 runs=4 n=12000000 run_U=[0.27622 0.27596 0.27585 0.27623]
+T=2.7: U_pooled=0.19804 jk_pooled=0.000258 runs=4 n=12000000 run_U=[0.19755 0.19752 0.19903 0.19805]
+T=2.8: U_pooled=0.14588 jk_pooled=0.000290 runs=4 n=12000000 run_U=[0.14583 0.14661 0.14577 0.14529]

@@ -1,0 +1,10 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+numpy 2.5.4
+scipy 1.18.1
+numba NOT AVAILABLE: No module named 'numba'
+['gcc', '--version'] not available: [Errno 2] No such file or directory: 'gcc'
+['cc', '--version'] not available: [Errno 2] No such file or directory: 'cc'
+['clang', '--version'] not available: [Errno 2] No such file or directory: 'clang'
+['nproc'] 0 ['1']
+cwd /work []
+pure python 1e7 loop s: 0.647

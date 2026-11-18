@@ -1,0 +1,6 @@
+N=4 T=1.5: exact U=0.663959  wolff U=0.663964  diff=+0.000005
+N=4 T=2.269: exact U=0.617224  wolff U=0.616659  diff=-0.000565
+N=4 T=3.0: exact U=0.480541  wolff U=0.480230  diff=-0.000311
+time N=4 validation 2.5878543853759766
+N=16 T=2.269: 22000 updates in 0.54 s -> 40829 updates/s
+U (20k): 0.6127988470557391  mean|m|: 0.716216015625

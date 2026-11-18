@@ -1,0 +1,9 @@
+T=2.5 seed=3101: U=0.38390 jk_err=0.00037  time 52.2s
+T=2.5 seed=3102: U=0.38237 jk_err=0.00038  time 51.1s
+T=2.5 seed=3103: U=0.38312 jk_err=0.00038  time 51.2s
+T=2.5 seed=3104: U=0.38230 jk_err=0.00036  time 52.3s
+T=2.27 seed=3201: U=0.61113 jk_err=0.00013  time 53.2s
+T=2.27 seed=3202: U=0.61088 jk_err=0.00013  time 52.7s
+T=2.5: runs=4 mean U=0.38292 sd across runs=0.00075 mean jk err=0.00037
+T=2.27: runs=2 mean U=0.61101 sd across runs=0.00018 mean jk err=0.00013
+total 312.6

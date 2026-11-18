@@ -1,0 +1,15 @@
+pooled chi2/dof = 24.32/16 = 1.520; calibration factor r = 1.233
+T=1.5: U=0.666453  U_err=5.737e-07  (k=3 runs, empirical se=2.16e-07, jk per-run=[1.e-06 1.e-06 1.e-06]) n=3072000
+T=1.6: U=0.666301  U_err=1.009e-06  (k=3 runs, empirical se=7.95e-07, jk per-run=[1.e-06 1.e-06 1.e-06]) n=3072000
+T=1.7: U=0.666036  U_err=1.766e-06  (k=3 runs, empirical se=5.06e-07, jk per-run=[2.e-06 2.e-06 3.e-06]) n=3072000
+T=1.8: U=0.665555  U_err=3.380e-06  (k=3 runs, empirical se=1.62e-06, jk per-run=[5.e-06 4.e-06 5.e-06]) n=3072000
+T=1.9: U=0.664600  U_err=7.035e-06  (k=3 runs, empirical se=1.79e-06, jk per-run=[1.e-05 9.e-06 1.e-05]) n=3072000
+T=2.0: U=0.662466  U_err=1.530e-05  (k=3 runs, empirical se=1.07e-05, jk per-run=[2.1e-05 2.2e-05 2.1e-05]) n=3072000
+T=2.1: U=0.656701  U_err=3.853e-05  (k=3 runs, empirical se=4.16e-05, jk per-run=[5.4e-05 5.5e-05 5.4e-05]) n=3072000
+T=2.2: U=0.639365  U_err=9.463e-05  (k=3 runs, empirical se=1.29e-04, jk per-run=[0.000132 0.000132 0.000135]) n=3072000
+T=2.3: U=0.592496  U_err=1.731e-04  (k=4 runs, empirical se=1.49e-04, jk per-run=[0.000282 0.000274 0.000281 0.000286]) n=4096000
+T=2.4: U=0.501091  U_err=3.365e-04  (k=3 runs, empirical se=2.61e-04, jk per-run=[0.000466 0.000491 0.00046 ]) n=3072000
+T=2.5: U=0.383536  U_err=4.469e-04  (k=3 runs, empirical se=4.03e-04, jk per-run=[0.000633 0.000621 0.000629]) n=3072000
+T=2.6: U=0.275924  U_err=5.487e-04  (k=3 runs, empirical se=3.85e-04, jk per-run=[0.000765 0.000775 0.000772]) n=3072000
+T=2.7: U=0.198215  U_err=6.400e-04  (k=3 runs, empirical se=3.48e-04, jk per-run=[0.00088  0.000939 0.000878]) n=3072000
+T=2.8: U=0.146154  U_err=6.049e-04  (k=4 runs, empirical se=8.18e-04, jk per-run=[0.000968 0.000996 0.000979 0.000982]) n=4096000

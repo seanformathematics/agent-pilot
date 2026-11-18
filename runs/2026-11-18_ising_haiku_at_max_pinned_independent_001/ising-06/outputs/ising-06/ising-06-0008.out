@@ -1,0 +1,6 @@
+T=2.3: K=12 chains: mean chain U=0.59266, sample sd=0.00051, sd/sqrtK=0.00015; mean jackknife per-chain err=0.00054 (predicted sd of single chain); ratio sd/err=0.94; early(20k) U mean=0.59259; time 74.8s
+   chain U: [0.59279, 0.59163, 0.5922, 0.59288, 0.59278, 0.59202, 0.59347, 0.59312, 0.59265, 0.59268, 0.59254, 0.5931]
+T=2.2: K=8 chains: mean chain U=0.63934, sample sd=0.00023, sd/sqrtK=0.00008; mean jackknife per-chain err=0.00023 (predicted sd of single chain); ratio sd/err=0.98; early(20k) U mean=0.63949; time 64.8s
+   chain U: [0.63909, 0.63959, 0.63953, 0.639, 0.6396, 0.63926, 0.63927, 0.63937]
+T=2.4: K=8 chains: mean chain U=0.50058, sample sd=0.00102, sd/sqrtK=0.00036; mean jackknife per-chain err=0.00100 (predicted sd of single chain); ratio sd/err=1.01; early(20k) U mean=0.50010; time 33.5s
+   chain U: [0.50014, 0.50221, 0.50083, 0.50026, 0.50124, 0.50052, 0.50076, 0.49864]

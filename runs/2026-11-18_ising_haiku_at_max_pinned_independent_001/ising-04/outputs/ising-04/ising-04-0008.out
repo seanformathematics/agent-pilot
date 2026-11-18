@@ -1,0 +1,15 @@
+T=1.50  U=0.666453  U_err(jk,160blk)=4.138e-07  err(jk20 per-rep)=4.003e-07  err(jk80)=3.949e-07  se_from_replicas=3.375e-07  jk_bias=1.5e-10  n=1600000
+T=1.60  U=0.666302  U_err(jk,160blk)=7.583e-07  err(jk20 per-rep)=7.775e-07  err(jk80)=7.611e-07  se_from_replicas=5.978e-07  jk_bias=2.7e-10  n=1600000
+T=1.70  U=0.666038  U_err(jk,160blk)=1.287e-06  err(jk20 per-rep)=1.252e-06  err(jk80)=1.332e-06  se_from_replicas=1.313e-06  jk_bias=4.0e-10  n=1600000
+T=1.80  U=0.665554  U_err(jk,160blk)=2.559e-06  err(jk20 per-rep)=2.332e-06  err(jk80)=2.485e-06  se_from_replicas=2.123e-06  jk_bias=7.9e-10  n=1600000
+T=1.90  U=0.664601  U_err(jk,160blk)=5.288e-06  err(jk20 per-rep)=5.212e-06  err(jk80)=5.394e-06  se_from_replicas=3.783e-06  jk_bias=1.7e-09  n=1600000
+T=2.00  U=0.662460  U_err(jk,160blk)=1.059e-05  err(jk20 per-rep)=1.077e-05  err(jk80)=1.127e-05  se_from_replicas=7.149e-06  jk_bias=3.1e-09  n=1600000
+T=2.10  U=0.656691  U_err(jk,160blk)=3.316e-05  err(jk20 per-rep)=3.364e-05  err(jk80)=3.328e-05  se_from_replicas=2.369e-05  jk_bias=5.1e-09  n=1600000
+T=2.20  U=0.639313  U_err(jk,160blk)=8.759e-05  err(jk20 per-rep)=8.597e-05  err(jk80)=8.927e-05  se_from_replicas=9.209e-05  jk_bias=-9.9e-10  n=1600000
+T=2.30  U=0.592501  U_err(jk,160blk)=2.253e-04  err(jk20 per-rep)=2.122e-04  err(jk80)=2.173e-04  se_from_replicas=2.508e-04  jk_bias=-5.9e-08  n=1600000
+T=2.40  U=0.501440  U_err(jk,160blk)=3.734e-04  err(jk20 per-rep)=4.018e-04  err(jk80)=4.084e-04  se_from_replicas=5.693e-04  jk_bias=-8.6e-08  n=1600000
+T=2.50  U=0.383690  U_err(jk,160blk)=6.271e-04  err(jk20 per-rep)=6.422e-04  err(jk80)=5.797e-04  se_from_replicas=5.545e-04  jk_bias=3.7e-08  n=1600000
+T=2.60  U=0.275635  U_err(jk,160blk)=7.845e-04  err(jk20 per-rep)=8.673e-04  err(jk80)=7.985e-04  se_from_replicas=7.253e-04  jk_bias=5.2e-07  n=1600000
+T=2.70  U=0.196827  U_err(jk,160blk)=9.951e-04  err(jk20 per-rep)=9.730e-04  err(jk80)=9.786e-04  se_from_replicas=5.847e-04  jk_bias=1.0e-06  n=1600000
+T=2.80  U=0.143589  U_err(jk,160blk)=1.210e-03  err(jk20 per-rep)=1.274e-03  err(jk80)=1.217e-03  se_from_replicas=1.133e-03  jk_bias=1.5e-06  n=1600000
+max U_err: 0.001210172553640192

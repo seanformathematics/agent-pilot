@@ -1,0 +1,22 @@
+T=1.50: run1 U=0.66645 (jk 0.00000) | run2 U=0.66645 (jk 0.00000) | combined U=0.66645 jk_err=0.00000 | z(diff)=+0.14
+T=1.60: run1 U=0.66630 (jk 0.00000) | run2 U=0.66630 (jk 0.00000) | combined U=0.66630 jk_err=0.00000 | z(diff)=+1.20
+T=1.70: run1 U=0.66604 (jk 0.00000) | run2 U=0.66604 (jk 0.00000) | combined U=0.66604 jk_err=0.00000 | z(diff)=+0.04
+T=1.80: run1 U=0.66556 (jk 0.00000) | run2 U=0.66556 (jk 0.00000) | combined U=0.66556 jk_err=0.00000 | z(diff)=-0.43
+T=1.90: run1 U=0.66461 (jk 0.00001) | run2 U=0.66461 (jk 0.00001) | combined U=0.66461 jk_err=0.00000 | z(diff)=+0.91
+T=2.00: run1 U=0.66245 (jk 0.00001) | run2 U=0.66245 (jk 0.00001) | combined U=0.66245 jk_err=0.00001 | z(diff)=-0.13
+T=2.10: run1 U=0.65667 (jk 0.00003) | run2 U=0.65666 (jk 0.00003) | combined U=0.65667 jk_err=0.00002 | z(diff)=+0.17
+T=2.20: run1 U=0.63945 (jk 0.00008) | run2 U=0.63930 (jk 0.00008) | combined U=0.63938 jk_err=0.00005 | z(diff)=+1.40
+T=2.30: run1 U=0.59281 (jk 0.00016) | run2 U=0.59282 (jk 0.00017) | combined U=0.59281 jk_err=0.00012 | z(diff)=-0.03
+T=2.40: run1 U=0.50069 (jk 0.00028) | run2 U=0.50101 (jk 0.00028) | combined U=0.50085 jk_err=0.00020 | z(diff)=-0.81
+T=2.50: run1 U=0.38417 (jk 0.00037) | run2 U=0.38286 (jk 0.00036) | combined U=0.38352 jk_err=0.00026 | z(diff)=+2.53
+T=2.60: run1 U=0.27622 (jk 0.00044) | run2 U=0.27596 (jk 0.00044) | combined U=0.27609 jk_err=0.00031 | z(diff)=+0.42
+T=2.70: run1 U=0.19755 (jk 0.00051) | run2 U=0.19752 (jk 0.00053) | combined U=0.19753 jk_err=0.00037 | z(diff)=+0.04
+T=2.80: run1 U=0.14583 (jk 0.00057) | run2 U=0.14661 (jk 0.00058) | combined U=0.14622 jk_err=0.00041 | z(diff)=-0.96
+
+Calibration over T with e>1e-4 (n=6): mean z^2 = 1.359 (expect 1), mean z = +0.198
+  T=2.30: |U1-U2|=0.00001, predicted sd of difference=0.00023
+  T=2.40: |U1-U2|=0.00032, predicted sd of difference=0.00040
+  T=2.50: |U1-U2|=0.00131, predicted sd of difference=0.00052
+  T=2.60: |U1-U2|=0.00026, predicted sd of difference=0.00062
+  T=2.70: |U1-U2|=0.00003, predicted sd of difference=0.00074
+  T=2.80: |U1-U2|=0.00078, predicted sd of difference=0.00081

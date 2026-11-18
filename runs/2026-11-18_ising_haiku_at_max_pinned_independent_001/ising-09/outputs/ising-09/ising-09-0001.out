@@ -1,0 +1,15 @@
+python 3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+platform Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+cpus 1
+numpy 2.5.4
+numba missing: No module named 'numba'
+scipy 1.18.1
+gcc None
+cc None
+clang None
+tcc None
+total 0
+drwx------ 2 agent agent 40 Nov 18 09:59 .
+drwxr-xr-x 1 root  root  12 Nov 18 09:59 ..
+/work
+

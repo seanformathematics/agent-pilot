@@ -1,0 +1,16 @@
+production T=2.5: block length 1: sd of block means of replica-avg m2 = 5.899e-03
+production T=2.5: block length 10: sd of block means of replica-avg m2 = 3.440e-03
+production T=2.5: block length 100: sd of block means of replica-avg m2 = 1.045e-03
+production T=2.5: block length 300: sd of block means of replica-avg m2 = 4.693e-04
+production T=2.5: mean pairwise replica correlation of m2 series = 0.00038  (expected ~0 +- 0.0183/sqrt(npairs-ish)), sd 0.0263; expected sd ~ 0.0183
+production T=2.5: acf of replica-avg m2, lags 0..6: [1.     0.5555 0.3455 0.2071 0.1216 0.1026 0.0716]
+production T=2.5: acf of single replica m2, lags 0..6: [1.     0.556  0.3426 0.2186 0.1418 0.0881 0.0556]
+production T=2.5: sd(replica-avg m2 over time)=0.00590, per-replica sd/sqrt(R)=0.00591
+pilot T=2.5: block length 1: sd of block means of replica-avg m2 = 5.615e-03
+pilot T=2.5: block length 10: sd of block means of replica-avg m2 = 2.891e-03
+pilot T=2.5: block length 100: sd of block means of replica-avg m2 = 1.172e-03
+pilot T=2.5: block length 300: sd of block means of replica-avg m2 = 3.549e-04
+pilot T=2.5: mean pairwise replica correlation of m2 series = -0.00024  (expected ~0 +- 0.0316/sqrt(npairs-ish)), sd 0.0451; expected sd ~ 0.0316
+pilot T=2.5: acf of replica-avg m2, lags 0..6: [ 1.      0.5051  0.2991  0.1453  0.0539  0.0143 -0.0123]
+pilot T=2.5: acf of single replica m2, lags 0..6: [1.     0.55   0.3421 0.2139 0.1432 0.099  0.0648]
+pilot T=2.5: sd(replica-avg m2 over time)=0.00561, per-replica sd/sqrt(R)=0.00589

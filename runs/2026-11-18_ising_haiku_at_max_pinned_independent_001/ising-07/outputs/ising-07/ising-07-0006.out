@@ -1,0 +1,16 @@
+== autocorrelation & block-size dependence (production data) ==
+T=2.3: tau_int(M^2)=2.95, tau_int(M^4)=2.94; jackknife err vs block: B=1:0.000104 B=2:0.000131 B=5:0.000169 B=10:0.000193 B=20:0.000209 B=50:0.000218 B=100:0.000220 | replica-bins err=0.000220
+T=2.8: tau_int(M^2)=0.92, tau_int(M^4)=0.91; jackknife err vs block: B=1:0.000710 B=2:0.000748 B=5:0.000780 B=10:0.000792 B=20:0.000798 B=50:0.000804 B=100:0.000804 | replica-bins err=0.000808
+T=2.5: tau_int(M^2)=1.97, tau_int(M^4)=2.00; jackknife err vs block: B=1:0.000323 B=2:0.000377 B=5:0.000442 B=10:0.000476 B=20:0.000494 B=50:0.000504 B=100:0.000508 | replica-bins err=0.000523
+== independent-seed repeats ==
+  T=2.3 seed=30000024 init=random: U=0.59272 Uerr_jack=0.00021 (36.4s)
+  T=2.3 seed=30000025 init=random: U=0.59264 Uerr_jack=0.00021 (35.8s)
+  T=2.3 seed=30000026 init=ordered: U=0.59265 Uerr_jack=0.00021 (36.1s)
+  T=2.3 seed=30000027 init=ordered: U=0.59239 Uerr_jack=0.00021 (36.1s)
+T=2.3: production U=0.59271 (jack err 0.00021); 5-run mean U=0.59262, sample std across runs=0.00013, mean jack err=0.00021
+  T=2.8 seed=30000029 init=random: U=0.14691 Uerr_jack=0.00079 (34.7s)
+  T=2.8 seed=30000030 init=random: U=0.14776 Uerr_jack=0.00079 (34.6s)
+  T=2.8 seed=30000031 init=ordered: U=0.14623 Uerr_jack=0.00079 (34.7s)
+  T=2.8 seed=30000032 init=ordered: U=0.14445 Uerr_jack=0.00080 (34.8s)
+T=2.8: production U=0.14555 (jack err 0.00080); 5-run mean U=0.14618, sample std across runs=0.00127, mean jack err=0.00080
+done

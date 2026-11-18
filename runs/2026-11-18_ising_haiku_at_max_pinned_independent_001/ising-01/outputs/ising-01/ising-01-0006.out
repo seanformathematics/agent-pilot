@@ -1,0 +1,6 @@
+T=1.5 start=random: U(first10 steps)=0.5809  U(steps200-400)=0.6665  tau_int(m^2)~1.71 rho(1..4)=[0.616 0.341 0.183 0.091]  time=2.9s iters/step=15.5
+T=1.5 start=ordered: U(first10 steps)=0.6665  U(steps200-400)=0.6665  tau_int(m^2)~1.09 rho(1..4)=[0.518 0.266 0.134 0.065]  time=2.8s iters/step=15.3
+T=2.269 start=random: U(first10 steps)=0.3908  U(steps200-400)=0.6120  tau_int(m^2)~2.30 rho(1..4)=[0.702 0.502 0.363 0.262]  time=6.7s iters/step=39.3
+T=2.269 start=ordered: U(first10 steps)=0.6362  U(steps200-400)=0.6128  tau_int(m^2)~1.99 rho(1..4)=[0.687 0.484 0.348 0.247]  time=6.6s iters/step=38.9
+T=2.8 start=random: U(first10 steps)=0.0580  U(steps200-400)=0.1494  tau_int(m^2)~0.67 rho(1..4)=[0.254 0.089 0.031 0.013]  time=5.4s iters/step=31.1
+T=2.8 start=ordered: U(first10 steps)=0.1399  U(steps200-400)=0.1453  tau_int(m^2)~0.77 rho(1..4)=[0.279 0.108 0.043 0.016]  time=5.4s iters/step=30.9

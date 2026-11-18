@@ -1,0 +1,5 @@
+N=4 T=1.8: exact U=0.656287  wolff U=0.656319 +- 0.000036  (bias-corr 0.656319)  pull=0.89  [2.0s]
+N=4 T=2.3: exact U=0.613054  wolff U=0.613028 +- 0.000098  (bias-corr 0.613028)  pull=-0.27  [2.2s]
+N=4 T=2.8: exact U=0.522931  wolff U=0.522638 +- 0.000232  (bias-corr 0.522638)  pull=-1.26  [2.2s]
+N=16 R=1024: 12.2 ms per Wolff step for all replicas -> 84086 updates/s
+N=16 R=4096: 54.3 ms per Wolff step for all replicas -> 75437 updates/s

@@ -1,0 +1,6 @@
+T=2.30 seed=50023 U=0.592778 err=0.000176 nn_corr=0.70324 (+-0.00016) onsager_nn=0.67143 elapsed=49.2
+T=2.40 seed=50024 U=0.501221 err=0.000312 nn_corr=0.62749 (+-0.00016) onsager_nn=0.60199 elapsed=98.0
+T=2.50 seed=50025 U=0.382440 err=0.000426 nn_corr=0.56542 (+-0.00014) onsager_nn=0.55304 elapsed=145.2
+T=2.60 seed=50026 U=0.276740 err=0.000503 nn_corr=0.51950 (+-0.00011) onsager_nn=0.51415 elapsed=192.5
+T=2.70 seed=50027 U=0.197904 err=0.000571 nn_corr=0.48409 (+-0.00010) onsager_nn=0.48177 elapsed=239.3
+T=2.80 seed=50028 U=0.147319 err=0.000638 nn_corr=0.45511 (+-0.00009) onsager_nn=0.45407 elapsed=285.1

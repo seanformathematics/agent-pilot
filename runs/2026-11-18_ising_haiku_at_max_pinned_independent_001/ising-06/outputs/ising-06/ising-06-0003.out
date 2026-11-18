@@ -1,0 +1,6 @@
+T=1.5: steps=20000 time=0.9s (45.8 us/step)  U=0.6665 +-0.0000  <|m|>=0.9865
+   tau_int(m2)=0.61 (win 4), tau_int(m4)=0.61 (win 4), tau_int(|m|)=0.61
+T=2.269: steps=40000 time=1.1s (28.2 us/step)  U=0.6119 +-0.0009  <|m|>=0.7138
+   tau_int(m2)=2.16 (win 13), tau_int(m4)=2.00 (win 13), tau_int(|m|)=2.15
+T=2.8: steps=40000 time=0.2s (4.2 us/step)  U=0.1568 +-0.0077  <|m|>=0.2177
+   tau_int(m2)=2.37 (win 15), tau_int(m4)=2.04 (win 13), tau_int(|m|)=2.36

@@ -1,0 +1,3 @@
+L=4 T=2.0: exact U=0.64481  wolff U=0.64470 +- 0.00012  (exact <m2>=0.86892, time 1.1s)
+L=4 T=2.5: exact U=0.58153  wolff U=0.58139 +- 0.00034  (exact <m2>=0.65483, time 0.9s)
+L=4 T=3.0: exact U=0.48054  wolff U=0.48074 +- 0.00062  (exact <m2>=0.45099, time 0.7s)

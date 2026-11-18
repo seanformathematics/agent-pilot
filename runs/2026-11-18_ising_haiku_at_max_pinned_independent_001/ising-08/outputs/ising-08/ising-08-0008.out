@@ -1,0 +1,17 @@
+rep 0 seed 3000: U=0.145828 jk_err=0.001496 [18.6s]
+rep 1 seed 3001: U=0.147459 jk_err=0.001523 [18.7s]
+rep 2 seed 3002: U=0.146077 jk_err=0.001427 [18.8s]
+rep 3 seed 3003: U=0.144221 jk_err=0.001661 [18.8s]
+rep 4 seed 3004: U=0.148943 jk_err=0.001472 [18.7s]
+rep 5 seed 3005: U=0.147337 jk_err=0.001518 [18.9s]
+rep 6 seed 3006: U=0.144320 jk_err=0.001648 [18.8s]
+rep 7 seed 3007: U=0.146596 jk_err=0.001506 [18.8s]
+rep 8 seed 3008: U=0.146400 jk_err=0.001693 [18.9s]
+rep 9 seed 3009: U=0.147549 jk_err=0.001618 [18.7s]
+rep 10 seed 3010: U=0.148774 jk_err=0.001528 [18.7s]
+rep 11 seed 3011: U=0.146130 jk_err=0.001665 [18.9s]
+mean U over reps: 0.146636
+scatter (std over reps, ddof=1): 0.001488
+mean within-run jackknife err: 0.001563  (rms 0.001565)
+std error of scatter estimate ~ 21.3%
+total time 225.35979986190796

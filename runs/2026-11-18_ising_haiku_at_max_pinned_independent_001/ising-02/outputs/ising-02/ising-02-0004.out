@@ -1,0 +1,4 @@
+T=2.27: 20 repeats (100 rep x 1000 steps each): mean U=0.61088, sd across repeats=0.00057, mean in-repeat jackknife err=0.00072 (rms 0.00072), time 40.7s
+T=2.5: 20 repeats (100 rep x 1000 steps each): mean U=0.38222, sd across repeats=0.00174, mean in-repeat jackknife err=0.00203 (rms 0.00204), time 40.5s
+T=2.8: 20 repeats (100 rep x 1000 steps each): mean U=0.14615, sd across repeats=0.00286, mean in-repeat jackknife err=0.00317 (rms 0.00318), time 39.3s
+total 120.5

@@ -1,0 +1,16 @@
+T=1.50  U=0.666454  U_err=0.000001  n_samples=2000000  replicas=2000  seeds=[1000]
+T=1.60  U=0.666301  U_err=0.000001  n_samples=2000000  replicas=2000  seeds=[1001]
+T=1.70  U=0.666039  U_err=0.000002  n_samples=2000000  replicas=2000  seeds=[1002]
+T=1.80  U=0.665556  U_err=0.000003  n_samples=2000000  replicas=2000  seeds=[1003]
+T=1.90  U=0.664597  U_err=0.000007  n_samples=2000000  replicas=2000  seeds=[1004]
+T=2.00  U=0.662457  U_err=0.000016  n_samples=2000000  replicas=2000  seeds=[1005]
+T=2.10  U=0.656630  U_err=0.000038  n_samples=2000000  replicas=2000  seeds=[1006]
+T=2.20  U=0.639382  U_err=0.000076  n_samples=3000000  replicas=3000  seeds=[1007, 2000]
+T=2.30  U=0.592762  U_err=0.000163  n_samples=3000000  replicas=3000  seeds=[1008, 2001]
+T=2.40  U=0.500895  U_err=0.000280  n_samples=3000000  replicas=3000  seeds=[1009, 2002]
+T=2.50  U=0.383324  U_err=0.000374  n_samples=3000000  replicas=3000  seeds=[1010, 2003]
+T=2.60  U=0.275903  U_err=0.000460  n_samples=3000000  replicas=3000  seeds=[1011, 2004]
+T=2.70  U=0.197672  U_err=0.000513  n_samples=3000000  replicas=3000  seeds=[1012, 2005]
+T=2.80  U=0.146308  U_err=0.000583  n_samples=3000000  replicas=3000  seeds=[1013, 2006]
+max U_err: 0.0005830486276120694
+all finite and <= 2/3: True

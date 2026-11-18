@@ -1,0 +1,10 @@
+time for 8 chains: 25.2 s
+per-chain U: [0.6113  0.61248 0.6114  0.61141 0.61232 0.61162 0.61158 0.61118]
+mean U over chains: 0.6116619262934854  std across chains: 0.00047935930633413373  std of mean: 0.00016947910806687275
+jackknife nblocks=10: per-chain err mean=0.00052  (block size 12500 updates)
+jackknife nblocks=20: per-chain err mean=0.00055  (block size 6250 updates)
+jackknife nblocks=50: per-chain err mean=0.00061  (block size 2500 updates)
+jackknife nblocks=100: per-chain err mean=0.00059  (block size 1250 updates)
+jackknife nblocks=200: per-chain err mean=0.00059  (block size 625 updates)
+jackknife nblocks=500: per-chain err mean=0.00058  (block size 250 updates)
+tau_int of M^2: 2.2472257651409286  tau_int of M^4: 0.812179730172984

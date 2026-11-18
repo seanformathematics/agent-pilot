@@ -1,0 +1,7 @@
+T=1.5: chain U=[0.66645493 0.66645511 0.66645573 0.66645158]  sd=1.87e-06  mean jk chain err=1.04e-06  sd/err=1.80  cold-mean=0.6664553 hot-mean=0.6664533
+T=1.6: chain U=[0.66630054 0.66630076 0.66629948 0.66630021]  sd=5.58e-07  mean jk chain err=1.76e-06  sd/err=0.32  cold-mean=0.6663000 hot-mean=0.6663005
+T=1.7: chain U=[0.66603816 0.66603591 0.66604206 0.66603844]  sd=2.55e-06  mean jk chain err=3.33e-06  sd/err=0.77  cold-mean=0.6660401 hot-mean=0.6660372
+T=1.8: chain U=[0.66555285 0.66554752 0.6655594  0.66555077]  sd=5.01e-06  mean jk chain err=6.67e-06  sd/err=0.75  cold-mean=0.6655561 hot-mean=0.6655491
+T=1.9: chain U=[0.66460871 0.66460305 0.66460633 0.66459425]  sd=6.33e-06  mean jk chain err=1.29e-05  sd/err=0.49  cold-mean=0.6646075 hot-mean=0.6645987
+T=2.0: chain U=[0.66247768 0.66244193 0.66248231 0.66247513]  sd=1.85e-05  mean jk chain err=3.18e-05  sd/err=0.58  cold-mean=0.6624800 hot-mean=0.6624585
+T=2.1: chain U=[0.65679534 0.6565354  0.65664901 0.65674724]  sd=1.15e-04  mean jk chain err=8.38e-05  sd/err=1.37  cold-mean=0.6567222 hot-mean=0.6566413

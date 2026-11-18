@@ -1,0 +1,4 @@
+T=2.5: K=16: mean chain U=0.38373, sample sd=0.00146, sd/sqrtK=0.00037; mean jackknife per-chain err=0.00158; sd/err=0.93; time 42.7s
+T=2.6: K=16: mean chain U=0.27672, sample sd=0.00218, sd/sqrtK=0.00055; mean jackknife per-chain err=0.00211; sd/err=1.04; time 28.6s
+T=2.7: K=16: mean chain U=0.19787, sample sd=0.00283, sd/sqrtK=0.00071; mean jackknife per-chain err=0.00261; sd/err=1.09; time 20.6s
+T=2.8: K=16: mean chain U=0.14625, sample sd=0.00290, sd/sqrtK=0.00072; mean jackknife per-chain err=0.00324; sd/err=0.89; time 15.8s
