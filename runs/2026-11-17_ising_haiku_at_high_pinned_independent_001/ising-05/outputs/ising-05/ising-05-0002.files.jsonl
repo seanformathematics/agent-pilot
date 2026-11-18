@@ -1,0 +1,4 @@
+{"dir": "/work", "path": "/work/batch1.json", "type": "f", "bytes": 579, "mtime": 1794958114.9310644}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 80, "mtime": 1794957823.1611683}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-05-0002.py", "type": "f", "bytes": 1409, "mtime": 1794957823.1625304}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-05-0001.py", "type": "f", "bytes": 918, "mtime": 1794957816.826186}

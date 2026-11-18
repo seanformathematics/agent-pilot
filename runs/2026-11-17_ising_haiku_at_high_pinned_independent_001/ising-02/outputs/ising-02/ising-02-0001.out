@@ -1,0 +1,2 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+CompletedProcess(args="which gcc cc clang; nproc; python -c 'import numba'", returncode=1, stdout='1\n', stderr='Traceback (most recent call last):\n  File "<string>", line 1, in <module>\n    import numba\nModuleNotFoundError: No module named \'numba\'\n')

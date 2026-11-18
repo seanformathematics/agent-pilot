@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-04-0002.py", line 39, in <module>
+    Ts=[float(x) for x in sys.argv[1].split(',')]
+                          ~~~~~~~~^^^
+IndexError: list index out of range
