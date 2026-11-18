@@ -1,0 +1,1 @@
+print(open('/work/res.json').read())
