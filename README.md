@@ -254,6 +254,7 @@ and the full agent list (`agents`) so it can count agents that never submitted.
 | `harness/sandbox.py` | Docker: execution, streaming, archive, cleanup | Claude |
 | `harness/config.py` | Config schema and loading | Claude |
 | `harness/tools.py` | Tool input models and schemas | Claude |
+| `harness/markup.py` | Read-only classifier of malformed tool calls (leaked markup, missing or unexpected fields), versioned; `python -m harness.markup runs/<id>` prints one JSON row per call | Claude |
 | `harness/logger.py` | Hash-chained log | **Sean** |
 | `harness/verify.py` | Chain and output-file checks | **Sean** |
 | `experiments/` | Designs, prompts, configs, schemas, checks, analysis | **Sean** |

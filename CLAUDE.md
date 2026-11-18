@@ -25,6 +25,7 @@ harness/          Reusable machinery shared by all experiments
   topologies.py   One function per topology (see below)
   report.py       Read-only HTML report of a run folder, written to reports/ (git-ignored)
   tools.py        Tool definitions and their Pydantic input models
+  markup.py       Read-only, versioned classifier of malformed tool calls (leaked markup, missing/unexpected fields)
 experiments/      SEAN'S — the science. Do not create or edit anything here.
   ising/          (designs, prompts, configs, submission schema, analysis)
 docker/           Dockerfile and launcher.py for the sandbox image
