@@ -1,0 +1,15 @@
+T=1.5    U=0.66645413  U_err=6.208e-07  n_samples=2000000  tau_int(m2)~1.64
+T=1.6    U=0.66630130  U_err=1.089e-06  n_samples=2000000  tau_int(m2)~1.75
+T=1.7    U=0.66603969  U_err=1.814e-06  n_samples=2000000  tau_int(m2)~1.83
+T=1.8    U=0.66555710  U_err=3.437e-06  n_samples=2000000  tau_int(m2)~1.88
+T=1.9    U=0.66460424  U_err=6.52e-06  n_samples=2000000  tau_int(m2)~2.03
+T=2.0    U=0.66246444  U_err=1.658e-05  n_samples=2000000  tau_int(m2)~2.25
+T=2.1    U=0.65665867  U_err=4.17e-05  n_samples=2000000  tau_int(m2)~2.49
+T=2.2    U=0.63935799  U_err=9.147e-05  n_samples=2000000  tau_int(m2)~2.90
+T=2.3    U=0.59269417  U_err=0.0002105  n_samples=2000000  tau_int(m2)~3.09
+T=2.4    U=0.50124765  U_err=0.0003281  n_samples=2000000  tau_int(m2)~2.71
+T=2.5    U=0.38278085  U_err=0.0004824  n_samples=2000000  tau_int(m2)~2.10
+T=2.6    U=0.27512096  U_err=0.0005399  n_samples=2000000  tau_int(m2)~1.50
+T=2.7    U=0.19744119  U_err=0.0006928  n_samples=2000000  tau_int(m2)~1.15
+T=2.8    U=0.14609339  U_err=0.0007926  n_samples=2000000  tau_int(m2)~0.94
+max U_err = 0.0007926398027327792

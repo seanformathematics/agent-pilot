@@ -1,0 +1,8 @@
+T=1.5: Metropolis U=0.666453 +- 0.000000 | SW pooled U=0.666453 +- 0.000000 | z=+0.71 | Metro early-late z=-0.16  (39s)
+T=1.6: Metropolis U=0.666301 +- 0.000000 | SW pooled U=0.666301 +- 0.000001 | z=+0.26 | Metro early-late z=-0.77  (78s)
+T=1.7: Metropolis U=0.666038 +- 0.000001 | SW pooled U=0.666037 +- 0.000001 | z=+1.06 | Metro early-late z=+1.29  (117s)
+T=1.8: Metropolis U=0.665556 +- 0.000002 | SW pooled U=0.665556 +- 0.000002 | z=-0.16 | Metro early-late z=-0.53  (157s)
+T=1.9: Metropolis U=0.664607 +- 0.000004 | SW pooled U=0.664607 +- 0.000005 | z=-0.05 | Metro early-late z=-1.11  (196s)
+T=2.0: Metropolis U=0.662477 +- 0.000012 | SW pooled U=0.662450 +- 0.000011 | z=+1.65 | Metro early-late z=-0.22  (237s)
+T=2.1: Metropolis U=0.656657 +- 0.000025 | SW pooled U=0.656656 +- 0.000027 | z=+0.02 | Metro early-late z=-0.04  (308s)
+T=2.2: Metropolis U=0.639303 +- 0.000065 | SW pooled U=0.639457 +- 0.000069 | z=-1.63 | Metro early-late z=+0.02  (384s)

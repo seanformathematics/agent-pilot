@@ -1,0 +1,18 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+cython None
+rustc None
+go None
+no numba: No module named 'numba'
+numpy 2.5.4 scipy 1.18.1
+no cffi: No module named 'cffi'
+1
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           256M     0  256M   0% /work
+tmpfs           256M  4.0K  256M   1% /tmp
+
+5M loop iters: 0.32337117195129395

@@ -1,0 +1,18 @@
+T=1.5: jk=6.208e-07 boot=5.870e-07 delta=5.888e-07 -> U_err=6.208e-07
+T=1.6: jk=1.089e-06 boot=1.044e-06 delta=1.034e-06 -> U_err=1.089e-06
+T=1.7: jk=1.814e-06 boot=1.716e-06 delta=1.730e-06 -> U_err=1.814e-06
+T=1.8: jk=3.437e-06 boot=3.127e-06 delta=3.186e-06 -> U_err=3.437e-06
+T=1.9: jk=6.251e-06 boot=6.520e-06 delta=6.513e-06 -> U_err=6.520e-06
+T=2.0: jk=1.658e-05 boot=1.532e-05 delta=1.560e-05 -> U_err=1.658e-05
+T=2.1: jk=3.332e-05 boot=4.170e-05 delta=3.989e-05 -> U_err=4.170e-05
+T=2.2: jk=8.481e-05 boot=9.147e-05 delta=9.136e-05 -> U_err=9.147e-05
+T=2.3: jk=2.105e-04 boot=1.981e-04 delta=2.010e-04 -> U_err=2.105e-04
+T=2.4: jk=3.214e-04 boot=3.255e-04 delta=3.281e-04 -> U_err=3.281e-04
+T=2.5: jk=4.690e-04 boot=4.824e-04 delta=4.743e-04 -> U_err=4.824e-04
+T=2.6: jk=5.248e-04 boot=5.399e-04 delta=5.325e-04 -> U_err=5.399e-04
+T=2.7: jk=6.928e-04 boot=6.491e-04 delta=6.514e-04 -> U_err=6.928e-04
+T=2.8: jk=7.926e-04 boot=7.494e-04 delta=7.408e-04 -> U_err=7.926e-04
+T=2.1: production U=0.656659+-4.17e-05; replicate U=0.656669+-3.64e-05; z=+0.19   [35s]
+T=2.3: production U=0.592694+-2.10e-04; replicate U=0.592604+-2.00e-04; z=-0.31   [69s]
+T=2.6: production U=0.275121+-5.40e-04; replicate U=0.275798+-5.97e-04; z=+0.84   [101s]
+T=2.8: production U=0.146093+-7.93e-04; replicate U=0.146513+-7.35e-04; z=+0.39   [134s]

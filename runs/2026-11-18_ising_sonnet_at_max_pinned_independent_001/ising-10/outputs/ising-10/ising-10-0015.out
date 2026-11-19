@@ -1,0 +1,3 @@
+N=8 T=2.0: exact U=0.65462 (<m2>=0.84167, symmetry err 2.8e-16) | SW U=0.65464+-0.00003, <m2>_mc=0.84192  z=+0.74  [exact 1s, mc 17s]
+N=8 T=2.269: exact U=0.61310 (<m2>=0.64708, symmetry err 2.1e-16) | SW U=0.61317+-0.00011, <m2>_mc=0.64719  z=+0.67  [exact 1s, mc 17s]
+N=8 T=2.6: exact U=0.47296 (<m2>=0.35291, symmetry err 9.7e-17) | SW U=0.47318+-0.00025, <m2>_mc=0.35292  z=+0.91  [exact 1s, mc 17s]

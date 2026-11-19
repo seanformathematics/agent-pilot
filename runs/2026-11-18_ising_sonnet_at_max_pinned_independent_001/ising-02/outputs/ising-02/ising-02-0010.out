@@ -1,0 +1,4 @@
+Metropolis(cold) T=1.5: U=0.666453 +- 0.000000  sweeps/replica=20000  time=18.3s
+Metropolis(cold) T=1.7: U=0.666036 +- 0.000001  sweeps/replica=20000  time=18.5s
+Metropolis(cold) T=1.9: U=0.664607 +- 0.000007  sweeps/replica=20000  time=18.6s
+Metropolis(cold) T=2.1: U=0.656674 +- 0.000033  sweeps/replica=40000  time=36.6s

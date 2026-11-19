@@ -1,0 +1,8 @@
+T=2.8 Metropolis(hot start, new seed): U=0.14541+-0.00036; energy -0.910061+-0.000069 vs exact -0.910061 (z=+0.01)   [90s]
+T=2.8 SW set C (new seed, 4e6 samples): plain U=0.14566+-0.00050; improved U=0.14600+-0.00017; energy z=+0.94   [136s]
+      old SW(A+B) improved 0.14548+-0.00018; old Metro 0.14724+-0.00036
+      z(newMetro - newSWimpr) = -1.48;  z(newMetro - oldMetro) = -3.57; z(newSWimpr - oldSWimpr) = +2.05
+T=2.5 Metropolis(hot start, new seed): U=0.38255+-0.00032; energy -1.131126+-0.000115 vs exact -1.131318 (z=+1.67)   [222s]
+T=2.5 SW set C (new seed, 4e6 samples): plain U=0.38297+-0.00033; improved U=0.38299+-0.00022; energy z=+0.85   [264s]
+      old SW(A+B) improved 0.38318+-0.00022; old Metro 0.38427+-0.00030
+      z(newMetro - newSWimpr) = -1.12;  z(newMetro - oldMetro) = -3.96; z(newSWimpr - oldSWimpr) = -0.62

@@ -1,0 +1,5 @@
+Metropolis: 1.24 ms per sweep for R=256 (206936 replica-sweeps/s)
+T=1.5 (cold, 56584 sweeps x 256 replicas, 65s): U_metro=0.666453+-0.000000   U_SW=0.666453+-0.000000   z=+1.31
+T=2.0 (cold, 56584 sweeps x 256 replicas, 67s): U_metro=0.662461+-0.000011   U_SW=0.662439+-0.000012   z=+1.31
+T=2.3 (hot, 56584 sweeps x 256 replicas, 69s): U_metro=0.592493+-0.000158   U_SW=0.592682+-0.000159   z=-0.84
+T=2.8 (hot, 56584 sweeps x 256 replicas, 74s): U_metro=0.146121+-0.000442   U_SW=0.146039+-0.000268   z=+0.16

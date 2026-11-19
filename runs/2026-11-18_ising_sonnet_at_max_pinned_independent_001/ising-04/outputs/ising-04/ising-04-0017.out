@@ -1,0 +1,4 @@
+T=2.8: Metropolis U=0.14590 +- 0.00036 | SW impr 0.14543+-0.00019 z= 1.15 | SW plain 0.14492+-0.00048 z= 1.63 | energy MC -0.91004+-0.00009 exact -0.91006 z= 0.21 | combined with previous Metropolis run: 0.14616+-0.00030 z_vs_SW_impr= 2.08 | 98s
+T=2.7: Metropolis U=0.19819 +- 0.00037 | SW impr 0.19770+-0.00020 z= 1.17 | SW plain 0.19755+-0.00045 z= 1.10 | energy MC -0.96803+-0.00010 exact -0.96805 z= 0.20 | combined with previous Metropolis run: 0.19816+-0.00030 z_vs_SW_impr= 1.27 | 197s
+T=2.6: Metropolis U=0.27592 +- 0.00033 | SW impr 0.27610+-0.00020 z=-0.46 | SW plain 0.27584+-0.00037 z= 0.18 | energy MC -1.03899+-0.00011 exact -1.03911 z= 1.09 | 293s
+T=2.5: Metropolis U=0.38300 +- 0.00032 | SW impr 0.38285+-0.00022 z= 0.38 | SW plain 0.38283+-0.00032 z= 0.36 | energy MC -1.13113+-0.00013 exact -1.13132 z= 1.50 | 389s

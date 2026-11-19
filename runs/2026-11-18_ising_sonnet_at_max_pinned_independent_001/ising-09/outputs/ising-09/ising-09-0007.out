@@ -1,0 +1,7 @@
+T=2.3 plain   : mean U=0.59227  std over repeats=0.00176  rms reported err=0.00200  mean err=0.00199 ratio std/rms_err=0.880  (expected 1 +- 0.11);  std of z=0.906
+T=2.3 improved: mean U=0.59233  std over repeats=0.00146  rms reported err=0.00163  mean err=0.00162 ratio std/rms_err=0.894  (expected 1 +- 0.11);  std of z=0.926
+      -> pooled mean (plain) = 0.59227 +- 0.00028;  (improved) = 0.59233 +- 0.00023
+T=2.8 plain   : mean U=0.14725  std over repeats=0.00766  rms reported err=0.00706  mean err=0.00703 ratio std/rms_err=1.086  (expected 1 +- 0.11);  std of z=1.125
+T=2.8 improved: mean U=0.14610  std over repeats=0.00277  rms reported err=0.00259  mean err=0.00258 ratio std/rms_err=1.070  (expected 1 +- 0.11);  std of z=1.092
+      -> pooled mean (plain) = 0.14725 +- 0.00121;  (improved) = 0.14610 +- 0.00044
+time 40.90131688117981

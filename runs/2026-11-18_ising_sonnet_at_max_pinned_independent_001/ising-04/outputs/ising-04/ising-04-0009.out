@@ -1,0 +1,15 @@
+T=1.6 impr : repeat-mean U=0.66630 scatter=0.00000 mean jk-err=0.00000 ratio=0.98 | prod U=0.66630 z(mean-prod)=-1.44 | hot-cold z= 1.05
+T=1.6 plain: repeat-mean U=0.66630 scatter=0.00000 mean jk-err=0.00000 ratio=0.99 | prod U=0.66630 z(mean-prod)=-0.58 | hot-cold z= 0.95
+   (elapsed 55s)
+T=2.0 impr : repeat-mean U=0.66243 scatter=0.00005 mean jk-err=0.00005 ratio=0.96 | prod U=0.66247 z(mean-prod)=-2.69 | hot-cold z=-0.06
+T=2.0 plain: repeat-mean U=0.66242 scatter=0.00007 mean jk-err=0.00007 ratio=0.92 | prod U=0.66248 z(mean-prod)=-2.49 | hot-cold z=-0.20
+   (elapsed 111s)
+T=2.3 impr : repeat-mean U=0.59246 scatter=0.00072 mean jk-err=0.00075 ratio=0.97 | prod U=0.59267 z(mean-prod)=-0.93 | hot-cold z=-0.06
+T=2.3 plain: repeat-mean U=0.59247 scatter=0.00083 mean jk-err=0.00092 ratio=0.91 | prod U=0.59273 z(mean-prod)=-0.96 | hot-cold z=-0.62
+   (elapsed 168s)
+T=2.5 impr : repeat-mean U=0.38319 scatter=0.00145 mean jk-err=0.00134 ratio=1.08 | prod U=0.38249 z(mean-prod)= 1.50 | hot-cold z=-0.19
+T=2.5 plain: repeat-mean U=0.38295 scatter=0.00197 mean jk-err=0.00195 ratio=1.01 | prod U=0.38243 z(mean-prod)= 0.79 | hot-cold z=-0.15
+   (elapsed 224s)
+T=2.8 impr : repeat-mean U=0.14531 scatter=0.00097 mean jk-err=0.00116 ratio=0.84 | prod U=0.14531 z(mean-prod)=-0.02 | hot-cold z= 1.58
+T=2.8 plain: repeat-mean U=0.14445 scatter=0.00262 mean jk-err=0.00320 ratio=0.82 | prod U=0.14480 z(mean-prod)=-0.39 | hot-cold z= 0.54
+   (elapsed 280s)

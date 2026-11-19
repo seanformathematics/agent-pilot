@@ -1,0 +1,19 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+numpy 2.5.4 scipy 1.18.1
+numba NOT available ModuleNotFoundError
+cython NOT available ModuleNotFoundError
+cffi NOT available ModuleNotFoundError
+pythran NOT available ModuleNotFoundError
+torch NOT available ModuleNotFoundError
+jax NOT available ModuleNotFoundError
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+make None
+rustc None
+go None
+cpu count 1
+[]
+pure python 3M loop iterations: 0.19s

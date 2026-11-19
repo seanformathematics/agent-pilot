@@ -1,0 +1,6 @@
+N=4 T=1.5: lnZ enum=22.1170139117  formula=22.1170139117
+      e enum=-1.95064256 formula=-1.95064255 ; C enum=0.20034987 formula=0.20034990
+N=4 T=2.269: lnZ enum=15.5228170959  formula=15.5228170959
+      e enum=-1.56576893 formula=-1.56576888 ; C enum=0.78319357 formula=0.78319357
+N=4 T=3.0: lnZ enum=13.2810334556  formula=13.2810334556
+      e enum=-1.01706963 formula=-1.01706964 ; C enum=0.60313471 formula=0.60313467

@@ -1,0 +1,7 @@
+T=2.2: plain U=0.63925 +- 0.00013 | improved U=0.63927 +- 0.00011 | elapsed 19s
+T=2.3: plain U=0.59240 +- 0.00028 | improved U=0.59242 +- 0.00022 | elapsed 38s
+T=2.4: plain U=0.50166 +- 0.00049 | improved U=0.50167 +- 0.00038 | elapsed 57s
+T=2.5: plain U=0.38269 +- 0.00066 | improved U=0.38277 +- 0.00045 | elapsed 76s
+T=2.6: plain U=0.27587 +- 0.00079 | improved U=0.27600 +- 0.00044 | elapsed 96s
+T=2.7: plain U=0.19856 +- 0.00088 | improved U=0.19834 +- 0.00039 | elapsed 115s
+T=2.8: plain U=0.14623 +- 0.00098 | improved U=0.14672 +- 0.00036 | elapsed 134s

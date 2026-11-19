@@ -1,0 +1,7 @@
+T=1.5: plain U=0.66645 +- 0.00000 | improved U=0.66645 +- 0.00000 | elapsed 20s
+T=1.6: plain U=0.66630 +- 0.00000 | improved U=0.66630 +- 0.00000 | elapsed 40s
+T=1.7: plain U=0.66603 +- 0.00000 | improved U=0.66604 +- 0.00000 | elapsed 61s
+T=1.8: plain U=0.66556 +- 0.00000 | improved U=0.66556 +- 0.00000 | elapsed 81s
+T=1.9: plain U=0.66460 +- 0.00001 | improved U=0.66460 +- 0.00001 | elapsed 101s
+T=2.0: plain U=0.66249 +- 0.00002 | improved U=0.66247 +- 0.00002 | elapsed 121s
+T=2.1: plain U=0.65671 +- 0.00006 | improved U=0.65671 +- 0.00004 | elapsed 140s

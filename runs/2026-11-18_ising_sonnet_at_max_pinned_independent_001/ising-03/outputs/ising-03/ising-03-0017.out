@@ -1,0 +1,24 @@
+T=2.3: <m2> SW=0.49206+-0.00029 SWimpr=0.49211+-0.00025 Metro=0.49253+-0.00023 | z(M-SW)=+1.27, z(M-SWimpr)=+1.23
+        <m4> SW=0.296048+-0.000260 SWimpr=0.296085+-0.000223 Metro=0.296458+-0.000180 | z(M-SW)=+1.30, z(M-SWimpr)=+1.30
+        U: SW plain 0.59243+-0.00014, SW impr 0.59247+-0.00011, Metro 0.59263+-0.00014; z(M-impr)=+0.95
+        Metro per-replica m2 max|z|=3.46, m4 max|z|=3.32; SW per-replica m2 max|z|=3.08
+T=2.4: <m2> SW=0.32393+-0.00027 SWimpr=0.32391+-0.00023 Metro=0.32393+-0.00021 | z(M-SW)=-0.00, z(M-SWimpr)=+0.05
+        <m4> SW=0.157049+-0.000201 SWimpr=0.157045+-0.000166 Metro=0.157047+-0.000144 | z(M-SW)=-0.01, z(M-SWimpr)=+0.01
+        U: SW plain 0.50110+-0.00024, SW impr 0.50107+-0.00019, Metro 0.50111+-0.00023; z(M-impr)=+0.13
+        Metro per-replica m2 max|z|=3.26, m4 max|z|=3.28; SW per-replica m2 max|z|=3.23
+T=2.5: <m2> SW=0.20234+-0.00019 SWimpr=0.20235+-0.00015 Metro=0.20288+-0.00015 | z(M-SW)=+2.19, z(M-SWimpr)=+2.45
+        <m4> SW=0.075772+-0.000118 SWimpr=0.075770+-0.000093 Metro=0.076030+-0.000084 | z(M-SW)=+1.79, z(M-SWimpr)=+2.08
+        U: SW plain 0.38311+-0.00032, SW impr 0.38318+-0.00022, Metro 0.38427+-0.00030; z(M-impr)=+2.95
+        Metro per-replica m2 max|z|=3.62, m4 max|z|=3.25; SW per-replica m2 max|z|=3.33
+T=2.6: <m2> SW=0.13184+-0.00012 SWimpr=0.13183+-0.00009 Metro=0.13197+-0.00009 | z(M-SW)=+0.89, z(M-SWimpr)=+1.09
+        <m4> SW=0.037779+-0.000060 SWimpr=0.037763+-0.000043 Metro=0.037811+-0.000043 | z(M-SW)=+0.44, z(M-SWimpr)=+0.79
+        U: SW plain 0.27548+-0.00039, SW impr 0.27575+-0.00021, Metro 0.27635+-0.00033; z(M-impr)=+1.55
+        Metro per-replica m2 max|z|=3.89, m4 max|z|=3.55; SW per-replica m2 max|z|=4.12
+T=2.7: <m2> SW=0.09254+-0.00008 SWimpr=0.09251+-0.00005 Metro=0.09255+-0.00006 | z(M-SW)=+0.13, z(M-SWimpr)=+0.49
+        <m4> SW=0.020593+-0.000034 SWimpr=0.020586+-0.000022 Metro=0.020608+-0.000024 | z(M-SW)=+0.37, z(M-SWimpr)=+0.69
+        U: SW plain 0.19844+-0.00046, SW impr 0.19824+-0.00021, Metro 0.19807+-0.00036; z(M-impr)=-0.42
+        Metro per-replica m2 max|z|=3.35, m4 max|z|=3.14; SW per-replica m2 max|z|=3.09
+T=2.8: <m2> SW=0.06942+-0.00006 SWimpr=0.06941+-0.00003 Metro=0.06944+-0.00005 | z(M-SW)=+0.28, z(M-SWimpr)=+0.50
+        <m4> SW=0.012352+-0.000020 SWimpr=0.012352+-0.000011 Metro=0.012337+-0.000015 | z(M-SW)=-0.61, z(M-SWimpr)=-0.85
+        U: SW plain 0.14569+-0.00049, SW impr 0.14548+-0.00018, Metro 0.14724+-0.00036; z(M-impr)=+4.33
+        Metro per-replica m2 max|z|=3.56, m4 max|z|=3.65; SW per-replica m2 max|z|=3.49

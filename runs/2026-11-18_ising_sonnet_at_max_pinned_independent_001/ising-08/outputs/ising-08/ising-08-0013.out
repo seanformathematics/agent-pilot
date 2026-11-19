@@ -1,0 +1,5 @@
+T=1.5: heat-bath U=0.66645+-7.46e-07 | SW pooled (improved) U=0.666454+-4.1e-07 | z=-1.23 | HB E z vs exact=-0.11 | 11s
+T=2.0: heat-bath U=0.66247+-6.46e-05 | SW pooled (improved) U=0.662461+-1.2e-05 | z=+0.14 | HB E z vs exact=-0.52 | 21s
+T=2.3: heat-bath U=0.59510+-8.47e-04 | SW pooled (improved) U=0.592724+-1.6e-04 | z=+2.75 | HB E z vs exact=-2.31 | 32s
+T=2.5: heat-bath U=0.38227+-2.12e-03 | SW pooled (improved) U=0.383212+-3.1e-04 | z=-0.44 | HB E z vs exact=-0.03 | 43s
+T=2.8: heat-bath U=0.14327+-2.05e-03 | SW pooled (improved) U=0.146451+-2.4e-04 | z=-1.54 | HB E z vs exact=+0.78 | 53s

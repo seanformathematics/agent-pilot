@@ -1,0 +1,14 @@
+{"dir": "/work", "path": "/work/run.py", "type": "f", "bytes": 1618, "mtime": 1795044166.594917}
+{"dir": "/work", "path": "/work/exact_torus.py", "type": "f", "bytes": 1149, "mtime": 1795044136.1599426}
+{"dir": "/work", "path": "/work/__pycache__", "type": "d", "bytes": 100, "mtime": 1795044166.763829}
+{"dir": "/work", "path": "/work/__pycache__/run.cpython-314.pyc", "type": "f", "bytes": 3653, "mtime": 1795044166.763829}
+{"dir": "/work", "path": "/work/__pycache__/exact_torus.cpython-314.pyc", "type": "f", "bytes": 4051, "mtime": 1795044136.1980555}
+{"dir": "/work", "path": "/work/__pycache__/sw.cpython-314.pyc", "type": "f", "bytes": 5736, "mtime": 1795044062.249122}
+{"dir": "/work", "path": "/work/sw.py", "type": "f", "bytes": 2602, "mtime": 1795044062.248264}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 160, "mtime": 1795044305.555114}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0006.py", "type": "f", "bytes": 2287, "mtime": 1795044305.5560324}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0005.py", "type": "f", "bytes": 2734, "mtime": 1795044166.5902643}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0004.py", "type": "f", "bytes": 2264, "mtime": 1795044136.1556783}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0003.py", "type": "f", "bytes": 1405, "mtime": 1795044073.6561763}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0002.py", "type": "f", "bytes": 3201, "mtime": 1795044062.243851}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0001.py", "type": "f", "bytes": 780, "mtime": 1795044029.8047035}

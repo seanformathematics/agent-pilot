@@ -1,0 +1,21 @@
+T=2.2: U_imp=0.63920 +- 1.07e-04 (bias est +9.6e-09) | U_plain=0.63916 +- 1.31e-04 diff/err_plain=-0.30
+      cold-start U=0.63905+-1.6e-04  hot-start U=0.63935+-1.5e-04  z=-1.40 | 1st half 0.63919+-1.5e-04 2nd half 0.63921+-1.5e-04 z=-0.09
+      E=-1.54944+-0.00038 exact -1.55011 z=+1.77 | tau_int(m2_imp)=2.93 tau_int(m2_plain)=2.91 | elapsed 23s
+T=2.3: U_imp=0.59288 +- 2.32e-04 (bias est -2.0e-08) | U_plain=0.59292 +- 2.85e-04 diff/err_plain=+0.14
+      cold-start U=0.59288+-3.1e-04  hot-start U=0.59288+-3.4e-04  z=-0.01 | 1st half 0.59301+-3.2e-04 2nd half 0.59275+-3.3e-04 z=+0.57
+      E=-1.40656+-0.00047 exact -1.40607 z=-1.05 | tau_int(m2_imp)=3.02 tau_int(m2_plain)=2.88 | elapsed 45s
+T=2.4: U_imp=0.50061 +- 3.74e-04 (bias est +7.5e-09) | U_plain=0.50047 +- 4.75e-04 diff/err_plain=-0.28
+      cold-start U=0.50001+-5.3e-04  hot-start U=0.50121+-5.2e-04  z=-1.60 | 1st half 0.50116+-5.2e-04 2nd half 0.50006+-5.2e-04 z=+1.50
+      E=-1.25414+-0.00042 exact -1.25504 z=+2.12 | tau_int(m2_imp)=2.85 tau_int(m2_plain)=2.70 | elapsed 67s
+T=2.5: U_imp=0.38322 +- 4.40e-04 (bias est +3.2e-07) | U_plain=0.38379 +- 6.42e-04 diff/err_plain=+0.88
+      cold-start U=0.38316+-5.8e-04  hot-start U=0.38328+-6.7e-04  z=-0.13 | 1st half 0.38311+-6.1e-04 2nd half 0.38333+-5.9e-04 z=-0.26
+      E=-1.13135+-0.00035 exact -1.13132 z=-0.09 | tau_int(m2_imp)=2.28 tau_int(m2_plain)=2.02 | elapsed 88s
+T=2.6: U_imp=0.27558 +- 4.18e-04 (bias est +7.0e-07) | U_plain=0.27585 +- 7.80e-04 diff/err_plain=+0.34
+      cold-start U=0.27492+-5.9e-04  hot-start U=0.27624+-5.9e-04  z=-1.57 | 1st half 0.27573+-5.9e-04 2nd half 0.27543+-5.9e-04 z=+0.37
+      E=-1.03950+-0.00028 exact -1.03911 z=-1.41 | tau_int(m2_imp)=1.86 tau_int(m2_plain)=1.66 | elapsed 110s
+T=2.7: U_imp=0.19864 +- 3.69e-04 (bias est +7.4e-07) | U_plain=0.19877 +- 9.23e-04 diff/err_plain=+0.14
+      cold-start U=0.19857+-5.2e-04  hot-start U=0.19871+-5.2e-04  z=-0.19 | 1st half 0.19861+-5.3e-04 2nd half 0.19867+-5.5e-04 z=-0.08
+      E=-0.96811+-0.00024 exact -0.96805 z=-0.27 | tau_int(m2_imp)=1.36 tau_int(m2_plain)=1.16 | elapsed 131s
+T=2.8: U_imp=0.14656 +- 3.49e-04 (bias est +6.2e-07) | U_plain=0.14531 +- 9.78e-04 diff/err_plain=-1.28
+      cold-start U=0.14689+-4.9e-04  hot-start U=0.14623+-4.9e-04  z=+0.95 | 1st half 0.14681+-5.5e-04 2nd half 0.14631+-4.7e-04 z=+0.70
+      E=-0.90999+-0.00021 exact -0.91006 z=+0.35 | tau_int(m2_imp)=1.21 tau_int(m2_plain)=0.99 | elapsed 152s

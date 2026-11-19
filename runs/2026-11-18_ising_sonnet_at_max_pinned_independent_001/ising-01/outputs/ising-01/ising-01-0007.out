@@ -1,0 +1,17 @@
+T=1.5: Metropolis U=0.66645+-0.00000 | SW pooled(2x10^6 meas) U=0.66645+-0.00000 | z=-1.07  [22s]
+T=1.6: Metropolis U=0.66630+-0.00000 | SW pooled(2x10^6 meas) U=0.66630+-0.00000 | z=-1.47  [45s]
+T=1.7: Metropolis U=0.66604+-0.00000 | SW pooled(2x10^6 meas) U=0.66604+-0.00000 | z=+0.42  [69s]
+T=1.8: Metropolis U=0.66555+-0.00000 | SW pooled(2x10^6 meas) U=0.66555+-0.00000 | z=+0.17  [93s]
+T=1.9: Metropolis U=0.66459+-0.00001 | SW pooled(2x10^6 meas) U=0.66459+-0.00001 | z=-0.03  [116s]
+T=2.0: Metropolis U=0.66248+-0.00002 | SW pooled(2x10^6 meas) U=0.66247+-0.00001 | z=+0.58  [141s]
+T=2.1: Metropolis U=0.65668+-0.00006 | SW pooled(2x10^6 meas) U=0.65669+-0.00003 | z=-0.18  [165s]
+T=2.2: Metropolis U=0.63934+-0.00014 | SW pooled(2x10^6 meas) U=0.63928+-0.00008 | z=+0.39  [190s]
+T=2.3: Metropolis U=0.59274+-0.00030 | SW pooled(2x10^6 meas) U=0.59260+-0.00017 | z=+0.40  [217s]
+T=2.4: Metropolis U=0.50073+-0.00051 | SW pooled(2x10^6 meas) U=0.50126+-0.00026 | z=-0.93  [244s]
+T=2.5: Metropolis U=0.38354+-0.00067 | SW pooled(2x10^6 meas) U=0.38326+-0.00030 | z=+0.37  [273s]
+T=2.6: Metropolis U=0.27608+-0.00073 | SW pooled(2x10^6 meas) U=0.27583+-0.00030 | z=+0.32  [302s]
+T=2.7: Metropolis U=0.19714+-0.00078 | SW pooled(2x10^6 meas) U=0.19787+-0.00028 | z=-0.88  [331s]
+T=2.8: Metropolis U=0.14693+-0.00076 | SW pooled(2x10^6 meas) U=0.14602+-0.00026 | z=+1.13  [360s]
+z: [-1.07 -1.47  0.42  0.17 -0.03  0.58 -0.18  0.39  0.4  -0.93  0.37  0.32
+ -0.88  1.13]
+mean z -0.06, rms z 0.72, chi2 = 7.3 for 14 dof, p = 0.921

@@ -1,0 +1,6 @@
+T=1.5 R=200: 1.58 ms/sweep -> 7.9 us/replica-sweep ; improved 9.2 us
+T=1.5 R=1000: 7.88 ms/sweep -> 7.9 us/replica-sweep ; improved 9.2 us
+T=2.27 R=200: 1.56 ms/sweep -> 7.8 us/replica-sweep ; improved 9.7 us
+T=2.27 R=1000: 8.22 ms/sweep -> 8.2 us/replica-sweep ; improved 10.2 us
+T=2.8 R=200: 1.56 ms/sweep -> 7.8 us/replica-sweep ; improved 10.7 us
+T=2.8 R=1000: 8.22 ms/sweep -> 8.2 us/replica-sweep ; improved 11.1 us

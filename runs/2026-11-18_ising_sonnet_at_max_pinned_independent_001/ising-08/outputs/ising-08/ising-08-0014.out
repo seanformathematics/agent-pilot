@@ -1,0 +1,3 @@
+T=2.3: HB U=0.59262+-3.38e-04 (block-jackknife err 3.13e-04) | cold-start 0.59243+-4.9e-04, hot-start 0.59281+-4.7e-04 (z=-0.57) | SW pooled 0.59272+-1.6e-04 | z(HB-SW)=-0.29 | HB E z vs exact=-0.44 | 57s
+T=2.2: HB U=0.63924+-3.15e-04 (block-jackknife err 2.98e-04) | cold-start 0.63920+-4.2e-04, hot-start 0.63929+-4.7e-04 (z=-0.15) | SW pooled 0.63918+-6.9e-05 | z(HB-SW)=+0.18 | HB E z vs exact=+0.35 | 72s
+T=2.4: HB U=0.49975+-1.26e-03 (block-jackknife err 1.06e-03) | cold-start 0.50021+-1.7e-03, hot-start 0.49929+-1.9e-03 (z=+0.37) | SW pooled 0.50076+-2.4e-04 | z(HB-SW)=-0.79 | HB E z vs exact=+0.78 | 88s

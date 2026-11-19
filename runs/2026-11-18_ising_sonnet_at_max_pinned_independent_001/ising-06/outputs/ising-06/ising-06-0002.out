@@ -1,0 +1,6 @@
+R=256 T=1.5: 4.5 ms/step  -> 57316 replica-updates/s; mean m2=0.9727 E=-1.9504
+R=256 T=2.269: 4.6 ms/step  -> 55921 replica-updates/s; mean m2=0.5283 E=-1.4359
+R=256 T=2.8: 4.5 ms/step  -> 57287 replica-updates/s; mean m2=0.0660 E=-0.9037
+R=1024 T=1.5: 17.6 ms/step  -> 58193 replica-updates/s; mean m2=0.9731 E=-1.9508
+R=1024 T=2.269: 18.1 ms/step  -> 56630 replica-updates/s; mean m2=0.5460 E=-1.4578
+R=1024 T=2.8: 17.5 ms/step  -> 58411 replica-updates/s; mean m2=0.0744 E=-0.9078

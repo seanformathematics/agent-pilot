@@ -1,0 +1,6 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+numpy 2.5.4 scipy 1.18.1
+no numba: No module named 'numba'
+R=500: 9.4 ms/step, 18.8 us per replica-step
+R=1000: 18.7 ms/step, 18.7 us per replica-step
+R=2000: 37.3 ms/step, 18.7 us per replica-step

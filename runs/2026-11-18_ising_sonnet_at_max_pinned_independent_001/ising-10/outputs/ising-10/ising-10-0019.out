@@ -1,0 +1,17 @@
+T    z_early-late(paired U): rep1  rep2  pooled | chi2(20 blocks, pooled U-blocks) p | chi2 of m2 block means p
+1.5   +1.85  +1.89  +2.65   | chi2(m2 blocks full-cov)=16.2/19 p=0.644
+1.6   -1.95  +0.27  -1.14   | chi2(m2 blocks full-cov)=19.2/19 p=0.447
+1.7   -0.60  +0.42  -0.14   | chi2(m2 blocks full-cov)=14.1/19 p=0.781
+1.8   -0.93  -0.31  -0.87   | chi2(m2 blocks full-cov)=21.6/19 p=0.302
+1.9   -1.21  -1.46  -1.88   | chi2(m2 blocks full-cov)=21.8/19 p=0.294
+2.0   -0.28  +0.36  +0.06   | chi2(m2 blocks full-cov)=14.0/19 p=0.782
+2.1   +0.69  -0.05  +0.44   | chi2(m2 blocks full-cov)=8.8/19 p=0.976
+2.2   -2.89  -2.64  -3.92   | chi2(m2 blocks full-cov)=33.8/19 p=0.019
+2.3   +0.29  +0.40  +0.49   | chi2(m2 blocks full-cov)=10.4/19 p=0.942
+2.4   +0.78  -0.48  +0.22   | chi2(m2 blocks full-cov)=17.4/19 p=0.562
+2.5   +1.45  +0.30  +1.24   | chi2(m2 blocks full-cov)=19.0/19 p=0.456
+2.6   -0.45  -0.54  -0.71   | chi2(m2 blocks full-cov)=20.1/19 p=0.387
+2.7   +1.12  +1.13  +1.59   | chi2(m2 blocks full-cov)=22.0/19 p=0.286
+2.8   -0.05  -0.95  -0.69   | chi2(m2 blocks full-cov)=22.0/19 p=0.287
+rms z (paired): rep1 1.28 rep2 1.07 pooled 1.55 ; mean z pooled -0.19
+p-values of chi2 tests: min 0.019; KS test uniformity p=0.477

@@ -1,0 +1,12 @@
+T=1.5: done  (27s)
+T=2.0: done  (56s)
+T=2.27: done  (86s)
+T=3.0: done  (120s)
+T=4.0: done  (154s)
+e  : n=50 mean z=+0.085 (se 0.141), rms z=1.070, max|z|=2.81
+m2 : n=50 mean z=-0.115 (se 0.141), rms z=1.074, max|z|=2.88
+m4 : n=50 mean z=-0.107 (se 0.141), rms z=1.071, max|z|=2.91
+U  : n=50 mean z=-0.096 (se 0.141), rms z=1.043, max|z|=2.39
+Ui : n=50 mean z=-0.064 (se 0.141), rms z=1.028, max|z|=2.39
+per-T mean z for e: [ 0.06  0.18 -0.09  0.04  0.24] (se 0.32 each)
+per-T mean z for U: [ 0.1  -0.2  -0.06 -0.06 -0.27]

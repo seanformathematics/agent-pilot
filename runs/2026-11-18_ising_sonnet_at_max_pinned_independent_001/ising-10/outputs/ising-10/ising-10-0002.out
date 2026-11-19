@@ -1,0 +1,3 @@
+N=16 R=1000 T=2.269: 16.5 ms/sweep -> 16.5 us per replica-sweep; <m^2>=0.5575
+N=16 R=1000 T=1.5: 16.0 ms/sweep -> 16.0 us per replica-sweep; <m^2>=0.9739
+N=16 R=1000 T=2.8: 16.0 ms/sweep -> 16.0 us per replica-sweep; <m^2>=0.0704

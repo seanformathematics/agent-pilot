@@ -1,0 +1,15 @@
+T=1.5: production U_imp=0.66645+-5.50e-07
+   improved: mean over 30 repeats=0.66645 (+-4.3e-07), scatter sd=2.356e-06, mean jackknife err=2.160e-06, ratio sd/err=1.09, rms z vs prod=1.13, mean z=-0.53
+   plain   : mean over 30 repeats=0.66645 (+-5.9e-07), scatter sd=3.234e-06, mean jackknife err=3.149e-06, ratio sd/err=1.03, rms z vs prod=1.09, mean z=-0.55  | elapsed 45s
+T=2.0: production U_imp=0.66247+-1.55e-05
+   improved: mean over 30 repeats=0.66246 (+-1.2e-05), scatter sd=6.477e-05, mean jackknife err=6.254e-05, ratio sd/err=1.04, rms z vs prod=1.00, mean z=-0.13
+   plain   : mean over 30 repeats=0.66247 (+-1.6e-05), scatter sd=9.004e-05, mean jackknife err=8.351e-05, ratio sd/err=1.08, rms z vs prod=1.03, mean z=-0.05  | elapsed 92s
+T=2.3: production U_imp=0.59288+-2.32e-04
+   improved: mean over 30 repeats=0.59263 (+-1.9e-04), scatter sd=1.045e-03, mean jackknife err=9.151e-04, ratio sd/err=1.14, rms z vs prod=1.13, mean z=-0.25
+   plain   : mean over 30 repeats=0.59260 (+-2.3e-04), scatter sd=1.269e-03, mean jackknife err=1.123e-03, ratio sd/err=1.13, rms z vs prod=1.14, mean z=-0.21  | elapsed 138s
+T=2.5: production U_imp=0.38322+-4.40e-04
+   improved: mean over 30 repeats=0.38346 (+-3.0e-04), scatter sd=1.650e-03, mean jackknife err=1.734e-03, ratio sd/err=0.95, rms z vs prod=0.95, mean z=+0.12
+   plain   : mean over 30 repeats=0.38320 (+-4.3e-04), scatter sd=2.333e-03, mean jackknife err=2.501e-03, ratio sd/err=0.93, rms z vs prod=0.93, mean z=-0.00  | elapsed 183s
+T=2.8: production U_imp=0.14656+-3.49e-04
+   improved: mean over 30 repeats=0.14552 (+-3.0e-04), scatter sd=1.647e-03, mean jackknife err=1.427e-03, ratio sd/err=1.15, rms z vs prod=1.29, mean z=-0.66
+   plain   : mean over 30 repeats=0.14554 (+-7.2e-04), scatter sd=3.937e-03, mean jackknife err=3.864e-03, ratio sd/err=1.02, rms z vs prod=1.06, mean z=-0.27  | elapsed 228s

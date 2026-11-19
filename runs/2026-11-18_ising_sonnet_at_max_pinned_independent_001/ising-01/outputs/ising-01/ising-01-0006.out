@@ -1,0 +1,8 @@
+Metropolis: 2.6 ms per sweep for R=500
+T=1.5: Metropolis(seed 3015) U=0.66645+-0.00000   SW pooled U=-0.00064+-0.00000   z=+540067.71   [9s]
+T=1.9: Metropolis(seed 3019) U=0.66461+-0.00001   SW pooled U=-0.00622+-0.00002   z=+35871.94   [9s]
+T=2.1: Metropolis(seed 3021) U=0.65668+-0.00009   SW pooled U=-0.02992+-0.00009   z=+5520.16   [10s]
+T=2.3: Metropolis(seed 3023) U=0.59318+-0.00049   SW pooled U=-0.22220+-0.00051   z=+1151.63   [11s]
+T=2.5: Metropolis(seed 3025) U=0.38200+-0.00110   SW pooled U=-0.85022+-0.00090   z=+867.58   [12s]
+T=2.8: Metropolis(seed 3028) U=0.14568+-0.00133   SW pooled U=-1.56194+-0.00079   z=+1102.85   [12s]
+z: [540067.71  35871.94   5520.16   1151.63    867.58   1102.85]  chi2 = 292993696910.28 for 6 dof

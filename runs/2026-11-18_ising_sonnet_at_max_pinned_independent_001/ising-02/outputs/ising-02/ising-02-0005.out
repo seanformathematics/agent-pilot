@@ -1,0 +1,4 @@
+Metropolis T=2.2: U=0.63932 +- 0.00009  (bias-corrected 0.63932), sweeps/replica=40000, time=37.2s
+Metropolis T=2.3: U=0.59241 +- 0.00019  (bias-corrected 0.59241), sweeps/replica=40000, time=38.2s
+Metropolis T=2.5: U=0.38319 +- 0.00057  (bias-corrected 0.38320), sweeps/replica=20000, time=21.1s
+Metropolis T=2.8: U=0.14610 +- 0.00072  (bias-corrected 0.14610), sweeps/replica=20000, time=22.1s

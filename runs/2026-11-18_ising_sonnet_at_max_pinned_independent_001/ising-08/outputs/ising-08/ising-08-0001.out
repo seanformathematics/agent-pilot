@@ -1,0 +1,9 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+numpy 2.5.4 scipy 1.18.1
+no numba
+T=1.5 R=64: 1.17 ms/step (18.3 us per replica-sweep)
+T=1.5 R=256: 4.36 ms/step (17.0 us per replica-sweep)
+T=2.3 R=64: 1.19 ms/step (18.6 us per replica-sweep)
+T=2.3 R=256: 4.44 ms/step (17.3 us per replica-sweep)
+T=2.8 R=64: 1.14 ms/step (17.8 us per replica-sweep)
+T=2.8 R=256: 4.25 ms/step (16.6 us per replica-sweep)

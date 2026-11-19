@@ -1,0 +1,47 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+Linux-7.2.12-orbstack-00394-gbecdd6130068-aarch64-with-glibc2.41
+numpy 2.5.4
+scipy 1.18.1
+numba NOT AVAILABLE ModuleNotFoundError No module named 'numba'
+cython NOT AVAILABLE ModuleNotFoundError No module named 'cython'
+cffi NOT AVAILABLE ModuleNotFoundError No module named 'cffi'
+pythran NOT AVAILABLE ModuleNotFoundError No module named 'pythran'
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+gfortran None
+rustc None
+go None
+cpu_count 1
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdfhm dit uscat ilrcpc flagm sb dcpodp flagm2 frint
+CPU implementer	: 0x61
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0x000
+CPU revision	: 0
+
+processor	: 1
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdfhm dit uscat ilrcpc flagm sb dcpodp flagm2 frint
+CPU implementer	: 0x61
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0x000
+CPU revision	: 0
+
+processor	: 2
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdf
+MemTotal:        8196284 kB
+MemFree:         7671000 kB
+MemAvailable:    7694684 kB
+Buffers:             100 kB
+Cached:           160720 kB
+SwapCached:            0 kB
+Active:            75288 kB
+Inac
+[]

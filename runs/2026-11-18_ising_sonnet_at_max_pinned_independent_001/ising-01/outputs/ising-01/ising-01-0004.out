@@ -1,0 +1,15 @@
+T=1.5 seed=1015: improved U=0.66645 +- 0.00000 (bias-corr 0.66645) | plain U=0.66645 +- 0.00000 | diff/err=-0.41 | 18s
+T=1.6 seed=1016: improved U=0.66630 +- 0.00000 (bias-corr 0.66630) | plain U=0.66630 +- 0.00000 | diff/err=+0.04 | 18s
+T=1.7 seed=1017: improved U=0.66604 +- 0.00000 (bias-corr 0.66604) | plain U=0.66604 +- 0.00000 | diff/err=+0.15 | 18s
+T=1.8 seed=1018: improved U=0.66555 +- 0.00000 (bias-corr 0.66555) | plain U=0.66555 +- 0.00001 | diff/err=+0.52 | 18s
+T=1.9 seed=1019: improved U=0.66460 +- 0.00001 (bias-corr 0.66460) | plain U=0.66459 +- 0.00001 | diff/err=+0.51 | 18s
+T=2.0 seed=1020: improved U=0.66247 +- 0.00002 (bias-corr 0.66247) | plain U=0.66248 +- 0.00002 | diff/err=-0.34 | 18s
+T=2.1 seed=1021: improved U=0.65665 +- 0.00004 (bias-corr 0.65665) | plain U=0.65663 +- 0.00006 | diff/err=+0.28 | 18s
+T=2.2 seed=1022: improved U=0.63937 +- 0.00011 (bias-corr 0.63937) | plain U=0.63942 +- 0.00013 | diff/err=-0.28 | 18s
+T=2.3 seed=1023: improved U=0.59239 +- 0.00024 (bias-corr 0.59239) | plain U=0.59221 +- 0.00029 | diff/err=+0.47 | 18s
+T=2.4 seed=1024: improved U=0.50082 +- 0.00037 (bias-corr 0.50082) | plain U=0.50084 +- 0.00048 | diff/err=-0.04 | 19s
+T=2.5 seed=1025: improved U=0.38334 +- 0.00042 (bias-corr 0.38334) | plain U=0.38330 +- 0.00062 | diff/err=+0.05 | 19s
+T=2.6 seed=1026: improved U=0.27619 +- 0.00043 (bias-corr 0.27619) | plain U=0.27580 +- 0.00080 | diff/err=+0.44 | 19s
+T=2.7 seed=1027: improved U=0.19734 +- 0.00040 (bias-corr 0.19734) | plain U=0.19631 +- 0.00088 | diff/err=+1.07 | 19s
+T=2.8 seed=1028: improved U=0.14562 +- 0.00038 (bias-corr 0.14562) | plain U=0.14567 +- 0.00100 | diff/err=-0.05 | 20s
+total 257.83782505989075

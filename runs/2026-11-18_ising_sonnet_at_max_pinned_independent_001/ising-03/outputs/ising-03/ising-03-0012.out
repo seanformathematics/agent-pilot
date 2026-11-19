@@ -1,0 +1,3 @@
+R=500: 2.00 ms/sweep -> 4.0 us per replica-sweep
+R=1000: 3.83 ms/sweep -> 3.8 us per replica-sweep
+N=4 T=2.27 Metropolis U=0.61714 +- 0.00007 ; exact U=0.61709

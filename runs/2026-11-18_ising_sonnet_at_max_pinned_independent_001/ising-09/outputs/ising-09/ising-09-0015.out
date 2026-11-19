@@ -1,0 +1,4 @@
+T=1.5 Metropolis(cold): U=0.666453 +- 0.000000 | SW plain 0.666452 +- 0.000001: z=-1.20 | SW improved 0.666452: z=-1.30   [11s]
+T=1.8 Metropolis(cold): U=0.665556 +- 0.000003 | SW plain 0.665557 +- 0.000005: z=+0.17 | SW improved 0.665556: z=+0.12   [24s]
+T=2.5 Metropolis(hot): U=0.382974 +- 0.000590 | SW plain 0.382695 +- 0.000657: z=-0.32 | SW improved 0.382772: z=-0.27   [47s]
+T=2.8 Metropolis(hot): U=0.146313 +- 0.000692 | SW plain 0.146227 +- 0.000980: z=-0.07 | SW improved 0.146717: z=+0.52   [70s]

@@ -1,0 +1,12 @@
+T=1.5 R=500: 6.16 ms/sweep -> 81205 replica-sweeps/s; <m^2>=0.9726
+    with improved estimators: 73969 replica-sweeps/s
+T=1.5 R=2000: 25.62 ms/sweep -> 78075 replica-sweeps/s; <m^2>=0.9736
+    with improved estimators: 71771 replica-sweeps/s
+T=2.269 R=500: 5.48 ms/sweep -> 91195 replica-sweeps/s; <m^2>=0.5472
+    with improved estimators: 77473 replica-sweeps/s
+T=2.269 R=2000: 22.73 ms/sweep -> 87997 replica-sweeps/s; <m^2>=0.5441
+    with improved estimators: 75871 replica-sweeps/s
+T=2.8 R=500: 5.22 ms/sweep -> 95875 replica-sweeps/s; <m^2>=0.0720
+    with improved estimators: 75652 replica-sweeps/s
+T=2.8 R=2000: 21.07 ms/sweep -> 94926 replica-sweeps/s; <m^2>=0.0705
+    with improved estimators: 75207 replica-sweeps/s

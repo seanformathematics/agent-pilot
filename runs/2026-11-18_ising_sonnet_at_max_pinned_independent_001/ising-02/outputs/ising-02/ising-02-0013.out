@@ -1,0 +1,8 @@
+N=4 Metropolis(cold) T=1.5: exact U=0.663959  MC U=0.663958+-0.000009  z=-0.12
+N=4 Metropolis(hot) T=2.3: exact U=0.613054  MC U=0.613037+-0.000079  z=-0.21
+N=4 Metropolis(hot) T=2.8: exact U=0.522931  MC U=0.523043+-0.000142  z=+0.79
+N=4 Metropolis(cold) T=2.0: exact U=0.644811  MC U=0.644834+-0.000042  z=+0.55
+N=4 Metropolis(hot) T=2.5: exact U=0.581528  MC U=0.581483+-0.000110  z=-0.40
+[{"T": 1.5, "status": "ok", "U": 0.6664525, "U_err": 6.34e-07, "n_samples": 800000}, {"T": 1.6, "status": "ok", "U": 0.6663022, "U_err": 1.02e-06, "n_samples": 800000}, {"T": 1.7, "status": "ok", "U": 0.6660401, "U_err": 1.81e-06, "n_samples": 800000}, {"T": 1.8, "status": "ok", "U": 0.6655523, "U_err": 3.74e-06, "n_samples": 800000}, {"T": 1.9, "status": "ok", "U": 0.6646037, "U_err": 7.23e-06, "n_samples": 800000}, {"T": 2.0, "status": "ok", "U": 0.6624487, "U_err": 1.79e-05, "n_samples": 800000}, {"T": 2.1, "status": "ok", "U": 0.6566887, "U_err": 3.33e-05, "n_samples": 1600000}, {"T": 2.2, "status": "ok", "U": 0.6394066, "U_err": 8.96e-05, "n_samples": 1600000}, {"T": 2.3, "status": "ok", "U": 0.5926763, "U_err": 0.000139, "n_samples": 4000000}, {"T": 2.4, "status": "ok", "U": 0.5008291, "U_err": 0.000256, "n_samples": 4000000}, {"T": 2.5, "status": "ok", "U": 0.382994, "U_err": 0.000269, "n_samples": 8000000}, {"T": 2.6, "status": "ok", "U": 0.2761568, "U_err": 0.000382, "n_samples": 8000000}, {"T": 2.7, "status": "ok", "U": 0.1977082, "U_err": 0.000483, "n_samples": 8000000}, {"T": 2.8, "status": "ok", "U": 0.1453726, "U_err": 0.000572, "n_samples": 8000000}]
+613 seeds
+production seed rule: 910000+100*iT+r (batch A) and 920000+100*iT+r (batch B), iT=0..13 temperature index, r=0..19

@@ -1,0 +1,26 @@
+===== T=2.8
+old (cold, 2000 burn-in)  U per 4000-sweep segment: 0.1476 0.1462 0.1480 0.1463 0.1480   (seg err ~0.0008)
+    segment-to-segment std = 0.00090 (expected ~ seg err 0.00080)
+    group scatter std=0.00143 vs rms jackknife err of group=0.00162  ratio=0.88
+    overall U=0.14724+-0.00036; <m2>=0.06944+-0.00005; <m4>=0.012337+-0.000015
+new (hot, 3000 burn-in)  U per 4000-sweep segment: 0.1463 0.1459 0.1445 0.1447 0.1457   (seg err ~0.0008)
+    segment-to-segment std = 0.00078 (expected ~ seg err 0.00081)
+    group scatter std=0.00207 vs rms jackknife err of group=0.00162  ratio=1.28
+    overall U=0.14541+-0.00036; <m2>=0.06944+-0.00005; <m4>=0.012363+-0.000015
+    ensemble-mean m2 per 20-block chunk: old [0.06929 0.06957 0.06967 0.06908 0.06947 0.06959 0.06927 0.06936 0.0697
+ 0.06941]
+                                          new [0.06921 0.06942 0.06961 0.06967 0.06956 0.0694  0.06918 0.06951 0.06931
+ 0.06954]
+===== T=2.5
+old (cold, 2000 burn-in)  U per 4000-sweep segment: 0.3833 0.3852 0.3833 0.3849 0.3846   (seg err ~0.0007)
+    segment-to-segment std = 0.00088 (expected ~ seg err 0.00066)
+    group scatter std=0.00093 vs rms jackknife err of group=0.00134  ratio=0.70
+    overall U=0.38427+-0.00030; <m2>=0.20288+-0.00015; <m4>=0.076030+-0.000084
+new (hot, 3000 burn-in)  U per 4000-sweep segment: 0.3824 0.3824 0.3827 0.3829 0.3824   (seg err ~0.0007)
+    segment-to-segment std = 0.00025 (expected ~ seg err 0.00067)
+    group scatter std=0.00144 vs rms jackknife err of group=0.00141  ratio=1.02
+    overall U=0.38255+-0.00032; <m2>=0.20203+-0.00016; <m4>=0.075603+-0.000087
+    ensemble-mean m2 per 20-block chunk: old [0.20292 0.20257 0.20349 0.20285 0.20196 0.20277 0.20297 0.20277 0.20356
+ 0.20292]
+                                          new [0.20225 0.20129 0.20189 0.20151 0.20238 0.2023  0.20233 0.20227 0.20199
+ 0.20206]

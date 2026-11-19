@@ -1,0 +1,3 @@
+R=100: 1.3 ms/step, 76919 samples/s
+R=400: 5.1 ms/step, 78236 samples/s
+R=1000: 13.0 ms/step, 77145 samples/s

@@ -1,0 +1,9 @@
+Metropolis(cold) T=1.5: U=0.666454+-0.000000 | SW pooled U=0.666454+-0.000000 | diff=-0.000001, z=-1.20  [26s]
+Metropolis(cold) T=1.7: U=0.666037+-0.000001 | SW pooled U=0.666039+-0.000001 | diff=-0.000002, z=-1.19  [26s]
+Metropolis(cold) T=1.9: U=0.664602+-0.000006 | SW pooled U=0.664606+-0.000005 | diff=-0.000004, z=-0.54  [27s]
+--- SW estimate of probability weight with |m|<0.5 (sector-crossing region) ---
+T=1.7: P(|m|<0.5) = 0.00e+00  (0 of 600000)
+T=1.9: P(|m|<0.5) = 8.33e-05  (50 of 600000)
+T=2.0: P(|m|<0.5) = 7.77e-04  (466 of 600000)
+T=2.1: P(|m|<0.5) = 7.23e-03  (4339 of 600000)
+T=2.2: P(|m|<0.5) = 4.73e-02  (28375 of 600000)

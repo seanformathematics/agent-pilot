@@ -1,0 +1,21 @@
+=== T = 2.2
+ rep1 hot: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [-1.46 -3.47 -0.2  -2.    2.06  1.4  -1.21  4.12] | per-block se ~1.98e-3 | paired early-late m2 diff = -2.85e-3 +- 1.30e-3 (z=-2.19)
+ rep1 cold: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [-1.18 -0.6  -0.56 -1.37 -0.52  2.02  0.58 -2.61] | per-block se ~1.98e-3 | paired early-late m2 diff = -0.76e-3 +- 1.29e-3 (z=-0.59)
+ rep2 hot: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [ 0.38  1.61 -2.5  -3.12 -1.43 -0.35  0.48  1.44] | per-block se ~1.99e-3 | paired early-late m2 diff = -0.66e-3 +- 1.23e-3 (z=-0.53)
+ rep2 cold: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [-1.84 -4.13 -2.57 -0.31 -0.12  1.73 -2.12 -0.64] | per-block se ~2.00e-3 | paired early-late m2 diff = -1.48e-3 +- 1.27e-3 (z=-1.17)
+ pooled paired first-half minus second-half m2: -1.216e-03 +- 4.394e-04  z=-2.77
+ pooled paired first-half minus second-half m4: -1.064e-03 +- 4.842e-04  z=-2.20
+=== T = 1.5
+ rep1 hot: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [ 0.22 -0.35  0.16  0.46 -0.09 -0.   -0.04 -0.31] | per-block se ~0.20e-3 | paired early-late m2 diff = +0.13e-3 +- 0.12e-3 (z=+1.10)
+ rep1 cold: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [ 0.25 -0.01 -0.03 -0.33 -0.04 -0.03  0.05 -0.31] | per-block se ~0.20e-3 | paired early-late m2 diff = +0.11e-3 +- 0.12e-3 (z=+0.87)
+ rep2 hot: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [ 0.18  0.12  0.12  0.   -0.01 -0.29  0.17  0.  ] | per-block se ~0.20e-3 | paired early-late m2 diff = +0.14e-3 +- 0.13e-3 (z=+1.14)
+ rep2 cold: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [-0.45 -0.12  0.02  0.11  0.09 -0.22  0.08  0.31] | per-block se ~0.20e-3 | paired early-late m2 diff = -0.16e-3 +- 0.12e-3 (z=-1.37)
+ pooled paired first-half minus second-half m2: +4.478e-05 +- 4.445e-05  z=+1.01
+ pooled paired first-half minus second-half m4: +8.119e-05 +- 8.501e-05  z=+0.95
+=== T = 1.9
+ rep1 hot: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [-0.2  -0.46 -1.1   0.41 -0.64  0.07  0.49 -0.4 ] | per-block se ~0.61e-3 | paired early-late m2 diff = -0.37e-3 +- 0.40e-3 (z=-0.93)
+ rep1 cold: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [-0.15  1.33 -0.07  0.58 -0.29  0.27 -1.08  0.25] | per-block se ~0.62e-3 | paired early-late m2 diff = +0.62e-3 +- 0.39e-3 (z=+1.58)
+ rep2 hot: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [ 0.6  -0.07 -0.94 -0.44  0.08 -1.27 -0.51  0.1 ] | per-block se ~0.62e-3 | paired early-late m2 diff = +0.03e-3 +- 0.38e-3 (z=+0.09)
+ rep2 cold: m2 block-mean (x1e3 dev from overall mean) first/last blocks: [ 1.18 -0.09 -0.49  0.6   0.22  0.06 -0.09  0.31] | per-block se ~0.62e-3 | paired early-late m2 diff = -0.09e-3 +- 0.40e-3 (z=-0.23)
+ pooled paired first-half minus second-half m2: -1.331e-04 +- 1.404e-04  z=-0.95
+ pooled paired first-half minus second-half m4: -1.933e-04 +- 2.343e-04  z=-0.82

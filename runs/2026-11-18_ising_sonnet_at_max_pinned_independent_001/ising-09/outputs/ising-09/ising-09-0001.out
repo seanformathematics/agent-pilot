@@ -1,0 +1,16 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+gcc None
+cc None
+clang None
+tcc None
+g++ None
+rustc None
+go None
+julia None
+no numba: No module named 'numba'
+numpy 2.5.4 scipy 1.18.1
+cpu_count 1
+[]
+pure python 1e7 loop 0.6792902946472168
+no cffi No module named 'cffi'
+no cython No module named 'Cython'

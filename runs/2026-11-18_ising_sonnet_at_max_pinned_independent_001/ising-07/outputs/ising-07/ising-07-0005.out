@@ -1,0 +1,9 @@
+L=4 T=1.5 lnZ exact formula 22.11701391  brute force 22.11701391 ; <E> formula -31.210281 brute -31.210281
+L=4 T=2.3 lnZ exact formula 15.37515625  brute force 15.37515625 ; <E> formula -24.660984 brute -24.660984
+L=4 T=3.0 lnZ exact formula 13.28103346  brute force 13.28103346 ; <E> formula -16.273114 brute -16.273114
+N=16 T=1.500  <E>/N^2: SW -1.95120 +- 0.00014   exact -1.95112   dev -0.65 sigma
+N=16 T=1.800  <E>/N^2: SW -1.85933 +- 0.00026   exact -1.85930   dev -0.10 sigma
+N=16 T=2.100  <E>/N^2: SW -1.66281 +- 0.00048   exact -1.66202   dev -1.65 sigma
+N=16 T=2.269  <E>/N^2: SW -1.45442 +- 0.00080   exact -1.45334   dev -1.33 sigma
+N=16 T=2.500  <E>/N^2: SW -1.13062 +- 0.00060   exact -1.13132   dev 1.15 sigma
+N=16 T=2.800  <E>/N^2: SW -0.91006 +- 0.00039   exact -0.91006   dev -0.01 sigma
