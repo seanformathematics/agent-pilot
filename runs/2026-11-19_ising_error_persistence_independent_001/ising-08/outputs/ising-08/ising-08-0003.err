@@ -1,0 +1,2 @@
+/work/ising.py:36: RuntimeWarning: invalid value encountered in divide
+  return s, S2/nmeas, S4/nmeas, S1/nmeas

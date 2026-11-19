@@ -1,0 +1,6 @@
+1.9 U=0.66460 jackknife err (nblocks: err) [(20, np.float64(1e-05)), (50, np.float64(1e-05)), (100, np.float64(1e-05)), (200, np.float64(1e-05))] chunk-based err of 10 chunks: 0.00001
+2.0 U=0.66247 jackknife err (nblocks: err) [(20, np.float64(2e-05)), (50, np.float64(1e-05)), (100, np.float64(2e-05)), (200, np.float64(2e-05))] chunk-based err of 10 chunks: 0.00001
+2.1 U=0.65669 jackknife err (nblocks: err) [(20, np.float64(5e-05)), (50, np.float64(4e-05)), (100, np.float64(4e-05)), (200, np.float64(4e-05))] chunk-based err of 10 chunks: 0.00005
+2.2 U=0.63945 jackknife err (nblocks: err) [(20, np.float64(0.0001)), (50, np.float64(0.0001)), (100, np.float64(0.00011)), (200, np.float64(0.00012))] chunk-based err of 10 chunks: 0.00008
+2.3 U=0.59263 jackknife err (nblocks: err) [(20, np.float64(0.00023)), (50, np.float64(0.00027)), (100, np.float64(0.00024)), (200, np.float64(0.00024))] chunk-based err of 10 chunks: 0.00014
+2.4 U=0.50155 jackknife err (nblocks: err) [(20, np.float64(0.00055)), (50, np.float64(0.00052)), (100, np.float64(0.00051)), (200, np.float64(0.00049))] chunk-based err of 10 chunks: 0.00066
