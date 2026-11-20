@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 err=0.00000  block std=0.00002 blk mean=0.66460 n_meas=6000 R=2000 seed=201
+T=2.0 U=0.66244 err=0.00001  block std=0.00007 blk mean=0.66244 n_meas=6000 R=2000 seed=202
+T=2.1 U=0.65670 err=0.00003  block std=0.00016 blk mean=0.65670 n_meas=6000 R=2000 seed=203
+T=2.2 U=0.63956 err=0.00006  block std=0.00037 blk mean=0.63956 n_meas=6000 R=2000 seed=204
+T=2.3 U=0.59262 err=0.00017  block std=0.00093 blk mean=0.59262 n_meas=6000 R=2000 seed=101
+T=2.4 U=0.50064 err=0.00030  block std=0.00115 blk mean=0.50064 n_meas=6000 R=2000 seed=205

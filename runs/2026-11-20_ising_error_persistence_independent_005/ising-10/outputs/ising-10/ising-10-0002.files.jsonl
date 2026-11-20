@@ -1,0 +1,5 @@
+{"dir": "/work", "path": "/work/acc_T2.0_s102.npz", "type": "f", "bytes": 24984, "mtime": 1795200137.7212768}
+{"dir": "/work", "path": "/work/acc_T1.9_s101.npz", "type": "f", "bytes": 24984, "mtime": 1795200031.6003487}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 80, "mtime": 1795199935.18626}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-10-0002.py", "type": "f", "bytes": 1363, "mtime": 1795199935.1872866}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-10-0001.py", "type": "f", "bytes": 711, "mtime": 1795199928.0271032}

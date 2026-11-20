@@ -1,0 +1,3 @@
+usage(total=268435456, used=268435456, free=0) ['T2.0.npz', 'T1.9.npz']
+usage(total=268435456, used=0, free=268435456)
+1.9 U=0.664601 err=0.000005 <|m|> early 0.93839 late 0.93825 time 42.4
