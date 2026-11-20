@@ -1,0 +1,7 @@
+{"dir": "/work", "path": "/work/log.txt", "type": "f", "bytes": 0, "mtime": 1795151530.2392285}
+{"dir": "/work", "path": "/work/run.py", "type": "f", "bytes": 1071, "mtime": 1795151530.2392285}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 120, "mtime": 1795151532.3044596}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-01-0004.py", "type": "f", "bytes": 199, "mtime": 1795151532.3053973}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-01-0003.py", "type": "f", "bytes": 1325, "mtime": 1795151530.2253206}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-01-0002.py", "type": "f", "bytes": 674, "mtime": 1795151523.000312}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-01-0001.py", "type": "f", "bytes": 678, "mtime": 1795151520.418266}

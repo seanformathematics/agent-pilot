@@ -1,0 +1,6 @@
+1.9 seed=1901 U=0.6646059 err_jk=2.24e-06 err_blocks=1.66e-06 seed=1901 seed_check
+2.0 seed=2001 U=0.6624545 err_jk=6.24e-06 err_blocks=5.11e-06 seed=2001 seed_check
+2.1 seed=2101 U=0.6566528 err_jk=1.73e-05 err_blocks=1.32e-05 seed=2101 seed_check
+2.2 seed=2201 U=0.6394178 err_jk=4.51e-05 err_blocks=4.40e-05 seed=2201 seed_check
+2.3 seed=2301 U=0.5926093 err_jk=9.59e-05 err_blocks=1.28e-04 seed=2301 seed_check
+2.4 seed=2401 U=0.5013216 err_jk=1.61e-04 err_blocks=1.31e-04 seed=2401 seed_check

@@ -1,0 +1,6 @@
+T=1.9 U=0.66461 err(jk)=0.00000 Ujk_bias_corr=0.66461 <m^2>=0.8819 blocks U first/last: 0.6646 0.6646 std_blocks=0.0000
+T=2.0 U=0.66245 err(jk)=0.00001 Ujk_bias_corr=0.66245 <m^2>=0.8334 blocks U first/last: 0.6624 0.6624 std_blocks=0.0000
+T=2.1 U=0.65665 err(jk)=0.00002 Ujk_bias_corr=0.65665 <m^2>=0.7620 blocks U first/last: 0.6568 0.6567 std_blocks=0.0001
+T=2.2 U=0.63942 err(jk)=0.00005 Ujk_bias_corr=0.63942 <m^2>=0.6517 blocks U first/last: 0.6393 0.6393 std_blocks=0.0003
+T=2.3 U=0.59261 err(jk)=0.00010 Ujk_bias_corr=0.59261 <m^2>=0.4925 blocks U first/last: 0.5929 0.5927 std_blocks=0.0008
+T=2.4 U=0.50132 err(jk)=0.00016 Ujk_bias_corr=0.50132 <m^2>=0.3242 blocks U first/last: 0.5018 0.5004 std_blocks=0.0008

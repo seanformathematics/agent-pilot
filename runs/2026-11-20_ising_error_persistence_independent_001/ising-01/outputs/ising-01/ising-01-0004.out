@@ -1,0 +1,8 @@
+
+[]
+total 4
+drwx------ 2 agent agent   80 Nov 20 05:12 .
+drwxr-xr-x 1 root  root    12 Nov 20 05:11 ..
+-rw-rw-rw- 1 agent agent    0 Nov 20 05:12 log.txt
+-rw-rw-rw- 1 agent agent 1071 Nov 20 05:12 run.py
+

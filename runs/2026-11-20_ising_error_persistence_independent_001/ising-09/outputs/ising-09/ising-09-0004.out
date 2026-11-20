@@ -1,0 +1,7 @@
+['pilot_2.4.npy', 'pilot_2.3.npy', 'pilot_2.2.npy', 'pilot_2.1.npy', 'pilot_2.0.npy', 'pilot_1.9.npy']
+1.9 U=0.6646 err_jk=0.00001 tau_m2~ 7.7
+2.0 U=0.6624 err_jk=0.00003 tau_m2~ 11.4
+2.1 U=0.6567 err_jk=0.00008 tau_m2~ 9.7
+2.2 U=0.6396 err_jk=0.00020 tau_m2~ 21.9
+2.3 U=0.5924 err_jk=0.00044 tau_m2~ 43.3
+2.4 U=0.5021 err_jk=0.00071 tau_m2~ 25.8

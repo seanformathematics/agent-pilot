@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 jackknife_err=0.000003 timeblock_err=0.000003
+T=2.0 U=0.66246 jackknife_err=0.000009 timeblock_err=0.000008
+T=2.1 U=0.65665 jackknife_err=0.000024 timeblock_err=0.000026
+T=2.2 U=0.63936 jackknife_err=0.000065 timeblock_err=0.000070
+T=2.3 U=0.59242 jackknife_err=0.000138 timeblock_err=0.000141
+T=2.4 U=0.50094 jackknife_err=0.000230 timeblock_err=0.000242

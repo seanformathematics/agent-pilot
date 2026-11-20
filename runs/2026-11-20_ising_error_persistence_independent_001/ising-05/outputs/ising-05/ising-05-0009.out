@@ -1,0 +1,2 @@
+2.3 [0.59267 0.59219 0.59207 0.59236 0.59308 0.59313] mean 0.59258 std 0.00045 expected from 2e6 run ~ std*sqrt(4)/sqrt(6)
+2.4 [0.50234 0.501   0.5013  0.50159 0.50065 0.50131] mean 0.50137 std 0.00057 expected from 2e6 run ~ std*sqrt(4)/sqrt(6)

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-01-0001.py", line 11, in <module>
+    for x in range(-4,5,2): ptab[x+4]=np.exp(-2*beta*x) if x>0 else 1.0
+                            ~~~~^^^^^
+IndexError: index 6 is out of bounds for axis 0 with size 5

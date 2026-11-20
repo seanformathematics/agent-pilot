@@ -1,0 +1,5 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+numba missing No module named 'numba'
+numpy ok
+scipy ok
+loop 1e7 time 0.6875779628753662
