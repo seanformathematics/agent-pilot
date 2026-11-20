@@ -1,0 +1,6 @@
+T=1.9 U=0.66459  chains=[0.66459 0.66459 0.6646  0.6646 ]  chain-scatter/sqrt4=0.00000  jackknife(mean chain)=0.00001  nsamp=2000000
+T=2.0 U=0.66249  chains=[0.66246 0.66253 0.66249 0.66248]  chain-scatter/sqrt4=0.00002  jackknife(mean chain)=0.00002  nsamp=2000000
+T=2.1 U=0.65670  chains=[0.65666 0.65667 0.65671 0.65675]  chain-scatter/sqrt4=0.00002  jackknife(mean chain)=0.00006  nsamp=2000000
+T=2.2 U=0.63933  chains=[0.63928 0.63939 0.63918 0.63946]  chain-scatter/sqrt4=0.00006  jackknife(mean chain)=0.00016  nsamp=2000000
+T=2.3 U=0.59258  chains=[0.59264 0.59239 0.59201 0.59328]  chain-scatter/sqrt4=0.00027  jackknife(mean chain)=0.00041  nsamp=2000000
+T=2.4 U=0.50098  chains=[0.50159 0.50182 0.50028 0.50023]  chain-scatter/sqrt4=0.00042  jackknife(mean chain)=0.00079  nsamp=2000000

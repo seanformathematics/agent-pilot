@@ -1,0 +1,6 @@
+T=1.9 U=0.66461 err_replica_jk=0.00000 err_timeblock_jk=0.00000 halves=0.6646,0.6646 <|m|>=0.9383
+T=2.0 U=0.66246 err_replica_jk=0.00001 err_timeblock_jk=0.00000 halves=0.6625,0.6625 <|m|>=0.9113
+T=2.1 U=0.65666 err_replica_jk=0.00001 err_timeblock_jk=0.00001 halves=0.6566,0.6567 <|m|>=0.8686
+T=2.2 U=0.63931 err_replica_jk=0.00004 err_timeblock_jk=0.00003 halves=0.6392,0.6394 <|m|>=0.7942
+T=2.3 U=0.59259 err_replica_jk=0.00008 err_timeblock_jk=0.00005 halves=0.5927,0.5925 <|m|>=0.6698
+T=2.4 U=0.50103 err_replica_jk=0.00013 err_timeblock_jk=0.00014 halves=0.5010,0.5011 <|m|>=0.5166
