@@ -6,7 +6,7 @@ This repo runs controlled experiments **on** LLM agents doing computational phys
 
 Phases (only Phase 1 is active):
 1. Ising model — estimate the 2D critical temperature from Binder cumulant crossings.
-2. A harder calculation (e.g. QED g−2 / fine-structure constant). Not started.
+2. A harder calculation with a known answer. Not started.
 3. A novel physics computation. Not started.
 
 Efficiency is not the goal. Legibility and trustworthiness of the record are.
