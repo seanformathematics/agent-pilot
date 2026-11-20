@@ -1,0 +1,4 @@
+{"dir": "/work", "path": "/work/res.json", "type": "f", "bytes": 12742832, "mtime": 1795206912.2040935}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 80, "mtime": 1795206607.054588}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-10-0002.py", "type": "f", "bytes": 1340, "mtime": 1795206607.0552359}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-10-0001.py", "type": "f", "bytes": 573, "mtime": 1795206600.8775127}

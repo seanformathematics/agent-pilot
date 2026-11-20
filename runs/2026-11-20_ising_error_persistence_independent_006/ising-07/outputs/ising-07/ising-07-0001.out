@@ -1,0 +1,3 @@
+2.5.4
+numba missing No module named 'numba'
+time per sweep (R=512): 0.003410317897796631

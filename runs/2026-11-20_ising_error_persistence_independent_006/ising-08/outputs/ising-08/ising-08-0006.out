@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 jackErr=0.00000 groupStd/sqrt10=0.00000 lag1ac(blocks)=0.037 <m2>=0.8818
+T=2.0 U=0.66246 jackErr=0.00001 groupStd/sqrt10=0.00001 lag1ac(blocks)=-0.001 <m2>=0.8335
+T=2.1 U=0.65669 jackErr=0.00002 groupStd/sqrt10=0.00002 lag1ac(blocks)=0.114 <m2>=0.7622
+T=2.2 U=0.63936 jackErr=0.00005 groupStd/sqrt10=0.00006 lag1ac(blocks)=0.140 <m2>=0.6516
+T=2.3 U=0.59258 jackErr=0.00011 groupStd/sqrt10=0.00010 lag1ac(blocks)=0.106 <m2>=0.4923
+T=2.4 U=0.50114 jackErr=0.00018 groupStd/sqrt10=0.00016 lag1ac(blocks)=0.101 <m2>=0.3239

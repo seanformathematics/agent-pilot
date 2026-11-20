@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 jackknife_err=0.00000  U(first half)=0.32922 U(second half)=0.32919
+T=2.0 U=0.66245 jackknife_err=0.00001  U(first half)=0.32485 U(second half)=0.32497
+T=2.1 U=0.65670 jackknife_err=0.00004  U(first half)=0.31333 U(second half)=0.31346
+T=2.2 U=0.63944 jackknife_err=0.00009  U(first half)=0.27890 U(second half)=0.27887
+T=2.3 U=0.59244 jackknife_err=0.00019  U(first half)=0.18467 U(second half)=0.18508
+T=2.4 U=0.50127 jackknife_err=0.00031  U(first half)=0.00148 U(second half)=0.00361

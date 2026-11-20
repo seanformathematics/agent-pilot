@@ -1,0 +1,9 @@
+{"dir": "/work", "path": "/work/res_2.0.npz", "type": "f", "bytes": 24730, "mtime": 1795206060.131552}
+{"dir": "/work", "path": "/work/res_1.9.npz", "type": "f", "bytes": 24730, "mtime": 1795205951.7319138}
+{"dir": "/work", "path": "/work/__pycache__", "type": "d", "bytes": 60, "mtime": 1795205842.5758324}
+{"dir": "/work", "path": "/work/__pycache__/ising.cpython-314.pyc", "type": "f", "bytes": 3629, "mtime": 1795205842.5758324}
+{"dir": "/work", "path": "/work/ising.py", "type": "f", "bytes": 1357, "mtime": 1795205835.551085}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 100, "mtime": 1795205842.5188324}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-09-0003.py", "type": "f", "bytes": 779, "mtime": 1795205842.51979}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-09-0002.py", "type": "f", "bytes": 1749, "mtime": 1795205835.51199}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-09-0001.py", "type": "f", "bytes": 180, "mtime": 1795205826.548944}

@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 jackknife_err=0.00000 firsthalf=0.66460 secondhalf=0.66461 n_rep=1000 blocks=32
+T=2.0 U=0.66246 jackknife_err=0.00001 firsthalf=0.66245 secondhalf=0.66246 n_rep=1000 blocks=32
+T=2.1 U=0.65672 jackknife_err=0.00003 firsthalf=0.65674 secondhalf=0.65671 n_rep=1000 blocks=32
+T=2.2 U=0.63929 jackknife_err=0.00007 firsthalf=0.63932 secondhalf=0.63925 n_rep=1000 blocks=32
+T=2.3 U=0.59268 jackknife_err=0.00015 firsthalf=0.59255 secondhalf=0.59281 n_rep=1000 blocks=32
+T=2.4 U=0.50070 jackknife_err=0.00026 firsthalf=0.50059 secondhalf=0.50080 n_rep=1000 blocks=32

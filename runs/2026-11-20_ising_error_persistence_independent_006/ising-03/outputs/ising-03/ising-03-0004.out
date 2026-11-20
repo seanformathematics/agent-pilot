@@ -1,0 +1,6 @@
+1.9 0.6646 jk_err 0.0 blockstd/sqrt10 1e-05 cnt 18000
+2.0 0.66245 jk_err 1e-05 blockstd/sqrt10 1e-05 cnt 18000
+2.1 0.65668 jk_err 3e-05 blockstd/sqrt10 2e-05 cnt 18000
+2.2 0.63943 jk_err 7e-05 blockstd/sqrt10 7e-05 cnt 18000
+2.3 0.5924 jk_err 0.00014 blockstd/sqrt10 0.00017 cnt 18000
+2.4 0.50127 jk_err 0.00023 blockstd/sqrt10 0.00019 cnt 18000
