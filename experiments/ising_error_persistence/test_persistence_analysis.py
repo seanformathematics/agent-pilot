@@ -1,5 +1,5 @@
 import math, random
-import persistence_analysis as pa
+from experiments.ising_error_persistence import persistence_analysis as pa
 
 def att(*kinds):
     return [{"kind": k, "issues": ["markup"] if k == "markup" else [], "accepted_with_markup": False} for k in kinds]
