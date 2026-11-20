@@ -1,0 +1,4 @@
+T 1.9 time 79.64528846740723
+U all 0.6646057280113579
+U first half 0.6646088698158814 second half 0.6646025864229705
+absm per 1000 sweeps [np.float64(0.9382), np.float64(0.9383), np.float64(0.9382), np.float64(0.9384), np.float64(0.9384), np.float64(0.9384), np.float64(0.9384), np.float64(0.9383), np.float64(0.9384), np.float64(0.9382), np.float64(0.9383), np.float64(0.9383), np.float64(0.9383), np.float64(0.9383), np.float64(0.9383), np.float64(0.9383), np.float64(0.9383), np.float64(0.9384), np.float64(0.9382), np.float64(0.9382)]

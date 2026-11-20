@@ -1,0 +1,7 @@
+['T2.40_s24007.npz', 'T2.30_s23007.npz', 'T2.20_s22007.npz', 'T2.10_s21007.npz', 'T2.00_s20007.npz', 'T1.90_s13438.npz']
+T=1.9 seed=13438 U=0.66461 err_jk_rep=0.00000 err_jk_20grp=0.00000 nsamp=400000
+T=2.0 seed=20007 U=0.66245 err_jk_rep=0.00001 err_jk_20grp=0.00001 nsamp=400000
+T=2.1 seed=21007 U=0.65668 err_jk_rep=0.00002 err_jk_20grp=0.00002 nsamp=400000
+T=2.2 seed=22007 U=0.63936 err_jk_rep=0.00006 err_jk_20grp=0.00006 nsamp=400000
+T=2.3 seed=23007 U=0.59244 err_jk_rep=0.00014 err_jk_20grp=0.00015 nsamp=400000
+T=2.4 seed=24007 U=0.50117 err_jk_rep=0.00023 err_jk_20grp=0.00021 nsamp=400000

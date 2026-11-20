@@ -1,0 +1,4 @@
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           256M  4.0K  256M   1% /work
+tmpfs           256M   16K  256M   1% /tmp
+

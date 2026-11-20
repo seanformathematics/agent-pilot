@@ -1,0 +1,6 @@
+1.9 U=0.66460 jk_err=0.00000 superblock_err=0.00000 n_blocks 1000
+2.0 U=0.66244 jk_err=0.00001 superblock_err=0.00002 n_blocks 1000
+2.1 U=0.65668 jk_err=0.00003 superblock_err=0.00003 n_blocks 1000
+2.2 U=0.63945 jk_err=0.00008 superblock_err=0.00010 n_blocks 1000
+2.3 U=0.59256 jk_err=0.00019 superblock_err=0.00018 n_blocks 1000
+2.4 U=0.50133 jk_err=0.00036 superblock_err=0.00043 n_blocks 1000
