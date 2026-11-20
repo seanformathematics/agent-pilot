@@ -1,0 +1,6 @@
+T=1.9: U=0.66462  jackknife_err=0.00001  group10_err=0.00001  <m2>=0.8819
+T=2.0: U=0.66245  jackknife_err=0.00002  group10_err=0.00002  <m2>=0.8335
+T=2.1: U=0.65671  jackknife_err=0.00006  group10_err=0.00006  <m2>=0.7622
+T=2.2: U=0.63947  jackknife_err=0.00014  group10_err=0.00008  <m2>=0.6517
+T=2.3: U=0.59260  jackknife_err=0.00030  group10_err=0.00026  <m2>=0.4920
+T=2.4: U=0.50052  jackknife_err=0.00050  group10_err=0.00049  <m2>=0.3236

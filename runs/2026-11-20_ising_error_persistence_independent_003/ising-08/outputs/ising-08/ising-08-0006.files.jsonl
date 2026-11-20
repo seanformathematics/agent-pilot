@@ -1,0 +1,12 @@
+{"dir": "/work", "path": "/work/replicates.json", "type": "f", "bytes": 414, "mtime": 1795170130.1470125}
+{"dir": "/work", "path": "/work/results.json", "type": "f", "bytes": 1186, "mtime": 1795169755.179823}
+{"dir": "/work", "path": "/work/__pycache__", "type": "d", "bytes": 60, "mtime": 1795169221.567488}
+{"dir": "/work", "path": "/work/__pycache__/ising.cpython-314.pyc", "type": "f", "bytes": 4570, "mtime": 1795169221.567488}
+{"dir": "/work", "path": "/work/ising.py", "type": "f", "bytes": 1938, "mtime": 1795169221.5660093}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 160, "mtime": 1795169761.6569815}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0006.py", "type": "f", "bytes": 723, "mtime": 1795169761.657588}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0005.py", "type": "f", "bytes": 635, "mtime": 1795169266.8134074}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0004.py", "type": "f", "bytes": 2256, "mtime": 1795169221.5623794}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0003.py", "type": "f", "bytes": 845, "mtime": 1795169208.549994}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0002.py", "type": "f", "bytes": 93, "mtime": 1795169204.940488}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-08-0001.py", "type": "f", "bytes": 192, "mtime": 1795169203.0837448}

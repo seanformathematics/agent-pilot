@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-05-0002.py", line 39, in <module>
+    ac=[np.dot(x[:-l],x[l:])/np.dot(x,x) for l in range(0,200,10)]
+        ~~~~~~^^^^^^^^^^^^^^
+ValueError: shapes (0,) and (3000,) not aligned: 0 (dim 0) != 3000 (dim 0)
