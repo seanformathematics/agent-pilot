@@ -119,7 +119,7 @@ The harness refuses to start unless the git tree is clean, and commits the run f
 
 An important (implicit) control parameter for this harness is how well-known a given subject is. Roughly, we can divide physics knowledge into "known" and "unknown", with active research at the boundary between the two. Studying known phenomena allows us to study agent behavior. Studying unknown phenomena is the literal definition of research. This harness can also be a tool for improving our understanding of the involvement of agents in active research.
 
-The next steps are deep in the "known". Specifically I will add complexity to the agent's tasks and look for pairwise correlation of error in weakly coupled agents. To be precise this involve two phases:
+The next steps are deep in the "known". Specifically I will add complexity to the agent's tasks and look for pairwise correlation of error in weakly coupled agents. To be precise this involves two phases:
 
 **Phase One** Task Complexity and Budgeting:
 
