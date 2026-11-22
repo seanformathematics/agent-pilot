@@ -493,8 +493,11 @@ leaked markup:
   In `2026-11-18_ising_haiku_at_max_pinned_independent_001` ising-01 asked
   for 60 s, the default, so nothing changed. In
   `2026-11-18_ising_haiku_at_xhigh_pinned_independent_001` ising-02 asked
-  for 300 s; the call passed validation, ran with the 60 s default, and
-  timed out at 60.1 s. **The agent's intent was changed without any error.**
+  for 300 s; the call passed validation and ran under the 60 s default.
+  It finished in 1.6 s, so nothing visible happened, and the agent never
+  remarked on it. (Its next call left out `timeout_s`, timed out at 60 s,
+  and the agent raised the timeout to 600; that call had no slip.)
+  **The agent's intent was changed without any error.**
 
 Grading reads only `points`, so no score changed, but nothing in the runs
 flagged the corrupted fields. They were found only by searching the logs.
