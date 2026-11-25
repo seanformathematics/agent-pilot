@@ -1,0 +1,5 @@
+time 2.9264583587646484
+tau_int (blocks of10 sweeps) m2: (np.float64(1.132230949384677), 8)
+m2 mean by 50-block chunks: [np.float64(0.4917), np.float64(0.4937), np.float64(0.4941), np.float64(0.4891), np.float64(0.4901), np.float64(0.4877), np.float64(0.4936), np.float64(0.4941), np.float64(0.4972), np.float64(0.4897)]
+U first/last chunk 0.6102600456099675 0.6109556525664107
+U std over replicas of sweep-avg 0.0005483623801116356

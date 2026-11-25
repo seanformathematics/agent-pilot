@@ -1,0 +1,1 @@
+CompletedProcess(args="which gcc cc clang; python3 -c 'import numba' ; nproc; free -m", returncode=127, stdout='1\n', stderr='Traceback (most recent call last):\n  File "<string>", line 1, in <module>\n    import numba\nModuleNotFoundError: No module named \'numba\'\n/bin/sh: 1: free: not found\n')

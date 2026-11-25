@@ -1,0 +1,6 @@
+total 16
+drwx------ 2 agent agent   80 Nov 25 19:20 .
+drwxr-xr-x 1 root  root    12 Nov 25 19:20 ..
+-rw-rw-rw- 1 agent agent 9476 Nov 25 19:20 res_T2.269_s1.npz
+-rw-rw-rw- 1 agent agent 1261 Nov 25 19:20 sim.py
+

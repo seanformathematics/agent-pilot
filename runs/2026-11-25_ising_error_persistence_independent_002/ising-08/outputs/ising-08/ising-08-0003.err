@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-08-0003.py", line 56, in <module>
+    T=float(sys.argv[1]); budget=float(sys.argv[2])
+            ~~~~~~~~^^^
+IndexError: list index out of range

@@ -1,0 +1,6 @@
+T=1.9 U=0.66459 err=0.00001 blockU_mean=0.66459 blockU_sd=0.00004 t=27s
+T=2.0 U=0.66246 err=0.00003 blockU_mean=0.66246 blockU_sd=0.00008 t=55s
+T=2.1 U=0.65651 err=0.00008 blockU_mean=0.65651 blockU_sd=0.00019 t=83s
+T=2.2 U=0.63930 err=0.00020 blockU_mean=0.63930 blockU_sd=0.00040 t=113s
+T=2.3 U=0.59233 err=0.00044 blockU_mean=0.59233 blockU_sd=0.00102 t=145s
+T=2.4 U=0.50083 err=0.00073 blockU_mean=0.50083 blockU_sd=0.00219 t=179s

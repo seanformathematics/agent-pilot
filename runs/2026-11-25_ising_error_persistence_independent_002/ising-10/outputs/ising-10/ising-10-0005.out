@@ -1,0 +1,8 @@
+1.9 U=0.66461  std(Ui)/sqrt(R)=0.000003  std(a2)/sqrt(R)/mean=0.00003 std(a4)/sqrt(R)/mean=0.00006
+   block-to-block std of replica-avg m2 (x sqrt(nblocks)): 0.028694426654823062 mean 0.8819056597351075
+2.0 U=0.66245  std(Ui)/sqrt(R)=0.000009  std(a2)/sqrt(R)/mean=0.00006 std(a4)/sqrt(R)/mean=0.00010
+   block-to-block std of replica-avg m2 (x sqrt(nblocks)): 0.048805767190647276 mean 0.8334047324279785
+2.1 U=0.65667  std(Ui)/sqrt(R)=0.000025  std(a2)/sqrt(R)/mean=0.00012 std(a4)/sqrt(R)/mean=0.00018
+   block-to-block std of replica-avg m2 (x sqrt(nblocks)): 0.09026961138616237 mean 0.7620819861236572
+2.2 U=0.63934  std(Ui)/sqrt(R)=0.000063  std(a2)/sqrt(R)/mean=0.00025 std(a4)/sqrt(R)/mean=0.00034
+   block-to-block std of replica-avg m2 (x sqrt(nblocks)): 0.16097219679934321 mean 0.6514506272094726
