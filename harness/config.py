@@ -84,6 +84,11 @@ class RunConfig(Strict):
     topology: Literal["single", "independent", "one_shot", "hierarchical"]
     model: str
     effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
+    # What a rejected malformed call (one that fails input validation) is told:
+    # "truncated" = Pydantic's message alone, which shortens the input it
+    # echoes (every run before 2026-11-24); "full" = the same message, then
+    # the whole input as the harness received it.
+    rejection_feedback: Literal["truncated", "full"]
     submission_model: str
     sanity_checks: str | None = None
     analysis: str

@@ -19,7 +19,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from harness import tools
+from harness import markup, tools
 from harness.config import RunConfig, load_object, load_prompt
 from harness.sandbox import Sandbox, SandboxUnresponsive, inspect_archive
 
@@ -219,6 +219,7 @@ class Harness:
         returned to the agent as errors; they never raise.
         """
         self.log(agent_id, "tool_call", {"tool_use_id": tool_use_id, "name": name, "input": raw_input})
+        self._flag_markup(agent_id, tool_use_id, name, raw_input)
 
         if name not in self._allowed_tools(agent_id):
             content, is_error = self._reject(agent_id, tool_use_id, f"Unknown or unavailable tool: {name!r}.")
@@ -237,7 +238,8 @@ class Harness:
             # The model also enforces 1 <= timeout_s <= limits.max_timeout_s.
             call = self.run_python_model.model_validate(raw_input)
         except ValidationError as error:
-            return self._reject(agent_id, tool_use_id, f"Invalid run_python input:\n{error}")
+            return self._reject(agent_id, tool_use_id,
+                                self._validation_message("Invalid run_python input:", error, raw_input))
 
         self._exec_counts[agent_id] += 1
         exec_id = f"{agent_id}-{self._exec_counts[agent_id]:04d}"
@@ -295,7 +297,8 @@ class Harness:
         try:
             submission = self.submission_model.model_validate(raw_input)
         except ValidationError as error:
-            return self._reject_submission(agent_id, tool_use_id, attempt, f"Invalid submission:\n{error}")
+            return self._reject_submission(agent_id, tool_use_id, attempt,
+                                           self._validation_message("Invalid submission:", error, raw_input))
 
         # NaN and infinity can't be written to a valid JSON log, and Pydantic
         # turns the strings "NaN" or "inf" into those values without complaint.
@@ -323,6 +326,33 @@ class Harness:
     def _reject(self, agent_id: str, tool_use_id: str, message: str) -> tuple[str, bool]:
         self.log(agent_id, "rejection", {"tool_use_id": tool_use_id, "message": message})
         return message, True
+
+    def _validation_message(self, heading: str, error: ValidationError, raw_input) -> str:
+        """What the agent is told when its input fails validation.
+
+        "truncated": Pydantic's message, which shortens the input it echoes,
+        so a field swallowed by leaked markup can't be seen. "full": the same
+        message word for word, then the whole input as received. The two
+        differ only in that last part (config ``rejection_feedback``).
+        """
+        text = f"{heading}\n{error}"
+        if self.config.rejection_feedback == "full":
+            text += "\n\nThe input as received:\n" + json.dumps(raw_input, indent=2, ensure_ascii=False)
+        return text
+
+    def _flag_markup(self, agent_id: str, tool_use_id: str, name: str, raw_input) -> None:
+        """Log a flag if leaked tool-call markup is in the input (harness/markup.py).
+
+        Log only: the agent is never told, and the call is handled exactly as
+        it would be otherwise.
+        """
+        model = {"run_python": self.run_python_model, "submit_result": self.submission_model}.get(name)
+        if model is None:
+            return
+        result = markup.classify_tool_input(raw_input, model)
+        if result["markup"]:
+            self.log(agent_id, "flag", {"reason": "tool_input_markup", "tool_use_id": tool_use_id,
+                                        "tool": name, **result})
 
     # ----- helpers -----------------------------------------------------
 

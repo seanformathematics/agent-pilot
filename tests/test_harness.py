@@ -1,6 +1,8 @@
 """Harness and Agent behaviour against a fake client and fake sandbox."""
 
 import json
+
+import pydantic
 import sys
 
 import anthropic
@@ -8,6 +10,7 @@ import httpx2 as httpx
 import pytest
 
 from harness.agent import Agent, outage_wait_s
+from harness.config import load_object
 from tests.conftest import FakeClient, entries_of, sent_to_model, text_reply, tool_call
 
 GOOD_SUBMISSION = {"total": 1555, "method_notes": "Summed with Python's sum()."}
@@ -611,3 +614,81 @@ def test_no_clock_gap_flag_on_an_ordinary_call(make_harness):
         tool_call("submit_result", GOOD_SUBMISSION),
     ])
     assert all(e["data"]["reason"] != "host_clock_gap" for e in entries_of(logger, "flag"))
+
+
+# ----- rejection feedback: truncated vs full; markup flag ------------------
+
+# The 2026-11 leak, in toy form: the model closed method_notes with the wrong
+# tag, so the `total` parameter was read as text inside method_notes.
+LEAKED = {"method_notes": "Summed with Python's sum(). " + "Checked twice. " * 20
+                          + '</method_notes>\n<parameter name="total">1555'}
+
+
+def with_feedback(config, mode):
+    return config.model_copy(update={"rejection_feedback": mode})
+
+
+def leaked_submission_rejection(make_harness, config):
+    _, _, logger, client = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
+        tool_call("submit_result", LEAKED),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ], config=config)
+    return entries_of(logger, "rejection")[0]["data"]["message"], logger, client
+
+
+def test_truncated_feedback_hides_where_the_leaked_field_went(make_harness, toy_config):
+    message, _, _ = leaked_submission_rejection(make_harness, with_feedback(toy_config, "truncated"))
+    assert "total\n  Field required" in message
+    assert '<parameter name="total">' not in message  # Pydantic cut the echoed input short
+    assert "The input as received" not in message
+
+
+def test_full_feedback_is_the_same_message_plus_the_whole_input(make_harness, toy_config):
+    full, _, client = leaked_submission_rejection(make_harness, with_feedback(toy_config, "full"))
+    with pytest.raises(pydantic.ValidationError) as error:  # what the truncated arm shows
+        load_object(toy_config.submission_model).model_validate(LEAKED)
+    assert full.startswith(f"Invalid submission:\n{error.value}\n\nThe input as received:\n")  # word for word
+    assert full.endswith("\n\nSubmissions remaining: 2.")
+    shown = full.split("The input as received:\n", 1)[1].split("\n\nSubmissions remaining:")[0]
+    assert json.loads(shown) == LEAKED  # the whole input, exactly as received
+    assert '<parameter name=\\"total\\">1555' in sent_to_model(client)  # the agent sees it
+
+
+def test_full_feedback_also_applies_to_run_python(make_harness, toy_config):
+    bad = {"purpose": "test call", "code": "print(1)", "timeout_s": "soon"}
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", bad),
+        text_reply("done"),
+    ], config=with_feedback(toy_config, "full"))
+    message = entries_of(logger, "rejection")[0]["data"]["message"]
+    assert message.startswith("Invalid run_python input:\n")
+    assert json.loads(message.split("The input as received:\n", 1)[1]) == bad
+
+
+def test_sanity_check_rejection_is_the_same_in_both_modes(make_harness, toy_config):
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "test call", "code": "print(1)"}),
+        tool_call("submit_result", {"total": 1555, "method_notes": "   "}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ], config=with_feedback(toy_config, "full"))
+    message = entries_of(logger, "rejection")[0]["data"]["message"]
+    assert "method_notes is empty" in message and "The input as received" not in message
+
+
+def test_leaked_markup_is_flagged_in_the_log_but_never_shown(make_harness, toy_config):
+    message, logger, client = leaked_submission_rejection(make_harness, with_feedback(toy_config, "truncated"))
+    [flag] = [e["data"] for e in entries_of(logger, "flag") if e["data"]["reason"] == "tool_input_markup"]
+    assert flag["tool"] == "submit_result" and flag["version"] == 1
+    assert flag["markup"]["tier"] == "confirmed" and flag["markup"]["swallowed"] == ["total"]
+    assert "missing_swallowed" in flag["issues"]
+    assert "tool_input_markup" not in sent_to_model(client)
+    assert "markup" not in message.lower()
+
+
+def test_clean_calls_are_not_flagged(make_harness):
+    _, _, logger, _ = run_agent(make_harness, [
+        tool_call("run_python", {"purpose": "test call", "code": "print('<b>html is fine in code</b>')"}),
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert [e for e in entries_of(logger, "flag") if e["data"]["reason"] == "tool_input_markup"] == []
