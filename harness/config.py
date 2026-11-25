@@ -46,7 +46,8 @@ class Limits(Strict):
     output_cap_bytes: int = Field(ge=100)  # per stream, per execution, shown to the agent
     max_stored_output_mb: int = Field(ge=1)  # per stream, per execution, saved to disk
     max_submissions: int = Field(ge=1)  # every submit_result call counts
-    api_retries: int = Field(ge=0)  # retries of a failed API call; each one is logged
+    api_retries: int = Field(ge=0)  # quick retries of a failed API call; each one is logged
+    api_outage_wait_s: int = Field(ge=0)  # then keep waiting this long for the API to come back (0 = don't)
 
     @model_validator(mode="after")
     def default_timeout_allowed(self):

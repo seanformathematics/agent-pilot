@@ -259,7 +259,7 @@ def render_event(record: dict, folder: Path, out_dir: Path) -> str:
                 f'{link(folder / "outputs" / (record.get("agent") or "") / str(data.get("file", "")), out_dir, str(data.get("file", "")))}</div>')
     if kind in ("agent_start", "container_stop"):
         return f'<div class="event muted">{stamp} {e(kind)} {scalar(data)}</div>'
-    if kind in ("api_error", "run_error", "workspace_archive_failed", "workspace_archive_incomplete", "unreadable_line"):
+    if kind in ("api_error", "api_outage_start", "api_outage_end", "run_error", "workspace_archive_failed", "workspace_archive_incomplete", "unreadable_line"):
         return f'<div class="event bad">{stamp} <b>{e(kind)}</b>{pre(json.dumps(data, indent=1))}</div>'
     # Anything else is shown raw, so nothing in the log is ever left off the page.
     return f'<div class="event">{stamp} <b>{e(kind)}</b>{details("record", pre(json.dumps(data, indent=1)))}</div>'

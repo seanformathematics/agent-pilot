@@ -7,7 +7,7 @@ import anthropic
 import httpx2 as httpx
 import pytest
 
-from harness.agent import Agent
+from harness.agent import Agent, outage_wait_s
 from tests.conftest import FakeClient, entries_of, sent_to_model, text_reply, tool_call
 
 GOOD_SUBMISSION = {"total": 1555, "method_notes": "Summed with Python's sum()."}
@@ -336,15 +336,62 @@ def test_transient_error_retried_and_logged(make_harness):
     assert waits == [2]
 
 
-def test_retries_exhausted_ends_agent(make_harness):
+def connection_errors(n):
     request = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
-    errors = [anthropic.APIConnectionError(request=request) for _ in range(3)]
-    outcome, logger, waits = run_with_sleep_log(make_harness, errors)
-    assert outcome["status"] == "api_error"
+    return [anthropic.APIConnectionError(request=request) for _ in range(n)]
+
+
+def with_outage_wait(config, seconds):
+    return config.model_copy(update={"limits": config.limits.model_copy(update={"api_outage_wait_s": seconds})})
+
+
+def test_quick_retries_then_outage_wait_then_recovery(make_harness):
+    # The 2026-11-20 failure: the connection drops for a few minutes.
+    outcome, logger, waits = run_with_sleep_log(make_harness, connection_errors(5) + [
+        tool_call("submit_result", GOOD_SUBMISSION),
+    ])
+    assert outcome["status"] == "submitted"
+    assert outcome["turns"] == 1  # the agent's conversation simply goes on
+    assert waits == [2, 4, 30, 60, 120]
+    assert [e["data"]["attempt"] for e in entries_of(logger, "api_error")] == [1, 2, 3, 4, 5]
+    [start] = entries_of(logger, "api_outage_start")
+    assert start["data"] == {"after_attempts": 3, "limit_s": 1800}
+    [end] = entries_of(logger, "api_outage_end")
+    assert end["data"] == {"recovered": True, "attempts": 6, "waited_s": 210}
+
+
+def test_outage_longer_than_the_wait_ends_agent_with_api_outage(make_harness, toy_config):
+    outcome, logger, waits = run_with_sleep_log(
+        make_harness, connection_errors(6), config=with_outage_wait(toy_config, 100))
+    assert outcome["status"] == "api_outage"
+    assert waits == [2, 4, 30, 60, 10]  # the last wait is cut to fit the 100 s limit
     logged = [e["data"] for e in entries_of(logger, "api_error")]
-    assert [e["attempt"] for e in logged] == [1, 2, 3]
-    assert [e["will_retry"] for e in logged] == [True, True, False]
+    assert [e["will_retry"] for e in logged] == [True] * 5 + [False]
+    [end] = entries_of(logger, "api_outage_end")
+    assert end["data"] == {"recovered": False, "attempts": 6, "waited_s": 100}
+    assert entries_of(logger, "agent_end")[0]["data"]["status"] == "api_outage"
+
+
+def test_no_outage_wait_gives_up_after_the_quick_retries(make_harness, toy_config):
+    outcome, logger, waits = run_with_sleep_log(
+        make_harness, connection_errors(3), config=with_outage_wait(toy_config, 0))
+    assert outcome["status"] == "api_outage"
     assert waits == [2, 4]
+    assert entries_of(logger, "api_outage_start") == [] and entries_of(logger, "api_outage_end") == []
+
+
+def test_non_retryable_error_during_an_outage_ends_it_as_api_error(make_harness):
+    outcome, logger, waits = run_with_sleep_log(make_harness, connection_errors(3) + [
+        api_status_error(anthropic.BadRequestError, 400),
+    ])
+    assert outcome["status"] == "api_error"
+    assert waits == [2, 4, 30]
+    [end] = entries_of(logger, "api_outage_end")
+    assert end["data"]["recovered"] is True  # the API answered, with an error retrying can't fix
+
+
+def test_outage_wait_schedule():
+    assert [outage_wait_s(n) for n in range(1, 7)] == [30, 60, 120, 240, 300, 300]
 
 
 def test_retry_after_header_respected(make_harness):

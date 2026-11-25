@@ -21,7 +21,19 @@ API retries belong to the harness, not the SDK, so every failed attempt and
 every wait is logged. The client must be made with ``max_retries=0`` (use
 ``make_client``). Errors that might succeed on a second try (network
 problems, rate limits, overload, server errors) are retried up to
-``limits.api_retries`` times; anything else ends the agent at once.
+``limits.api_retries`` times, 2, 4, 8, ... seconds apart; anything else ends
+the agent at once (status ``api_error``).
+
+If the quick retries run out on such an error, the API is treated as down
+and the agent waits it out: the same request is sent again after 30 s, then
+60, 120, ... (at most 5 min apart) until ``limits.api_outage_wait_s`` seconds
+of waiting are spent. The agent cannot tell: it sees no clock, nothing runs
+in its container meanwhile, and the conversation goes on where it stopped.
+``api_outage_start`` and ``api_outage_end`` entries bracket the wait. If the
+API is still down at the end, the agent ends with status ``api_outage``, and
+an independent batch stops instead of starting its next agent into the same
+outage. On 2026-11-20 a connection loss of a few minutes ended six agents of
+one batch in 30 s, one after another, because each gave up after 6 s.
 
 Every request is streamed: the response arrives as a flow of small pieces
 and ``get_final_message()`` assembles them into the same Message that
@@ -50,6 +62,8 @@ import time
 import anthropic
 
 MAX_RETRY_WAIT_S = 60
+OUTAGE_FIRST_WAIT_S = 30   # first wait once the quick retries are used up
+OUTAGE_MAX_WAIT_S = 300    # longest single wait during an outage
 
 # Adaptive thinking (the model decides how much to think), with a readable
 # summary returned instead of empty thinking text. See the module docstring.
@@ -61,13 +75,18 @@ STATUS_BUDGET = "budget_exhausted"
 STATUS_ENDED_TURN = "ended_turn_without_submission"
 STATUS_MAX_TOKENS = "max_tokens_without_tool_call"
 STATUS_REFUSAL = "refusal"
-STATUS_API_ERROR = "api_error"
+STATUS_API_ERROR = "api_error"      # an error that retrying can't fix (e.g. a bad request)
+STATUS_API_OUTAGE = "api_outage"    # the API stayed unreachable for limits.api_outage_wait_s
+
+
+class APIOutage(Exception):
+    """The API stayed down for the whole outage wait."""
 
 
 class Agent:
     """One LLM conversation driven to completion through the harness."""
 
-    def __init__(self, agent_id: str, client, harness, sleep=time.sleep) -> None:
+    def __init__(self, agent_id: str, client, harness, sleep=None) -> None:
         if getattr(client, "max_retries", 0) != 0:
             raise ValueError("the client must have max_retries=0; the harness does its own logged retries")
         self.agent_id = agent_id
@@ -79,7 +98,8 @@ class Agent:
         self.max_turns = config.limits.max_turns
         self.max_tokens = config.limits.max_tokens_per_response
         self.api_retries = config.limits.api_retries
-        self._sleep = sleep  # replaced in tests so retries don't really wait
+        self.api_outage_wait_s = config.limits.api_outage_wait_s
+        self._sleep = sleep or time.sleep  # replaced in tests so retries don't really wait
         self.system_prompt = harness.system_prompt_for(agent_id)
         self.tools = harness.tool_definitions(agent_id)
         self.messages: list[dict] = []
@@ -97,6 +117,9 @@ class Agent:
 
             try:
                 response = self._create_with_retries()
+            except APIOutage:
+                status = STATUS_API_OUTAGE
+                break
             except anthropic.APIError:
                 status = STATUS_API_ERROR
                 break
@@ -137,17 +160,33 @@ class Agent:
         return outcome
 
     def _create_with_retries(self):
-        """Call the API, retrying transient failures. Every failure is logged."""
+        """Call the API, retrying transient failures. Every failure is logged.
+
+        Quick retries first (``api_retries``); then, if the error is still
+        one that retrying might fix, the outage wait (module docstring).
+        """
         attempt = 0
+        outage_waits = 0      # waits taken since the outage began
+        outage_waited_s = 0   # seconds spent in those waits
         while True:
             attempt += 1
             try:
                 with self._client.messages.stream(**self._request()) as stream:
-                    return stream.get_final_message()
+                    response = stream.get_final_message()
             except anthropic.APIError as error:
                 retryable = is_retryable(error)
-                will_retry = retryable and attempt <= self.api_retries
-                wait_s = retry_wait_s(error, attempt) if will_retry else 0
+                in_outage = retryable and attempt > self.api_retries
+                if not retryable:
+                    wait_s = 0
+                elif not in_outage:
+                    wait_s = retry_wait_s(error, attempt)
+                else:
+                    remaining_s = self.api_outage_wait_s - outage_waited_s
+                    wait_s = min(outage_wait_s(outage_waits + 1), remaining_s)
+                    if outage_waits == 0 and wait_s > 0:
+                        self._harness.log(self.agent_id, "api_outage_start", {
+                            "after_attempts": attempt, "limit_s": self.api_outage_wait_s})
+                will_retry = wait_s > 0
                 self._harness.log(self.agent_id, "api_error", {
                     "attempt": attempt,
                     "type": type(error).__name__,
@@ -158,8 +197,24 @@ class Agent:
                     "wait_s": wait_s,
                 })
                 if not will_retry:
+                    if outage_waits:  # a non-retryable error means the API answered again
+                        self._log_outage_end(recovered=not in_outage, attempts=attempt,
+                                             waited_s=outage_waited_s)
+                    if in_outage:
+                        raise APIOutage(f"API unreachable after {attempt} attempts") from error
                     raise
                 self._sleep(wait_s)
+                if in_outage:
+                    outage_waits += 1
+                    outage_waited_s += wait_s
+                continue
+            if outage_waits:
+                self._log_outage_end(recovered=True, attempts=attempt, waited_s=outage_waited_s)
+            return response
+
+    def _log_outage_end(self, recovered: bool, attempts: int, waited_s: float) -> None:
+        self._harness.log(self.agent_id, "api_outage_end", {
+            "recovered": recovered, "attempts": attempts, "waited_s": waited_s})
 
     def _reason_to_stop(self) -> str | None:
         if self._harness.is_done(self.agent_id):
@@ -190,6 +245,11 @@ def make_client() -> anthropic.Anthropic:
     SDK retries are off: retries happen in Agent, where they are logged.
     """
     return anthropic.Anthropic(max_retries=0)
+
+
+def outage_wait_s(n: int) -> float:
+    """The n-th wait of an outage: 30, 60, 120, 240, then 300 s each."""
+    return min(OUTAGE_FIRST_WAIT_S * 2 ** (n - 1), OUTAGE_MAX_WAIT_S)
 
 
 def is_retryable(error: anthropic.APIError) -> bool:

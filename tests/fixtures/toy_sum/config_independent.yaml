@@ -39,6 +39,7 @@ limits:
   max_stored_output_mb: 100    # per stream, per execution, saved to disk
   max_submissions: 3           # first attempt plus two resubmissions
   api_retries: 2               # retries of a failed API call, each logged
+  api_outage_wait_s: 1800      # then wait up to 30 min for the API to come back
 
 sandbox:
   image: residency-sandbox:py3.14

@@ -61,6 +61,7 @@ import pydantic
 import yaml
 
 from harness.config import REPO_ROOT, load_config, load_object, load_prompt, repo_path
+from harness.agent import STATUS_API_OUTAGE
 from harness.harness import Harness
 from harness.sandbox import Sandbox
 from harness.topologies import TOPOLOGIES, single_agent
@@ -252,6 +253,11 @@ class ProgressLogger:
             return f"{who} flag: {data['reason']}"
         if kind == "api_error":
             return f"{who} API error (retries are logged)"
+        if kind == "api_outage_start":
+            return f"{who} API UNREACHABLE: waiting up to {data['limit_s'] / 60:.0f} min for it to come back"
+        if kind == "api_outage_end":
+            back = "API is back" if data["recovered"] else "API still down; agent ends"
+            return f"{who} {back} after {data['waited_s'] / 60:.1f} min of waiting"
         if kind == "sandbox_unresponsive":
             return f"{who} SANDBOX UNRESPONSIVE after {data['exec_id']}; agent ends"
         if kind == "agent_end":
@@ -261,6 +267,8 @@ class ProgressLogger:
         if kind == "batch_start":
             self._batch_size = len(data["agents"])
             return f"{'batch':<10} started: {self._batch_size} agents, one after another"
+        if kind == "agent_not_started":
+            return f"{data['agent_id']:<10} not started ({data.get('reason', '')})"
         if kind == "agent_run_end":
             self._batch_done += 1
             return (f"{data['agent_id']:<10} done: {data['status']}, {data['tokens_used'] / 1000:.0f}k tokens,"
@@ -409,6 +417,8 @@ def record_one_log(config, folder: Path, client, logger_factory, sandbox_factory
         if (folder / "log.jsonl").stat().st_size == 0:
             raise RuntimeError("the logger wrote nothing; is harness/logger.py implemented?")
         outcomes = play(harness, client)
+        if any(o["status"] == STATUS_API_OUTAGE for o in outcomes):
+            status = "api_outage"
     except KeyboardInterrupt:
         status = "aborted"
     except Exception as error:
@@ -478,8 +488,10 @@ def run_independent(config, run_dir: Path, client, logger_factory, sandbox_facto
     subfolder's own log would still verify on its own.
 
     If one agent's run fails with an error, the next agent still runs: they
-    are independent. Ctrl-C stops the batch; agents not yet started are
-    logged as not started.
+    are independent. Ctrl-C stops the batch, and so does an agent that ends
+    because the API stayed down for its whole outage wait (status
+    "api_outage"): the next agent would only meet the same outage. Agents not
+    yet started are logged as not started, with the reason.
     """
     batch = logger_factory(run_dir / "batch.jsonl")
     status = "completed"
@@ -493,8 +505,8 @@ def run_independent(config, run_dir: Path, client, logger_factory, sandbox_facto
         if (run_dir / "batch.jsonl").stat().st_size == 0:
             raise RuntimeError("the logger wrote nothing; is harness/logger.py implemented?")
         for agent in config.agents:
-            if status == "aborted":
-                batch.append("harness", "agent_not_started", {"agent_id": agent.id})
+            if status in ("aborted", "api_outage"):
+                batch.append("harness", "agent_not_started", {"agent_id": agent.id, "reason": status})
                 continue
             folder = run_dir / agent.id
             folder.mkdir()
@@ -509,8 +521,8 @@ def run_independent(config, run_dir: Path, client, logger_factory, sandbox_facto
                 "tokens_used": result["tokens_used"],
                 "wall_clock_s": result["wall_clock_s"],
             })
-            if result["status"] == "aborted":
-                status = "aborted"
+            if result["status"] in ("aborted", "api_outage"):
+                status = result["status"]
             elif result["status"] == "error" and status == "completed":
                 status = "error"
     except KeyboardInterrupt:

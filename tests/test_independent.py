@@ -15,6 +15,8 @@ cross-checks between batch.jsonl and the agents' logs are tested for real.
 import json
 import shutil
 
+import anthropic
+import httpx2 as httpx
 import pytest
 
 from harness.config import repo_path
@@ -167,6 +169,25 @@ def test_ctrl_c_stops_the_batch_and_closes_every_log(tmp_path):
     assert ("agent_not_started", "solver-2") in kinds
     assert read_jsonl(run_dir / "solver-1" / "log.jsonl")[-1]["data"]["status"] == "aborted"
     assert read_jsonl(run_dir / "batch.jsonl")[-1]["data"]["status"] == "aborted"
+
+
+def test_api_outage_stops_the_batch_instead_of_spending_the_next_agents(tmp_path, monkeypatch):
+    # 2026-11-20, batch 5: a connection loss ended six agents in 30 s, one after another.
+    waits = []
+    monkeypatch.setattr("harness.agent.time.sleep", waits.append)
+    request = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
+    down = [anthropic.APIConnectionError(request=request) for _ in range(12)]  # 2 quick retries + 30 min
+    record = independent_run(tmp_path, solves() + down)
+    assert sum(waits) == 2 + 4 + 1800
+    assert record["status"] == "api_outage"
+    assert record["agent_statuses"] == {"solver-0": "submitted", "solver-1": "api_outage"}
+    assert record["verify"]["ok"]
+    run_dir = tmp_path / "runs" / record["run_id"]
+    assert sorted(p.name for p in run_dir.iterdir() if p.is_dir()) == ["solver-0", "solver-1"]
+    batch = read_jsonl(run_dir / "batch.jsonl")
+    assert {"agent_id": "solver-2", "reason": "api_outage"} in [e["data"] for e in batch]
+    assert batch[-1]["data"]["status"] == "api_outage"
+    assert read_jsonl(run_dir / "solver-1" / "log.jsonl")[-1]["data"]["status"] == "api_outage"
 
 
 # ----- tampering with the batch is caught -----------------------------------
