@@ -1,0 +1,16 @@
+{"dir": "/work", "path": "/work/prod_res.json", "type": "f", "bytes": 348, "mtime": 1795630079.0345876}
+{"dir": "/work", "path": "/work/prod_T2.4.npz", "type": "f", "bytes": 16000494, "mtime": 1795630079.0305877}
+{"dir": "/work", "path": "/work/prod_T2.3.npz", "type": "f", "bytes": 16000494, "mtime": 1795630061.0776212}
+{"dir": "/work", "path": "/work/prod_T2.2.npz", "type": "f", "bytes": 16000494, "mtime": 1795630034.2686713}
+{"dir": "/work", "path": "/work/prod_T2.1.npz", "type": "f", "bytes": 16000494, "mtime": 1795629999.5647364}
+{"dir": "/work", "path": "/work/prod_T2.0.npz", "type": "f", "bytes": 16000494, "mtime": 1795629959.580798}
+{"dir": "/work", "path": "/work/prod_T1.9.npz", "type": "f", "bytes": 16000494, "mtime": 1795629916.5375614}
+{"dir": "/work", "path": "/work/pilot_T2.3.npz", "type": "f", "bytes": 16000494, "mtime": 1795629865.866283}
+{"dir": "/work", "path": "/work/__pycache__", "type": "d", "bytes": 60, "mtime": 1795629833.618411}
+{"dir": "/work", "path": "/work/__pycache__/wolff.cpython-314.pyc", "type": "f", "bytes": 2639, "mtime": 1795629833.618411}
+{"dir": "/work", "path": "/work/wolff.py", "type": "f", "bytes": 1105, "mtime": 1795629833.6177368}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 120, "mtime": 1795629871.698315}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0004.py", "type": "f", "bytes": 700, "mtime": 1795629871.6993122}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0003.py", "type": "f", "bytes": 666, "mtime": 1795629839.4723148}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0002.py", "type": "f", "bytes": 1455, "mtime": 1795629833.6116989}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-07-0001.py", "type": "f", "bytes": 253, "mtime": 1795629822.7606833}

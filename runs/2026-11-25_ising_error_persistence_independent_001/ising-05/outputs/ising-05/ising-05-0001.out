@@ -1,0 +1,5 @@
+numba missing No module named 'numba'
+numpy ok
+scipy ok
+1 2.5.4
+1000 ops on 256k arrays 0.05286097526550293

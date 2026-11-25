@@ -1,0 +1,7 @@
+3.14.10 (main, Nov  5 2026, 08:03:50) [GCC 14.2.0]
+gcc None None None
+numba no No module named 'numba'
+numpy ok
+scipy ok
+cython no No module named 'cython'
+1

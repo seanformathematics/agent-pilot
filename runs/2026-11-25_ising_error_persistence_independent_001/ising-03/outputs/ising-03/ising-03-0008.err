@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-03-0008.py", line 11, in <module>
+    early=U_of(slice(0,5)); late=U_of(slice(nb-5,nb)); allu=U_of(slice(0,nb))
+  File "/tmp/run_python/ising-03-0008.py", line 9, in U_of
+    s2=b2[sel].sum(0); s4=b4[sel].sum(0); n=len(sel)*1000
+                                            ~~~^^^^^
+TypeError: object of type 'slice' has no len()

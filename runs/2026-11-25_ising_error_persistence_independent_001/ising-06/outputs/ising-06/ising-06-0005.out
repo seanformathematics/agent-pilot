@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 jk_err=0.00001  U(first half)=0.66460 U(second half)=0.66459 <|m|>=0.9382
+T=2.0 U=0.66244 jk_err=0.00001  U(first half)=0.66247 U(second half)=0.66242 <|m|>=0.9112
+T=2.1 U=0.65670 jk_err=0.00003  U(first half)=0.65667 U(second half)=0.65673 <|m|>=0.8687
+T=2.2 U=0.63937 jk_err=0.00008  U(first half)=0.63953 U(second half)=0.63922 <|m|>=0.7945
+T=2.3 U=0.59262 jk_err=0.00017  U(first half)=0.59251 U(second half)=0.59273 <|m|>=0.6698
+T=2.4 U=0.50099 jk_err=0.00028  U(first half)=0.50104 U(second half)=0.50093 <|m|>=0.5166
