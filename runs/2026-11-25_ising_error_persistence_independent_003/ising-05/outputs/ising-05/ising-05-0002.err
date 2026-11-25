@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-05-0002.py", line 48, in <module>
+    s=sw_sweep(s,T,rng)
+  File "/tmp/run_python/ising-05-0002.py", line 40, in sw_sweep
+    return np.where(f, -s, s).astype(np.int8)
+           ~~~~~~~~^^^^^^^^^^
+ValueError: operands could not be broadcast together with shapes (102400,) (400,256) (400,256) 

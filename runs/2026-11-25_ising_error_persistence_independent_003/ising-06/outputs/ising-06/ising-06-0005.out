@@ -1,0 +1,39 @@
+ False, allow_pickle=allow_pickle)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_npyio_impl.py", line 790, in _savez
+    zipf.close()
+    ~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2134, in close
+    self._fpclose(fp)
+    ~~~~~~~~~~~~~^^^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2236, in _fpclose
+    fp.close()
+    ~~~~~~~~^^
+OSError: [Errno 28] No space left on device
+
+ False, allow_pickle=allow_pickle)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_npyio_impl.py", line 790, in _savez
+    zipf.close()
+    ~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2134, in close
+    self._fpclose(fp)
+    ~~~~~~~~~~~~~^^^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2236, in _fpclose
+    fp.close()
+    ~~~~~~~~^^
+OSError: [Errno 28] No space left on device
+
+ False, allow_pickle=allow_pickle)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_npyio_impl.py", line 790, in _savez
+    zipf.close()
+    ~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2134, in close
+    self._fpclose(fp)
+    ~~~~~~~~~~~~~^^^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2236, in _fpclose
+    fp.close()
+    ~~~~~~~~^^
+OSError: [Errno 28] No space left on device
+
