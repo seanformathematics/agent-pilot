@@ -68,6 +68,7 @@ class SandboxConfig(Strict):
     cpus: float = Field(gt=0)
     pids_limit: int = Field(ge=16)
     workspace_archive_max_mb: int = Field(ge=1)  # cap on the tar of /work kept after the agent ends
+    workspace_archive_max_file_mb: float = Field(gt=0)  # larger files are listed with their SHA-256, not stored
 
     @model_validator(mode="after")
     def folders_fit_in_memory(self):

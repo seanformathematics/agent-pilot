@@ -254,8 +254,11 @@ def render_event(record: dict, folder: Path, out_dir: Path) -> str:
         return f'<div class="event">{stamp} <b>Agent ended:</b> {e(data.get("status"))} after {e(data.get("turns"))} turns</div>'
     if kind == "workspace_archive":
         contents = data.get("contents", {})
+        left_out = (data.get("left_out") or {}).get("files", [])
+        left = (f', {len(left_out)} large files left out ({sum(f.get("bytes", 0) for f in left_out)} bytes; hashes in the log)'
+                if left_out else "")
         return (f'<div class="event">{stamp} <b>Workspace archived</b> (not extracted): {e(data.get("bytes"))} bytes, '
-                f'{e(contents.get("members"))} members, {e(contents.get("flagged_count"))} flagged · '
+                f'{e(contents.get("members"))} members, {e(contents.get("flagged_count"))} flagged{e(left)} · '
                 f'{link(folder / "outputs" / (record.get("agent") or "") / str(data.get("file", "")), out_dir, str(data.get("file", "")))}</div>')
     if kind in ("agent_start", "container_stop"):
         return f'<div class="event muted">{stamp} {e(kind)} {scalar(data)}</div>'

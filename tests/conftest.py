@@ -111,7 +111,7 @@ class FakeSandbox:
     def stop(self):
         self.container_id = None
 
-    def archive_workspace(self, archive_path, max_bytes):
+    def archive_workspace(self, archive_path, max_bytes, max_file_bytes):
         import io, tarfile
         data = b"agent file contents\n"
         with tarfile.open(archive_path, mode="x") as tar:
@@ -122,7 +122,9 @@ class FakeSandbox:
         errors_path.write_text("")
         return {"archive_path": str(archive_path), "errors_path": str(errors_path),
                 "bytes": Path(archive_path).stat().st_size, "truncated": False,
-                "timed_out": False, "exit_code": 0, "tar_errors": ""}
+                "timed_out": False, "exit_code": 0, "tar_errors": "",
+                "left_out": {"max_file_bytes": max_file_bytes, "files": [], "listing_truncated": False,
+                             "exit_code": 0}}
 
     def run_python(self, code, timeout_s, exec_id, output_dir):
         failed = code == "fail"

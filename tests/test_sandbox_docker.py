@@ -430,7 +430,7 @@ from harness.sandbox import inspect_archive
 def test_archive_holds_agent_files(make_sandbox):
     box = make_sandbox()
     run(box, "import os; os.makedirs('/work/sub'); open('/work/sub/result.txt','w').write('42')")
-    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024)
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024, max_file_bytes=1024 * 1024)
     assert info["truncated"] is False and info["exit_code"] == 0
     summary = inspect_archive(box.test_output_dir / "ws.tar")
     assert summary["complete"] is True
@@ -443,7 +443,7 @@ def test_archive_stores_links_not_host_files(make_sandbox, tmp_path):
     host_secret.write_text("HOST-ONLY-CONTENT")
     box = make_sandbox()
     run(box, f"import os; os.symlink({str(host_secret)!r}, '/work/sneaky')")
-    box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024)
+    box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024, max_file_bytes=1024 * 1024)
     assert b"HOST-ONLY-CONTENT" not in (box.test_output_dir / "ws.tar").read_bytes()
     flagged = inspect_archive(box.test_output_dir / "ws.tar")["flagged"]
     assert flagged == [{"name": "./sneaky", "type": "symlink", "reasons": ["link"], "target": str(host_secret)}]
@@ -452,7 +452,8 @@ def test_archive_stores_links_not_host_files(make_sandbox, tmp_path):
 def test_archive_size_cap(make_sandbox):
     box = make_sandbox()
     run(box, "import os; open('/work/big.bin','wb').write(os.urandom(3 * 1024 * 1024))")
-    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=1024 * 1024)
+    # max_file_bytes above the file's size, so only the total cap can stop it
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=1024 * 1024, max_file_bytes=10 * 1024 * 1024)
     assert info["truncated"] is True
     assert os.path.getsize(box.test_output_dir / "ws.tar") == 1024 * 1024
     assert inspect_archive(box.test_output_dir / "ws.tar")["complete"] is False
@@ -464,9 +465,47 @@ def test_archive_cap_stops_huge_sparse_file_quickly(make_sandbox):
     run(box, "f = open('/work/huge.bin','wb'); f.truncate(20 * 1024**3); f.close()")
     import time
     start = time.monotonic()
-    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=1024 * 1024)
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=1024 * 1024,
+                                 max_file_bytes=100 * 1024**3)  # never left out: test the total cap
     assert info["truncated"] is True
     assert time.monotonic() - start < 30
+
+
+def test_large_files_left_out_of_the_archive_and_listed_with_their_hash(make_sandbox):
+    import hashlib
+    box = make_sandbox()
+    run(box, "import os; os.makedirs('/work/data'); "
+             "open('/work/data/samples 1.npy','wb').write(b'x' * (2 * 1024 * 1024)); "
+             "open('/work/result.json','w').write('{\"U\": 0.6}'); "
+             "open('/work/edge.bin','wb').write(b'y' * (1024 * 1024))")  # exactly at the limit: kept
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024,
+                                 max_file_bytes=1024 * 1024)
+    assert info["truncated"] is False and info["exit_code"] == 0
+    with tarfile.open(box.test_output_dir / "ws.tar") as tar:  # reading, not extracting
+        names = set(tar.getnames())
+    assert {"./result.json", "./edge.bin", "./data"} <= names
+    assert "./data/samples 1.npy" not in names
+    left_out = info["left_out"]
+    assert left_out["exit_code"] == 0 and left_out["listing_truncated"] is False
+    [entry] = left_out["files"]
+    assert entry["path"] == "./data/samples 1.npy" and entry["bytes"] == 2 * 1024 * 1024
+    assert entry["sha256"] == hashlib.sha256(b"x" * (2 * 1024 * 1024)).hexdigest()
+
+
+def test_huge_sparse_file_is_left_out_unhashed_and_quickly(make_sandbox):
+    box = make_sandbox()
+    run(box, "f = open('/work/huge.bin','wb'); f.truncate(20 * 1024**3); f.close(); "
+             "open('/work/keep.txt','w').write('kept')")
+    import time
+    start = time.monotonic()
+    info = box.archive_workspace(box.test_output_dir / "ws.tar", max_bytes=10 * 1024 * 1024,
+                                 max_file_bytes=1024 * 1024)
+    assert time.monotonic() - start < 30
+    assert info["truncated"] is False
+    [entry] = info["left_out"]["files"]
+    assert entry["path"] == "./huge.bin" and entry["sha256"] is None  # over HASH_MAX_BYTES
+    with tarfile.open(box.test_output_dir / "ws.tar") as tar:
+        assert tar.extractfile("./keep.txt").read() == b"kept"
 
 
 
@@ -612,4 +651,4 @@ def test_archiving_a_frozen_container_raises_sandbox_unresponsive(make_sandbox, 
     box = make_sandbox()
     subprocess.run(["docker", "pause", box.container_id], check=True, capture_output=True)
     with pytest.raises(SandboxUnresponsive):
-        box.archive_workspace(tmp_path / "work.tar", 1024 * 1024)
+        box.archive_workspace(tmp_path / "work.tar", 1024 * 1024, 1024 * 1024)

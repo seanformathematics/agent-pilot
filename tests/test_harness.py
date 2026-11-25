@@ -515,6 +515,8 @@ def test_workspace_archived_after_agent_ends_then_container_removed(make_harness
     import hashlib
     assert hashlib.sha256(path.read_bytes()).hexdigest() == archive["sha256"]
     assert archive["contents"]["members"] == 1
+    assert archive["left_out"] == {"max_file_bytes": 1024 * 1024, "files": [],
+                                   "listing_truncated": False, "exit_code": 0}
 
 
 # ----- non-finite numbers in submissions -----------------------------------

@@ -127,10 +127,11 @@ class Harness:
         output_dir.mkdir(parents=True, exist_ok=True)
         archive_path = output_dir / f"{agent_id}-workspace.tar"
         max_bytes = self.config.sandbox.workspace_archive_max_mb * 1024 * 1024
+        max_file_bytes = int(self.config.sandbox.workspace_archive_max_file_mb * 1024 * 1024)
 
         archived = False
         try:
-            info = box.archive_workspace(archive_path, max_bytes)
+            info = box.archive_workspace(archive_path, max_bytes, max_file_bytes)
             archived = True
         except (OSError, subprocess.SubprocessError) as error:
             self.log(agent_id, "workspace_archive_failed", {"error": f"{type(error).__name__}: {error}"})
@@ -148,10 +149,14 @@ class Harness:
                 "tar_errors": info["tar_errors"],
                 "errors_file_sha256": sha256_file(Path(info["errors_path"])),
                 "contents": inspect_archive(archive_path),
+                "left_out": info["left_out"],  # files over max_file_bytes: listed and hashed, not stored
             })
-            if info["truncated"] or info["timed_out"]:
+            left_out = info["left_out"]
+            listing_incomplete = left_out["listing_truncated"] or left_out["exit_code"] != 0
+            if info["truncated"] or info["timed_out"] or listing_incomplete:
                 self.log(agent_id, "flag", {"reason": "workspace_archive_incomplete",
-                                            "truncated": info["truncated"], "timed_out": info["timed_out"]})
+                                            "truncated": info["truncated"], "timed_out": info["timed_out"],
+                                            "left_out_listing_incomplete": listing_incomplete})
 
         box.stop()
         self.log(agent_id, "container_stop", {"workspace_archived": archived})

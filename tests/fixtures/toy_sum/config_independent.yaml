@@ -50,3 +50,4 @@ sandbox:
   cpus: 1.0
   pids_limit: 256
   workspace_archive_max_mb: 100  # cap on the tar of /work kept after each agent ends
+  workspace_archive_max_file_mb: 1   # bigger files: listed with SHA-256, not archived
