@@ -1,0 +1,12 @@
+{"dir": "/work", "path": "/work/res1.json", "type": "f", "bytes": 934, "mtime": 1795685078.2255127}
+{"dir": "/work", "path": "/work/raw_T2.4.npz", "type": "f", "bytes": 128494, "mtime": 1795685078.224886}
+{"dir": "/work", "path": "/work/raw_T2.3.npz", "type": "f", "bytes": 128494, "mtime": 1795685020.0222206}
+{"dir": "/work", "path": "/work/raw_T2.2.npz", "type": "f", "bytes": 128494, "mtime": 1795684966.2441852}
+{"dir": "/work", "path": "/work/raw_T2.1.npz", "type": "f", "bytes": 128494, "mtime": 1795684916.903623}
+{"dir": "/work", "path": "/work/raw_T2.0.npz", "type": "f", "bytes": 128494, "mtime": 1795684870.744924}
+{"dir": "/work", "path": "/work/raw_T1.9.npz", "type": "f", "bytes": 128494, "mtime": 1795684827.4456856}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 120, "mtime": 1795685085.9525166}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0004.py", "type": "f", "bytes": 1343, "mtime": 1795685085.9536362}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0003.py", "type": "f", "bytes": 1715, "mtime": 1795684786.2286384}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0002.py", "type": "f", "bytes": 1401, "mtime": 1795684775.694096}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0001.py", "type": "f", "bytes": 245, "mtime": 1795684761.444858}

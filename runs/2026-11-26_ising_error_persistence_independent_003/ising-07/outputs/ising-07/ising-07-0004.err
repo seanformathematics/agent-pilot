@@ -1,0 +1,46 @@
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_npyio_impl.py", line 786, in _savez
+    format.write_array(fid, val,
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+                       allow_pickle=allow_pickle,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       pickle_kwargs=pickle_kwargs)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_format_impl.py", line 777, in write_array
+    fp.write(chunk.tobytes('C'))
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 1367, in write
+    self._fileobj.write(data)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2130, in close
+    self._write_end_record()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2230, in _write_end_record
+    self.fp.flush()
+    ~~~~~~~~~~~~~^^
+OSError: [Errno 28] No space left on device
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-07-0004.py", line 28, in <module>
+    np.savez(f'/work/raw_T{T:.2f}.npz',M2=M2.astype(np.float32),M4=M4.astype(np.float32),T=T,seed=SEED)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_npyio_impl.py", line 673, in savez
+    _savez(file, args, kwds, False, allow_pickle=allow_pickle)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/numpy/lib/_npyio_impl.py", line 790, in _savez
+    zipf.close()
+    ~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2134, in close
+    self._fpclose(fp)
+    ~~~~~~~~~~~~~^^^^
+  File "/usr/local/lib/python3.14/zipfile/__init__.py", line 2236, in _fpclose
+    fp.close()
+    ~~~~~~~~^^
+OSError: [Errno 28] No space left on device
