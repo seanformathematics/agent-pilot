@@ -1,0 +1,10 @@
+{"dir": "/work", "path": "/work/meas_1.npz", "type": "f", "bytes": 7680494, "mtime": 1795656864.9913802}
+{"dir": "/work", "path": "/work/state_rng.npy", "type": "f", "bytes": 136, "mtime": 1795656640.1114273}
+{"dir": "/work", "path": "/work/state_s.npy", "type": "f", "bytes": 3072128, "mtime": 1795656864.9809282}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 160, "mtime": 1795656878.5474887}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0006.py", "type": "f", "bytes": 372, "mtime": 1795656878.5488102}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0005.py", "type": "f", "bytes": 730, "mtime": 1795656868.6493924}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0004.py", "type": "f", "bytes": 1139, "mtime": 1795656647.1999514}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0003.py", "type": "f", "bytes": 1091, "mtime": 1795656559.6717632}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0002.py", "type": "f", "bytes": 891, "mtime": 1795656551.2375877}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-06-0001.py", "type": "f", "bytes": 317, "mtime": 1795656534.895227}

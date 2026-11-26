@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 err_jk=0.00000 chain-std/sqrt(C)=0.00000 halves 0.66461 0.66460 <m2>=0.8820
+T=2.0 U=0.66246 err_jk=0.00001 chain-std/sqrt(C)=0.00001 halves 0.66243 0.66249 <m2>=0.8335
+T=2.1 U=0.65669 err_jk=0.00003 chain-std/sqrt(C)=0.00003 halves 0.65669 0.65670 <m2>=0.7622
+T=2.2 U=0.63930 err_jk=0.00007 chain-std/sqrt(C)=0.00007 halves 0.63930 0.63930 <m2>=0.6512
+T=2.3 U=0.59247 err_jk=0.00025 chain-std/sqrt(C)=0.00025 halves 0.59287 0.59208 <m2>=0.4922
+T=2.4 U=0.50114 err_jk=0.00040 chain-std/sqrt(C)=0.00040 halves 0.50153 0.50076 <m2>=0.3239

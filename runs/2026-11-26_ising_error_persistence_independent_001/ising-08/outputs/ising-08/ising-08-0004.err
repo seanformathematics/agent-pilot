@@ -1,0 +1,4 @@
+  File "/tmp/run_python/ising-08-0004.py", line 24
+    '''
+    ^
+SyntaxError: unterminated triple-quoted string literal (detected at line 24)

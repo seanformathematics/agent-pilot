@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 err=0.00000  first-half-blocks 0.6646 second 0.6646
+T=2.0 U=0.66245 err=0.00001  first-half-blocks 0.6625 second 0.6625
+T=2.1 U=0.65663 err=0.00004  first-half-blocks 0.6568 second 0.6565
+T=2.2 U=0.63928 err=0.00010  first-half-blocks 0.6395 second 0.6391
+T=2.3 U=0.59237 err=0.00021  first-half-blocks 0.5924 second 0.5923
+T=2.4 U=0.50062 err=0.00035  first-half-blocks 0.5008 second 0.5004

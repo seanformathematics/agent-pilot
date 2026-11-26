@@ -1,0 +1,6 @@
+1.9 U=0.66461 jack_err=0.00001 chain-jk err=0.00001 per-chain [0.66461 0.66459 0.66464]
+2.0 U=0.66246 jack_err=0.00001 chain-jk err=0.00002 per-chain [0.66248 0.66242 0.66247]
+2.1 U=0.65673 jack_err=0.00004 chain-jk err=0.00004 per-chain [0.65669 0.65668 0.65681]
+2.2 U=0.63947 jack_err=0.00010 chain-jk err=0.00016 per-chain [0.63952 0.63917 0.63972]
+2.3 U=0.59254 jack_err=0.00022 chain-jk err=0.00011 per-chain [0.59277 0.59245 0.59241]
+2.4 U=0.50115 jack_err=0.00046 chain-jk err=0.00013 per-chain [0.50127 0.50089 0.50127]
