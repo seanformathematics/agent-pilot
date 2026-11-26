@@ -1,0 +1,6 @@
+T=1.9: U=0.664605 err=0.000003  block-U range [0.66261,0.66464] first-block U=0.66261, last=0.66461
+T=2.0: U=0.662449 err=0.000008  block-U range [0.66033,0.66249] first-block U=0.66033, last=0.66244
+T=2.1: U=0.656673 err=0.000020  block-U range [0.65428,0.65684] first-block U=0.65428, last=0.65667
+T=2.2: U=0.639387 err=0.000040  block-U range [0.63668,0.63985] first-block U=0.63668, last=0.63944
+T=2.3: U=0.592691 err=0.000108  block-U range [0.58981,0.59330] first-block U=0.58981, last=0.59266
+T=2.4: U=0.501164 err=0.000184  block-U range [0.49844,0.50311] first-block U=0.49844, last=0.50089

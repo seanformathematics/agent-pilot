@@ -1,0 +1,5 @@
+{"dir": "/work", "path": "/work/prod1.json", "type": "f", "bytes": 312, "mtime": 1795681093.450201}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 100, "mtime": 1795680823.318899}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-09-0003.py", "type": "f", "bytes": 1739, "mtime": 1795680823.3200386}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-09-0002.py", "type": "f", "bytes": 1714, "mtime": 1795680815.0685806}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-09-0001.py", "type": "f", "bytes": 202, "mtime": 1795680802.4538822}

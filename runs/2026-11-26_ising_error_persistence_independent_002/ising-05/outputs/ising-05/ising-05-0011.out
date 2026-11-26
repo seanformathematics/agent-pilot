@@ -1,0 +1,4 @@
+5.0 [(np.float64(0.082), np.float64(-0.432), np.float64(0.061)), (np.float64(0.084), np.float64(-0.428), np.float64(0.065)), (np.float64(0.083), np.float64(-0.433), np.float64(0.062))]
+3.0 [(np.float64(0.167), np.float64(-0.819), np.float64(0.124)), (np.float64(0.172), np.float64(-0.818), np.float64(0.121)), (np.float64(0.168), np.float64(-0.82), np.float64(0.127))]
+2.4 [(np.float64(0.512), np.float64(-1.251), np.float64(0.233)), (np.float64(0.567), np.float64(-1.278), np.float64(0.212)), (np.float64(0.512), np.float64(-1.262), np.float64(0.234))]
+2.0 [(np.float64(0.916), np.float64(-1.754), np.float64(0.046)), (np.float64(0.917), np.float64(-1.753), np.float64(0.044)), (np.float64(0.916), np.float64(-1.756), np.float64(0.047))]

@@ -1,0 +1,6 @@
+{"dir": "/work", "path": "/work/res_a.json", "type": "f", "bytes": 333, "mtime": 1795681426.4974284}
+{"dir": "/work", "path": "/work/raw_T2.0.npz", "type": "f", "bytes": 32494, "mtime": 1795681426.4962614}
+{"dir": "/work", "path": "/work/raw_T1.9.npz", "type": "f", "bytes": 32494, "mtime": 1795681338.5889955}
+{"dir": "/tmp", "path": "/tmp/run_python", "type": "d", "bytes": 80, "mtime": 1795681253.6202228}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-10-0002.py", "type": "f", "bytes": 2428, "mtime": 1795681253.6207404}
+{"dir": "/tmp", "path": "/tmp/run_python/ising-10-0001.py", "type": "f", "bytes": 625, "mtime": 1795681243.1899621}

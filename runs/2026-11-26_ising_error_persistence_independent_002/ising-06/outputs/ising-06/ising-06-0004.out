@@ -1,0 +1,6 @@
+T=1.9 U=0.66461 err_repjk=0.00000 err_timejk=0.00000 U_firsthalf=0.66461 U_secondhalf=0.66460
+T=2.0 U=0.66245 err_repjk=0.00001 err_timejk=0.00001 U_firsthalf=0.66245 U_secondhalf=0.66245
+T=2.1 U=0.65670 err_repjk=0.00003 err_timejk=0.00003 U_firsthalf=0.65673 U_secondhalf=0.65667
+T=2.2 U=0.63930 err_repjk=0.00010 err_timejk=0.00005 U_firsthalf=0.63937 U_secondhalf=0.63923
+T=2.3 U=0.59286 err_repjk=0.00019 err_timejk=0.00021 U_firsthalf=0.59293 U_secondhalf=0.59278
+T=2.4 U=0.50080 err_repjk=0.00034 err_timejk=0.00037 U_firsthalf=0.50122 U_secondhalf=0.50038

@@ -1,0 +1,9 @@
+1.9 min meanm2 0.8781 frac<0.3 0.0 median 0.8819
+2.0 min meanm2 0.8266 frac<0.3 0.0 median 0.8336
+2.1 min meanm2 0.7488 frac<0.3 0.0 median 0.7625
+2.2 min meanm2 0.627 frac<0.3 0.0 median 0.6513
+2.3 min meanm2 0.4578 frac<0.3 0.0 median 0.4934
+2.4 min meanm2 0.2909 frac<0.3 0.004 median 0.3237
+ordered-start check T 1.9 U= 0.6645964502158275 26.44786524772644
+ordered-start check T 2.0 U= 0.6624933966261153 26.44788384437561
+ordered-start check T 2.1 U= 0.6566725906051419 26.447888612747192

@@ -1,0 +1,6 @@
+T=1.9 U=0.66460870 err_repl=0.00000311 err_block=0.00000312 nrep=1000 nsweeps=20000
+T=2.0 U=0.66245762 err_repl=0.00000810 err_block=0.00001125 nrep=1000 nsweeps=20000
+T=2.1 U=0.65664716 err_repl=0.00002510 err_block=0.00003222 nrep=1000 nsweeps=20000
+T=2.2 U=0.63939769 err_repl=0.00006433 err_block=0.00005754 nrep=1000 nsweeps=20000
+T=2.3 U=0.59236040 err_repl=0.00013851 err_block=0.00014673 nrep=1000 nsweeps=20000
+T=2.4 U=0.50104150 err_repl=0.00023355 err_block=0.00023843 nrep=1000 nsweeps=20000
