@@ -1,0 +1,4 @@
+T 2.2 time 75.0 U pooled 0.6395337842982107
+  block U: [np.float64(0.63935), np.float64(0.63946), np.float64(0.6397), np.float64(0.6397), np.float64(0.63948), np.float64(0.63928), np.float64(0.63976), np.float64(0.63953)]
+T 2.3 time 81.0 U pooled 0.5926460826172117
+  block U: [np.float64(0.59303), np.float64(0.5926), np.float64(0.5932), np.float64(0.59247), np.float64(0.59236), np.float64(0.59285), np.float64(0.59213), np.float64(0.59254)]

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/run_python/ising-06-0003.py", line 40, in <module>
+    h1=ustats(a2[:500],a4[:500]); h2=ustats(a2[500:],a4[500:])
+  File "/tmp/run_python/ising-06-0003.py", line 31, in ustats
+    jk[r]=1-a4[mask].mean()/(3*a2[mask].mean()**2)
+            ~~^^^^^^
+IndexError: boolean index did not match indexed array along axis 0; size of axis is 500 but size of corresponding boolean axis is 1000

@@ -1,0 +1,6 @@
+T=1.9 U=0.66460 jackknife_err=0.00000 bootstrap_err=0.00000 R=1000
+T=2.0 U=0.66245 jackknife_err=0.00001 bootstrap_err=0.00001 R=1000
+T=2.1 U=0.65668 jackknife_err=0.00003 bootstrap_err=0.00003 R=1000
+T=2.2 U=0.63939 jackknife_err=0.00006 bootstrap_err=0.00007 R=1000
+T=2.3 U=0.59259 jackknife_err=0.00014 bootstrap_err=0.00014 R=1000
+T=2.4 U=0.50087 jackknife_err=0.00024 bootstrap_err=0.00024 R=1000

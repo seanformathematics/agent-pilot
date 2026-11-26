@@ -1,0 +1,6 @@
+1.9 0.66461 jk-replica err 0.0 jk-time err 1e-05
+2.0 0.66245 jk-replica err 1e-05 jk-time err 1e-05
+2.1 0.65668 jk-replica err 4e-05 jk-time err 4e-05
+2.2 0.63953 jk-replica err 0.00012 jk-time err 9e-05
+2.3 0.59265 jk-replica err 0.00023 jk-time err 0.0002
+2.4 0.50152 jk-replica err 0.00041 jk-time err 0.00036

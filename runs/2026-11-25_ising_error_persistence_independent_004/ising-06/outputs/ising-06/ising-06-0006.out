@@ -1,0 +1,6 @@
+1.9 early<m2>=0.88185 late=0.88195 tau_int(m2)~4.4 U_series_mean=0.6646
+2.0 early<m2>=0.83385 late=0.83341 tau_int(m2)~6.8 U_series_mean=0.6625
+2.1 early<m2>=0.76204 late=0.76206 tau_int(m2)~12.6 U_series_mean=0.6567
+2.2 early<m2>=0.65091 late=0.65156 tau_int(m2)~18.2 U_series_mean=0.6394
+2.3 early<m2>=0.49149 late=0.49189 tau_int(m2)~17.6 U_series_mean=0.5923
+2.4 early<m2>=0.32369 late=0.32394 tau_int(m2)~18.6 U_series_mean=0.5012
